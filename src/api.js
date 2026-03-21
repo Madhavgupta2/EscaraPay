@@ -195,7 +195,7 @@
 //   }
 // };
 
-const BASE_URL = "http://localhost:5000";
+const BASE_URL = "https://escarapay-backend-production.up.railway.app";
 
 /* ── Auth ── */
 export const registerUser = async (name, email, phone, role, password, shopName = "") => {
