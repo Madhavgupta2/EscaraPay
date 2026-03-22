@@ -106,7 +106,7 @@ function getStyle(dark) {
 
 const MIN_TOKEN = 200;
 const calcToken = (amount, pct) => Math.max(MIN_TOKEN, Math.round(Number(amount)*Number(pct)/100));
-const BASE_URL = "http://localhost:3000";
+const BASE_URL = process.env.REACT_APP_FRONTEND_URL || "https://escara-pay.vercel.app";
 
 const STATUS_META = {
   pending:                { label:"Awaiting Token",       cls:"bm",     icon:"⏳" },
@@ -518,14 +518,15 @@ function Landing({ onEnter, dark, onToggle }) {
 /* ══════════ AUTH ══════════ */
 function Auth({ type, onLogin, onBack, dark, onToggle }) {
   const [mode, setMode] = useState("login");
-  const [form, setForm] = useState({name:"",email:"",password:"",shop:"",phone:""});
+  const [form, setForm] = useState({name:"",email:"",password:"",shop:"",phone:"",pan:"",gst:""});
   const [loading, setLoading] = useState(false);
 
   const handle = async () => {
     if (mode==="register"&&!form.phone){alert("❌ Phone number zaroori hai!"); return;}
+    if (mode==="register"&&type==="seller"&&!form.pan&&!form.gst){alert("❌ PAN Card ya GST Number mein se ek zaroori hai!"); return;}
     setLoading(true);
     const result = mode==="register"
-      ? await registerUser(form.name,form.email,form.phone,type,form.password,form.shop||"")
+      ? await registerUser(form.name,form.email,form.phone,type,form.password,form.shop||"",form.pan||"",form.gst||"")
       : await loginUser(form.email,form.password,type);
     setLoading(false);
     if (result.success) {
@@ -554,6 +555,26 @@ function Auth({ type, onLogin, onBack, dark, onToggle }) {
             <div><label className="label">Email</label><input className="input" placeholder="aapki@email.com" value={form.email} onChange={e=>setForm({...form,email:e.target.value})} /></div>
             <div><label className="label">Phone Number {type==="buyer"?"(Orders track karne ke liye)":""}</label><input className="input" placeholder="9876543210" value={form.phone} onChange={e=>setForm({...form,phone:e.target.value})} /></div>
             <div><label className="label">Password</label><input className="input" type="password" placeholder="••••••••" value={form.password} onChange={e=>setForm({...form,password:e.target.value})} /></div>
+            {mode==="register"&&type==="seller" && (
+              <div>
+                <div style={{background:"rgba(14,165,233,.08)",border:"1px solid rgba(14,165,233,.2)",borderRadius:10,padding:12,marginBottom:8}}>
+                  <div style={{fontSize:12,fontWeight:600,marginBottom:8,color:"var(--gold)"}}>📋 KYC Details (Dono mein se ek zaroori)</div>
+                  <div style={{display:"flex",flexDirection:"column",gap:10}}>
+                    <div>
+                      <label className="label">PAN Card Number</label>
+                      <input className="input" placeholder="ABCDE1234F" value={form.pan} onChange={e=>setForm({...form,pan:e.target.value.toUpperCase()})} maxLength={10} />
+                    </div>
+                    <div style={{textAlign:"center",fontSize:12,color:"var(--muted)"}}>— ya —</div>
+                    <div>
+                      <label className="label">GST Number</label>
+                      <input className="input" placeholder="27ABCDE1234F1Z5" value={form.gst} onChange={e=>setForm({...form,gst:e.target.value.toUpperCase()})} maxLength={15} />
+                    </div>
+                  </div>
+                  <div style={{fontSize:11,color:"var(--muted)",marginTop:8}}>⚠️ Payouts ke liye zaroori — secure rakha jayega</div>
+                </div>
+              </div>
+            )}
+            {mode==="register"&&type==="seller" && <div><label className="label">UPI ID (payouts ke liye)</label><input className="input" placeholder="yourname@upi" /></div>}
             <button className="btn-gold" style={{width:"100%",padding:12}} onClick={handle}>{loading?"⏳ Processing...":mode==="login"?"Login Karo":"Account Banao"}</button>
           </div>
         </div>
