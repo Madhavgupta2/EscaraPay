@@ -503,7 +503,13 @@ function Landing({ onEnter, dark, onToggle }) {
         </div>
       </div>
       <div style={{borderTop:"1px solid var(--border)",padding:"18px 40px",display:"flex",justifyContent:"space-between",alignItems:"center",flexWrap:"wrap",gap:10}}>
-        <Logo /><div style={{color:"var(--muted)",fontSize:12}}>© 2026 EscaraPay</div>
+        <Logo />
+        <div style={{color:"var(--muted)",fontSize:12}}>© 2026 EscaraPay. Secure Token-Based Payments for India.</div>
+        <div style={{display:"flex",gap:16}}>
+          {[["🔒 Privacy","privacy"],["📋 Terms","terms"],["📞 Contact","contact"]].map(([l,s])=>(
+            <span key={l} style={{color:"var(--muted)",fontSize:12,cursor:"pointer"}} onClick={()=>window._goToPage(s)}>{l}</span>
+          ))}
+        </div>
       </div>
     </div>
   );
@@ -1290,6 +1296,122 @@ function DealPage({ orderId, dark, onToggle, onGoHome }) {
   );
 }
 
+/* ══════════ PRIVACY POLICY PAGE ══════════ */
+function PrivacyPage({ onBack, dark, onToggle }) {
+  return (
+    <div style={{minHeight:"100vh"}}>
+      <nav className="nav"><Logo /><div style={{display:"flex",gap:8,alignItems:"center"}}><ThemeToggle dark={dark} onToggle={onToggle} /><button className="btn-ghost" onClick={onBack}>← Back</button></div></nav>
+      <div style={{maxWidth:760,margin:"0 auto",padding:"40px 20px"}}>
+        <h1 className="syne" style={{fontWeight:800,fontSize:"clamp(24px,4vw,36px)",marginBottom:8}}>Privacy Policy</h1>
+        <p style={{color:"var(--muted)",fontSize:13,marginBottom:32}}>Last updated: March 2026</p>
+        {[
+          {t:"1. Information We Collect",c:"EscaraPay collects: name, email, phone number, UPI ID for payments, transaction history, and device info for security. We collect this to provide escrow payment services and protect buyers and sellers."},
+          {t:"2. How We Use Your Information",c:"Your information is used to: process and manage escrow transactions, verify identity for payment security, send transaction notifications, resolve disputes, comply with legal requirements, and improve our services."},
+          {t:"3. Payment Information",c:"EscaraPay uses Razorpay as our payment gateway. All payment processing is handled by Razorpay which is RBI-compliant and PCI-DSS certified. We do not store card details or banking credentials. Token amounts are held in escrow accounts managed by Razorpay's NBFC partner."},
+          {t:"4. Information Sharing",c:"We do not sell or rent your personal information. We may share with: Razorpay for payment processing, law enforcement when legally required, dispute resolution partners when necessary. We never share for marketing without consent."},
+          {t:"5. Data Security",c:"We implement SSL/TLS encryption, secure database storage with access controls, regular security audits, and password hashing. However no method of transmission over the Internet is 100% secure."},
+          {t:"6. Data Retention",c:"We retain data as long as your account is active. Transaction records are retained for 7 years as required by Indian financial regulations. Request deletion by contacting support@escarapay.in"},
+          {t:"7. Your Rights",c:"You have the right to: access personal data, correct inaccurate information, request deletion (subject to legal requirements), opt out of non-essential communications. Contact: support@escarapay.in"},
+          {t:"8. Contact",c:"Privacy concerns: privacy@escarapay.in | General support: support@escarapay.in | Website: escara-pay.vercel.app"},
+        ].map(s=>(
+          <div key={s.t} className="card" style={{marginBottom:14}}>
+            <h3 className="syne" style={{fontWeight:700,fontSize:15,marginBottom:10,color:"var(--gold)"}}>{s.t}</h3>
+            <p style={{fontSize:13,color:"var(--muted)",lineHeight:1.8}}>{s.c}</p>
+          </div>
+        ))}
+        <div style={{textAlign:"center",marginTop:24}}><button className="btn-ghost" onClick={onBack}>← Back to Home</button></div>
+      </div>
+    </div>
+  );
+}
+
+/* ══════════ TERMS & CONDITIONS PAGE ══════════ */
+function TermsPage({ onBack, dark, onToggle }) {
+  return (
+    <div style={{minHeight:"100vh"}}>
+      <nav className="nav"><Logo /><div style={{display:"flex",gap:8,alignItems:"center"}}><ThemeToggle dark={dark} onToggle={onToggle} /><button className="btn-ghost" onClick={onBack}>← Back</button></div></nav>
+      <div style={{maxWidth:760,margin:"0 auto",padding:"40px 20px"}}>
+        <h1 className="syne" style={{fontWeight:800,fontSize:"clamp(24px,4vw,36px)",marginBottom:8}}>Terms & Conditions</h1>
+        <p style={{color:"var(--muted)",fontSize:13,marginBottom:32}}>Last updated: March 2026 | Effective immediately upon registration</p>
+        {[
+          {t:"1. Acceptance of Terms",c:"By registering for or using EscaraPay, you agree to be bound by these Terms & Conditions. EscaraPay provides an escrow-based payment platform for buyers and sellers on WhatsApp, Instagram, and social media."},
+          {t:"2. Eligibility",c:"To use EscaraPay you must: be at least 18 years old, have a valid Indian bank account or UPI ID, provide accurate registration information, and not be prohibited from using financial services under Indian law."},
+          {t:"3. Escrow Service & Fees",c:"Buyers pay a minimum ₹200 token held in escrow. A 2% gateway fee is charged to buyers (non-refundable). EscaraPay charges 5% commission per transaction. Sellers receive 95% of token amount upon successful delivery. Tokens are released after 7-day hold post delivery confirmation."},
+          {t:"4. Token Release Conditions",c:"Condition 1 — Delivered: Buyer confirms → Token to seller (7-day hold). Condition 2 — Buyer Cancels: Token goes to seller (shipping cover). Condition 3 — Seller Doesn't Ship: Token refunded to buyer. Gateway fee and commission are non-refundable in all conditions."},
+          {t:"5. Prohibited Activities",c:"Users may not use EscaraPay for: illegal goods or services, fraudulent transactions, money laundering, prohibited items under Indian law, or multiple/fake accounts. Violations result in immediate suspension and may be reported to law enforcement."},
+          {t:"6. Dispute Resolution",c:"Buyers must raise disputes within 48 hours of expected delivery. EscaraPay investigates within 24 business hours. Both parties must provide evidence. EscaraPay's decision is final. We may freeze funds during investigation."},
+          {t:"7. Liability Limitation",c:"EscaraPay's liability is limited to the token amount in escrow for that transaction. We are not liable for indirect damages, losses due to network failures, or the quality/safety/legality of items exchanged."},
+          {t:"8. Governing Law",c:"These Terms are governed by Indian law. Disputes subject to exclusive jurisdiction of Indian courts. Terms comply with IT Act 2000, Payment and Settlement Systems Act 2007, and applicable RBI guidelines."},
+          {t:"9. Contact",c:"Legal queries: legal@escarapay.in | Support: support@escarapay.in | Website: escara-pay.vercel.app"},
+        ].map(s=>(
+          <div key={s.t} className="card" style={{marginBottom:14}}>
+            <h3 className="syne" style={{fontWeight:700,fontSize:15,marginBottom:10,color:"var(--gold)"}}>{s.t}</h3>
+            <p style={{fontSize:13,color:"var(--muted)",lineHeight:1.8}}>{s.c}</p>
+          </div>
+        ))}
+        <div style={{textAlign:"center",marginTop:24}}><button className="btn-ghost" onClick={onBack}>← Back to Home</button></div>
+      </div>
+    </div>
+  );
+}
+
+/* ══════════ CONTACT US PAGE ══════════ */
+function ContactPage({ onBack, dark, onToggle }) {
+  const [form, setForm] = useState({name:"",email:"",subject:"",message:""});
+  const [sent, setSent] = useState(false);
+  return (
+    <div style={{minHeight:"100vh"}}>
+      <nav className="nav"><Logo /><div style={{display:"flex",gap:8,alignItems:"center"}}><ThemeToggle dark={dark} onToggle={onToggle} /><button className="btn-ghost" onClick={onBack}>← Back</button></div></nav>
+      <div style={{maxWidth:680,margin:"0 auto",padding:"40px 20px"}}>
+        <div style={{textAlign:"center",marginBottom:40}}>
+          <img src={LOGO_SRC} alt="EscaraPay" style={{height:52,marginBottom:16,objectFit:"contain"}} onError={e=>e.target.style.display="none"} />
+          <h1 className="syne" style={{fontWeight:800,fontSize:"clamp(24px,4vw,36px)",marginBottom:8}}>Contact Us</h1>
+          <p style={{color:"var(--muted)",fontSize:14}}>Koi sawaal hai? Hum 24 ghante mein jawaab denge!</p>
+        </div>
+        <div className="g3" style={{marginBottom:32}}>
+          {[{icon:"📧",title:"Email Support",value:"support@escarapay.in",sub:"General queries"},{icon:"⚖️",title:"Legal / Privacy",value:"legal@escarapay.in",sub:"Privacy concerns"},{icon:"📱",title:"WhatsApp",value:"+91-99999-ESCARA",sub:"Quick support"}].map(c=>(
+            <div key={c.title} className="card" style={{textAlign:"center"}}>
+              <div style={{fontSize:28,marginBottom:10}}>{c.icon}</div>
+              <div className="syne" style={{fontWeight:700,fontSize:13,marginBottom:4}}>{c.title}</div>
+              <div style={{fontSize:12,color:"var(--gold)",marginBottom:4,wordBreak:"break-all"}}>{c.value}</div>
+              <div style={{fontSize:11,color:"var(--muted)"}}>{c.sub}</div>
+            </div>
+          ))}
+        </div>
+        {!sent ? (
+          <div className="card">
+            <h3 className="syne" style={{fontWeight:700,fontSize:18,marginBottom:20}}>Message Bhejo</h3>
+            <div style={{display:"flex",flexDirection:"column",gap:14}}>
+              <div className="g2">
+                <div><label className="label">Naam *</label><input className="input" placeholder="Rahul Sharma" value={form.name} onChange={e=>setForm({...form,name:e.target.value})} /></div>
+                <div><label className="label">Email *</label><input className="input" placeholder="rahul@email.com" value={form.email} onChange={e=>setForm({...form,email:e.target.value})} /></div>
+              </div>
+              <div>
+                <label className="label">Subject *</label>
+                <select className="select" value={form.subject} onChange={e=>setForm({...form,subject:e.target.value})}>
+                  <option value="">-- Subject Select Karo --</option>
+                  <option>Payment Issue</option><option>Dispute Help</option><option>Account Problem</option>
+                  <option>Refund Request</option><option>Technical Bug</option><option>Partnership</option><option>Other</option>
+                </select>
+              </div>
+              <div><label className="label">Message *</label><textarea className="input" placeholder="Apni problem ya sawaal yahan likhein..." rows={5} value={form.message} onChange={e=>setForm({...form,message:e.target.value})} style={{resize:"vertical"}} /></div>
+              <button className="btn-gold" style={{width:"100%",padding:12}} onClick={()=>{ if(form.name&&form.email&&form.subject&&form.message) setSent(true); else alert("Sab fields bharo!"); }}>📨 Message Bhejo</button>
+            </div>
+          </div>
+        ) : (
+          <div className="card" style={{textAlign:"center",padding:50}}>
+            <div style={{fontSize:52,marginBottom:16}}>✅</div>
+            <div className="syne" style={{fontWeight:800,fontSize:22,marginBottom:8}}>Message Mila!</div>
+            <div style={{color:"var(--muted)",fontSize:14,marginBottom:24}}>Hum 24 ghante ke andar jawaab denge.<br/>Reference: <strong style={{color:"var(--gold)"}}>ESC-{Date.now().toString().slice(-6)}</strong></div>
+            <button className="btn-ghost" onClick={()=>setSent(false)}>← Wapas Jao</button>
+          </div>
+        )}
+        <div style={{textAlign:"center",marginTop:24}}><button className="btn-ghost" onClick={onBack}>← Back to Home</button></div>
+      </div>
+    </div>
+  );
+}
+
 /* ══════════ MAIN APP ══════════ */
 export default function App() {
   const [screen, setScreen] = useState("landing");
@@ -1301,18 +1423,18 @@ export default function App() {
   const [payOrderId, setPayOrderId] = useState(null);
   const [dealOrderId, setDealOrderId] = useState(null);
 
+  // Footer links ke liye global function
+  useEffect(()=>{ window._goToPage = (s) => setScreen(s); },[]);
+
   useEffect(()=>{
     const path = window.location.pathname;
-    // /pay/ORDERID — Direct payment
     const payMatch = path.match(/^\/pay\/([A-Z0-9]+)$/);
     if (payMatch) { setPayOrderId(payMatch[1]); setScreen("pay"); return; }
-    // /deal/ORDERID — Seller deal confirm
     const dealMatch = path.match(/^\/deal\/([A-Z0-9]+)$/);
     if (dealMatch) { setDealOrderId(dealMatch[1]); setScreen("deal"); return; }
   },[]);
 
   const props = { dark, onToggle: ()=>setDark(d=>!d) };
-
   const handleLogin = (t,n,id,phone)=>{ setUserType(t); setUserName(n); setUserId(id); setUserPhone(phone||""); setScreen("dashboard"); };
   const handleLogout = ()=>{ setScreen("landing"); setUserType(null); setUserId(null); setUserPhone(""); setUserName(""); };
   const goHome = ()=>{ window.history.pushState({},"","/"); setScreen("landing"); setPayOrderId(null); setDealOrderId(null); };
@@ -1320,12 +1442,13 @@ export default function App() {
   return (
     <>
       <style>{getStyle(dark)}</style>
-      {/* Direct payment page — no login needed */}
-      {screen==="pay" && payOrderId && <PayPage orderId={payOrderId} dark={dark} onToggle={()=>setDark(d=>!d)} onGoHome={goHome} />}
-      {/* Seller deal confirm page — no login needed */}
-      {screen==="deal" && dealOrderId && <DealPage orderId={dealOrderId} dark={dark} onToggle={()=>setDark(d=>!d)} onGoHome={goHome} />}
+      {screen==="pay"     && payOrderId  && <PayPage    orderId={payOrderId}  dark={dark} onToggle={()=>setDark(d=>!d)} onGoHome={goHome} />}
+      {screen==="deal"    && dealOrderId && <DealPage   orderId={dealOrderId} dark={dark} onToggle={()=>setDark(d=>!d)} onGoHome={goHome} />}
+      {screen==="privacy" && <PrivacyPage onBack={()=>setScreen("landing")} {...props} />}
+      {screen==="terms"   && <TermsPage   onBack={()=>setScreen("landing")} {...props} />}
+      {screen==="contact" && <ContactPage onBack={()=>setScreen("landing")} {...props} />}
       {screen==="landing" && <Landing onEnter={t=>{ setUserType(t); setScreen("auth"); }} {...props} />}
-      {screen==="auth" && <Auth type={userType} onLogin={handleLogin} onBack={()=>setScreen("landing")} {...props} />}
+      {screen==="auth"    && <Auth type={userType} onLogin={handleLogin} onBack={()=>setScreen("landing")} {...props} />}
       {screen==="dashboard" && userType==="seller" && <SellerDB user={userName||"Seller"} userId={userId} onLogout={handleLogout} {...props} />}
       {screen==="dashboard" && userType==="buyer"  && <BuyerDB  user={userName||"Buyer"}  userId={userId} userPhone={userPhone} onLogout={handleLogout} {...props} />}
     </>
