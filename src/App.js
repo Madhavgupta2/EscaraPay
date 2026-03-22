@@ -1318,6 +1318,340 @@ function DealPage({ orderId, dark, onToggle, onGoHome }) {
 }
 
 /* ══════════ PRIVACY POLICY PAGE ══════════ */
+/* ══════════ ADMIN PANEL ══════════ */
+const ADMIN_URL = "https://escarapay-backend-production.up.railway.app";
+
+function AdminPanel({ onLogout, dark, onToggle }) {
+  const [adminKey]       = useState(localStorage.getItem("adminKey") || "");
+  const [page, setPage]  = useState("stats");
+  const [stats, setStats]= useState(null);
+  const [orders, setOrders] = useState([]);
+  const [users, setUsers]   = useState([]);
+  const [disputes, setDisputes] = useState([]);
+  const [loading, setLoading]   = useState(false);
+  const [toast, setToast]       = useState("");
+  const [filterStatus, setFilter] = useState("all");
+  const [search, setSearch]       = useState("");
+
+  const headers = { "Content-Type":"application/json", "x-admin-key": adminKey };
+
+  const load = async (p) => {
+    setLoading(true);
+    if (p === "stats" || p === "dashboard") {
+      const r = await fetch(`${ADMIN_URL}/api/admin/stats`, { headers });
+      const d = await r.json();
+      if (d.success) setStats(d.stats);
+    }
+    if (p === "orders") {
+      const r = await fetch(`${ADMIN_URL}/api/admin/orders`, { headers });
+      const d = await r.json();
+      if (d.success) setOrders(d.orders);
+    }
+    if (p === "users") {
+      const r = await fetch(`${ADMIN_URL}/api/admin/users`, { headers });
+      const d = await r.json();
+      if (d.success) setUsers(d.users);
+    }
+    if (p === "disputes") {
+      const r = await fetch(`${ADMIN_URL}/api/admin/disputes`, { headers });
+      const d = await r.json();
+      if (d.success) setDisputes(d.disputes);
+    }
+    setLoading(false);
+  };
+
+  useEffect(() => { load(page); }, [page]);
+
+  const resolveDispute = async (orderId, decision) => {
+    const r = await fetch(`${ADMIN_URL}/api/admin/disputes/${orderId}/resolve`, {
+      method:"POST", headers, body: JSON.stringify({ decision })
+    });
+    const d = await r.json();
+    if (d.success) {
+      setToast(d.message);
+      setDisputes(disputes.filter(o => o.id !== orderId));
+    }
+  };
+
+  const filteredOrders = orders.filter(o => {
+    const matchStatus = filterStatus === "all" || o.status === filterStatus;
+    const matchSearch = !search || o.id.includes(search.toUpperCase()) || (o.seller_name||"").toLowerCase().includes(search.toLowerCase()) || (o.buyer_name||"").toLowerCase().includes(search.toLowerCase()) || (o.product_name||"").toLowerCase().includes(search.toLowerCase());
+    return matchStatus && matchSearch;
+  });
+
+  const nav = [
+    {id:"dashboard", icon:"📊", label:"Dashboard"},
+    {id:"orders",    icon:"📦", label:"All Orders"},
+    {id:"users",     icon:"👥", label:"Users"},
+    {id:"disputes",  icon:"⚠️", label:"Disputes"},
+  ];
+
+  return (
+    <div style={{minHeight:"100vh"}}>
+      {toast && <Toast msg={toast} onDone={()=>setToast("")} />}
+      <nav className="nav">
+        <Logo />
+        <div style={{display:"flex",gap:8,alignItems:"center"}}>
+          <ThemeToggle dark={dark} onToggle={onToggle} />
+          <span className="badge br" style={{fontSize:11}}>🔐 Admin</span>
+          <button className="btn-ghost" onClick={onLogout}>Logout</button>
+        </div>
+      </nav>
+      <div className="sidebar">
+        <div style={{marginBottom:16,padding:"0 8px"}}><div style={{fontSize:10,color:"var(--muted)",fontWeight:700,textTransform:"uppercase",letterSpacing:".6px"}}>Admin Panel</div></div>
+        {nav.map(n=>(
+          <div key={n.id} className={`si ${page===n.id?"active":""}`} onClick={()=>setPage(n.id)}>
+            <span>{n.icon}</span><span>{n.label}</span>
+            {n.id==="disputes" && disputes.length>0 && <span style={{marginLeft:"auto",background:"var(--red)",color:"#fff",borderRadius:10,fontSize:11,padding:"1px 7px",fontWeight:700}}>{disputes.length}</span>}
+          </div>
+        ))}
+        <div style={{marginTop:"auto",paddingTop:16}}>
+          <div style={{background:"rgba(239,68,68,.1)",border:"1px solid rgba(239,68,68,.2)",borderRadius:10,padding:12,fontSize:12}}>
+            <div style={{fontWeight:700,color:"var(--red)",marginBottom:4}}>🔐 Admin Access</div>
+            <div style={{color:"var(--muted)",fontSize:11}}>Yeh page sirf tumhare liye hai!</div>
+          </div>
+        </div>
+      </div>
+      <div className="main">
+
+        {/* DASHBOARD */}
+        {page==="dashboard" && (
+          <div className="fu">
+            <h1 className="syne" style={{fontWeight:800,fontSize:"clamp(20px,3vw,26px)",marginBottom:22}}>Admin Dashboard 🛡️</h1>
+            {loading ? <div style={{textAlign:"center",padding:40,color:"var(--muted)"}}>⏳ Loading...</div> : stats && (
+              <>
+                <div className="g4" style={{marginBottom:18}}>
+                  {[
+                    {label:"Total Orders",   value:stats.totalOrders,              icon:"📦", color:"var(--gold)"},
+                    {label:"Total GMV",       value:`₹${(stats.totalGMV||0).toLocaleString()}`,  icon:"💰", color:"var(--green)"},
+                    {label:"EscaraPay Revenue",value:`₹${(stats.totalRevenue||0).toLocaleString()}`,icon:"🏦", color:"var(--blue)"},
+                    {label:"Pending Disputes",value:stats.pendingDisputes,          icon:"⚠️", color:"var(--red)"},
+                  ].map(s=>(
+                    <div key={s.label} className="stat-card">
+                      <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start"}}>
+                        <div><div style={{fontSize:11,color:"var(--muted)",marginBottom:6}}>{s.label}</div><div className="syne" style={{fontSize:24,fontWeight:800,color:s.color}}>{s.value}</div></div>
+                        <span style={{fontSize:20}}>{s.icon}</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                <div className="g2" style={{marginBottom:18}}>
+                  <div className="card">
+                    <h3 className="syne" style={{fontWeight:700,fontSize:15,marginBottom:16}}>Users</h3>
+                    {[
+                      ["Total Users", stats.totalUsers],
+                      ["Sellers",     stats.totalSellers],
+                      ["Buyers",      stats.totalBuyers],
+                    ].map(([l,v])=>(
+                      <div key={l} style={{display:"flex",justifyContent:"space-between",padding:"10px 0",borderBottom:"1px solid var(--border)"}}>
+                        <span style={{color:"var(--muted)",fontSize:13}}>{l}</span>
+                        <span className="syne" style={{fontWeight:700,color:"var(--gold)"}}>{v}</span>
+                      </div>
+                    ))}
+                  </div>
+                  <div className="card">
+                    <h3 className="syne" style={{fontWeight:700,fontSize:15,marginBottom:16}}>Orders Summary</h3>
+                    {[
+                      ["Active Escrows",  stats.activeEscrows],
+                      ["Delivered",       stats.delivered],
+                      ["Disputed",        stats.pendingDisputes],
+                    ].map(([l,v])=>(
+                      <div key={l} style={{display:"flex",justifyContent:"space-between",padding:"10px 0",borderBottom:"1px solid var(--border)"}}>
+                        <span style={{color:"var(--muted)",fontSize:13}}>{l}</span>
+                        <span className="syne" style={{fontWeight:700,color:"var(--gold)"}}>{v}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+                {stats.pendingDisputes > 0 && (
+                  <div style={{background:"rgba(239,68,68,.1)",border:"1px solid rgba(239,68,68,.3)",borderRadius:12,padding:16,display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+                    <div>
+                      <div style={{fontWeight:700,color:"var(--red)",marginBottom:4}}>⚠️ {stats.pendingDisputes} Pending Dispute{stats.pendingDisputes>1?"s":""}</div>
+                      <div style={{fontSize:12,color:"var(--muted)"}}>24 ghante mein resolve karo</div>
+                    </div>
+                    <button className="btn-red" style={{padding:"8px 16px",fontSize:13}} onClick={()=>setPage("disputes")}>Resolve Now →</button>
+                  </div>
+                )}
+              </>
+            )}
+          </div>
+        )}
+
+        {/* ALL ORDERS */}
+        {page==="orders" && (
+          <div className="fu">
+            <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:18,flexWrap:"wrap",gap:10}}>
+              <h1 className="syne" style={{fontWeight:800,fontSize:"clamp(20px,3vw,26px)"}}>All Orders ({orders.length})</h1>
+              <input className="input" style={{maxWidth:220,padding:"8px 12px"}} placeholder="🔍 Search order/buyer/seller..." value={search} onChange={e=>setSearch(e.target.value)} />
+            </div>
+            <div style={{display:"flex",gap:8,flexWrap:"wrap",marginBottom:14}}>
+              {["all","pending","token_paid","dispatched","delivered","disputed","cancelled_buyer","cancelled_seller"].map(s=>(
+                <div key={s} className={`chip ${filterStatus===s?"active":""}`} onClick={()=>setFilter(s)} style={{fontSize:11}}>
+                  {s==="all"?`All (${orders.length})`:s.replace("_"," ")}
+                </div>
+              ))}
+            </div>
+            {loading ? <div style={{textAlign:"center",padding:30,color:"var(--muted)"}}>⏳ Loading...</div> : (
+              <div className="card" style={{padding:0,overflowX:"auto"}}>
+                <table className="tbl">
+                  <thead><tr><th>Order ID</th><th>Date</th><th>Seller</th><th>Buyer</th><th>Product</th><th>Amount</th><th>Token</th><th>Commission</th><th>Status</th></tr></thead>
+                  <tbody>
+                    {filteredOrders.length===0 ? <tr><td colSpan={9} style={{textAlign:"center",color:"var(--muted)",padding:30}}>Koi order nahi</td></tr>
+                    : filteredOrders.map(o=>(
+                      <tr key={o.id}>
+                        <td><span style={{fontFamily:"monospace",color:"var(--gold)",fontSize:11}}>{o.id}</span></td>
+                        <td style={{fontSize:11,color:"var(--muted)"}}>{(o.created_at||"").split("T")[0]}</td>
+                        <td style={{fontSize:12}}>{o.seller_name||"—"}</td>
+                        <td style={{fontSize:12}}>{o.buyer_name||"—"}</td>
+                        <td style={{fontSize:12,color:"var(--muted)"}}>{o.product_name}</td>
+                        <td style={{fontWeight:600,fontSize:12}}>₹{o.order_amount}</td>
+                        <td style={{color:"var(--green)",fontWeight:600,fontSize:12}}>₹{o.token_amount}</td>
+                        <td style={{color:"var(--blue)",fontSize:12}}>₹{o.escara_commission||0}</td>
+                        <td><Bdg status={o.status} /></td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* USERS */}
+        {page==="users" && (
+          <div className="fu">
+            <h1 className="syne" style={{fontWeight:800,fontSize:"clamp(20px,3vw,26px)",marginBottom:18}}>All Users ({users.length})</h1>
+            {loading ? <div style={{textAlign:"center",padding:30,color:"var(--muted)"}}>⏳ Loading...</div> : (
+              <div className="card" style={{padding:0,overflowX:"auto"}}>
+                <table className="tbl">
+                  <thead><tr><th>ID</th><th>Name</th><th>Email</th><th>Phone</th><th>Role</th><th>PAN</th><th>GST</th><th>Joined</th></tr></thead>
+                  <tbody>
+                    {users.map(u=>(
+                      <tr key={u.id}>
+                        <td style={{color:"var(--muted)",fontSize:12}}>{u.id}</td>
+                        <td style={{fontWeight:600,fontSize:13}}>{u.name}</td>
+                        <td style={{fontSize:12,color:"var(--muted)"}}>{u.email}</td>
+                        <td style={{fontSize:12}}>{u.phone}</td>
+                        <td><span className={`badge ${u.role==="seller"?"bg":"bo"}`} style={{fontSize:11}}>{u.role}</span></td>
+                        <td style={{fontFamily:"monospace",fontSize:11,color:u.pan_number?"var(--green)":"var(--muted)"}}>{u.pan_number||"—"}</td>
+                        <td style={{fontFamily:"monospace",fontSize:11,color:u.gst_number?"var(--green)":"var(--muted)"}}>{u.gst_number||"—"}</td>
+                        <td style={{fontSize:11,color:"var(--muted)"}}>{(u.created_at||"").split("T")[0]}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* DISPUTES */}
+        {page==="disputes" && (
+          <div className="fu">
+            <h1 className="syne" style={{fontWeight:800,fontSize:"clamp(20px,3vw,26px)",marginBottom:18}}>
+              Disputes {disputes.length>0&&<span className="badge br" style={{fontSize:14}}>🔥 {disputes.length} pending</span>}
+            </h1>
+            {loading ? <div style={{textAlign:"center",padding:30,color:"var(--muted)"}}>⏳ Loading...</div>
+            : disputes.length===0 ? (
+              <div className="card" style={{textAlign:"center",padding:50}}>
+                <div style={{fontSize:40,marginBottom:10}}>🎉</div>
+                <div className="syne" style={{fontWeight:700,fontSize:18}}>Koi Dispute Nahi!</div>
+                <div style={{color:"var(--muted)",fontSize:13,marginTop:8}}>Sab orders smooth chal rahe hain</div>
+              </div>
+            ) : (
+              <div style={{display:"flex",flexDirection:"column",gap:12}}>
+                {disputes.map(o=>(
+                  <div key={o.id} className="card" style={{borderColor:"rgba(239,68,68,.3)"}}>
+                    <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:14,flexWrap:"wrap",gap:8}}>
+                      <div>
+                        <div style={{fontFamily:"monospace",color:"var(--red)",fontSize:12,marginBottom:3}}>{o.id}</div>
+                        <div className="syne" style={{fontWeight:700,fontSize:17}}>{o.product_name}</div>
+                        <div style={{fontSize:13,color:"var(--muted)",marginTop:4}}>
+                          Seller: <strong style={{color:"var(--text)"}}>{o.seller_name||"—"}</strong> &nbsp;|&nbsp;
+                          Buyer: <strong style={{color:"var(--text)"}}>{o.buyer_name||"—"}</strong>
+                        </div>
+                      </div>
+                      <div style={{textAlign:"right"}}>
+                        <div className="syne" style={{fontWeight:800,fontSize:20}}>₹{o.order_amount}</div>
+                        <div style={{fontSize:12,color:"var(--gold)"}}>Token: ₹{o.token_amount}</div>
+                      </div>
+                    </div>
+
+                    <div style={{background:"rgba(239,68,68,.08)",borderRadius:10,padding:12,marginBottom:14}}>
+                      <div style={{fontSize:12,fontWeight:700,color:"var(--red)",marginBottom:4}}>
+                        Dispute by: {o.dispute_raised_by||"—"} &nbsp;|&nbsp; {(o.dispute_at||"").split("T")[0]}
+                      </div>
+                      <div style={{fontSize:13,color:"var(--muted)"}}>{o.dispute_reason||"No reason provided"}</div>
+                    </div>
+
+                    <div style={{fontSize:12,color:"var(--muted)",marginBottom:14}}>
+                      <strong>Agar Seller sahi:</strong> ₹{o.seller_receives} seller ko release hoga &nbsp;|&nbsp;
+                      <strong>Agar Buyer sahi:</strong> ₹{o.seller_receives} buyer ko wapas hoga
+                    </div>
+
+                    <div style={{display:"flex",gap:10}}>
+                      <button className="btn-green" style={{flex:1,padding:"10px"}} onClick={()=>resolveDispute(o.id,"seller")}>
+                        ✅ Seller Sahi — Token Release Karo
+                      </button>
+                      <button className="btn-red" style={{flex:1,padding:"10px"}} onClick={()=>resolveDispute(o.id,"buyer")}>
+                        ↩️ Buyer Sahi — Refund Karo
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+/* ══════════ ADMIN LOGIN ══════════ */
+function AdminLogin({ onLogin, dark, onToggle }) {
+  const [password, setPassword] = useState("");
+  const [loading, setLoading]   = useState(false);
+  const [error, setError]       = useState("");
+
+  const handle = async () => {
+    setLoading(true); setError("");
+    try {
+      const res = await fetch(`${ADMIN_URL}/api/admin/login`, {
+        method:"POST", headers:{"Content-Type":"application/json"},
+        body: JSON.stringify({ password })
+      });
+      const data = await res.json();
+      setLoading(false);
+      if (data.success) {
+        localStorage.setItem("adminKey", password);
+        onLogin(password);
+      } else setError("❌ Wrong password!");
+    } catch(e) { setLoading(false); setError("❌ Backend se connect nahi hua!"); }
+  };
+
+  return (
+    <div style={{minHeight:"100vh",display:"flex",alignItems:"center",justifyContent:"center",padding:20}}>
+      <div className="modal" style={{maxWidth:360}}>
+        <div style={{textAlign:"center",marginBottom:22}}>
+          <div style={{fontSize:40,marginBottom:10}}>🔐</div>
+          <h2 className="syne" style={{fontWeight:800,fontSize:22,marginBottom:4}}>Admin Access</h2>
+          <p style={{color:"var(--muted)",fontSize:13}}>EscaraPay Admin Panel</p>
+        </div>
+        <div style={{display:"flex",flexDirection:"column",gap:12}}>
+          <div><label className="label">Admin Password</label>
+            <input className="input" type="password" placeholder="••••••••" value={password} onChange={e=>setPassword(e.target.value)} onKeyDown={e=>e.key==="Enter"&&handle()} />
+          </div>
+          {error && <div style={{color:"var(--red)",fontSize:13}}>{error}</div>}
+          <button className="btn-gold" style={{width:"100%",padding:12}} onClick={handle}>
+            {loading?"⏳ Checking...":"Login →"}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function PrivacyPage({ onBack, dark, onToggle }) {
   return (
     <div style={{minHeight:"100vh"}}>
@@ -1453,7 +1787,11 @@ export default function App() {
     if (payMatch) { setPayOrderId(payMatch[1]); setScreen("pay"); return; }
     const dealMatch = path.match(/^\/deal\/([A-Z0-9]+)$/);
     if (dealMatch) { setDealOrderId(dealMatch[1]); setScreen("deal"); return; }
+    // Admin panel
+    if (path === "/admin") { setScreen("admin-login"); return; }
   },[]);
+
+  const [adminKey, setAdminKey] = useState("");
 
   const props = { dark, onToggle: ()=>setDark(d=>!d) };
   const handleLogin = (t,n,id,phone)=>{ setUserType(t); setUserName(n); setUserId(id); setUserPhone(phone||""); setScreen("dashboard"); };
@@ -1463,15 +1801,17 @@ export default function App() {
   return (
     <>
       <style>{getStyle(dark)}</style>
-      {screen==="pay"     && payOrderId  && <PayPage    orderId={payOrderId}  dark={dark} onToggle={()=>setDark(d=>!d)} onGoHome={goHome} />}
-      {screen==="deal"    && dealOrderId && <DealPage   orderId={dealOrderId} dark={dark} onToggle={()=>setDark(d=>!d)} onGoHome={goHome} />}
-      {screen==="privacy" && <PrivacyPage onBack={()=>setScreen("landing")} {...props} />}
-      {screen==="terms"   && <TermsPage   onBack={()=>setScreen("landing")} {...props} />}
-      {screen==="contact" && <ContactPage onBack={()=>setScreen("landing")} {...props} />}
-      {screen==="landing" && <Landing onEnter={t=>{ setUserType(t); setScreen("auth"); }} {...props} />}
-      {screen==="auth"    && <Auth type={userType} onLogin={handleLogin} onBack={()=>setScreen("landing")} {...props} />}
-      {screen==="dashboard" && userType==="seller" && <SellerDB user={userName||"Seller"} userId={userId} onLogout={handleLogout} {...props} />}
-      {screen==="dashboard" && userType==="buyer"  && <BuyerDB  user={userName||"Buyer"}  userId={userId} userPhone={userPhone} onLogout={handleLogout} {...props} />}
+      {screen==="pay"          && payOrderId  && <PayPage    orderId={payOrderId}  dark={dark} onToggle={()=>setDark(d=>!d)} onGoHome={goHome} />}
+      {screen==="deal"         && dealOrderId && <DealPage   orderId={dealOrderId} dark={dark} onToggle={()=>setDark(d=>!d)} onGoHome={goHome} />}
+      {screen==="admin-login"  && <AdminLogin onLogin={(k)=>{ setAdminKey(k); setScreen("admin"); }} dark={dark} onToggle={()=>setDark(d=>!d)} />}
+      {screen==="admin"        && <AdminPanel adminKey={adminKey} onLogout={()=>{ localStorage.removeItem("adminKey"); setScreen("landing"); }} dark={dark} onToggle={()=>setDark(d=>!d)} />}
+      {screen==="privacy"      && <PrivacyPage onBack={()=>setScreen("landing")} {...props} />}
+      {screen==="terms"        && <TermsPage   onBack={()=>setScreen("landing")} {...props} />}
+      {screen==="contact"      && <ContactPage onBack={()=>setScreen("landing")} {...props} />}
+      {screen==="landing"      && <Landing onEnter={t=>{ setUserType(t); setScreen("auth"); }} {...props} />}
+      {screen==="auth"         && <Auth type={userType} onLogin={handleLogin} onBack={()=>setScreen("landing")} {...props} />}
+      {screen==="dashboard"    && userType==="seller" && <SellerDB user={userName||"Seller"} userId={userId} onLogout={handleLogout} {...props} />}
+      {screen==="dashboard"    && userType==="buyer"  && <BuyerDB  user={userName||"Buyer"}  userId={userId} userPhone={userPhone} onLogout={handleLogout} {...props} />}
     </>
   );
 }
