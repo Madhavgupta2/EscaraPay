@@ -97,10 +97,38 @@ function getStyle(dark) {
   .pfill{height:100%;border-radius:3px;background:linear-gradient(90deg,var(--gold),var(--gold2));transition:width .5s;}
   .tracking-box{background:rgba(2,132,199,.1);border:1px solid rgba(2,132,199,.3);border-radius:10px;padding:12px;display:flex;align-items:center;gap:10px;}
   .hold-box{background:rgba(124,58,237,.1);border:1px solid rgba(124,58,237,.3);border-radius:10px;padding:12px;}
-  .copy-toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--green);color:#fff;padding:10px 22px;border-radius:10px;font-size:13px;font-weight:600;z-index:999;animation:fadeUp .3s ease;}
+  .copy-toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:var(--green);color:#fff;padding:10px 22px;border-radius:10px;font-size:13px;font-weight:600;z-index:999;animation:fadeUp .3s ease;}
+  .btn-whatsapp{background:linear-gradient(135deg,#25D366,#128C7E);color:#fff;border:none;padding:11px 20px;border-radius:10px;font-family:'Syne',sans-serif;font-weight:700;font-size:14px;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:7px;white-space:nowrap;}
+  .btn-whatsapp:hover{transform:translateY(-2px);box-shadow:0 8px 22px rgba(37,211,102,.35);}
+  .mobile-nav{display:none;position:fixed;bottom:0;left:0;right:0;background:${dark?"rgba(18,18,26,.97)":"rgba(255,255,255,.97)"};backdrop-filter:blur(20px);border-top:1px solid var(--border);z-index:100;padding:8px 0 max(8px,env(safe-area-inset-bottom));}
+  .mobile-nav-inner{display:flex;justify-content:space-around;align-items:center;}
+  .mni{display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px 16px;cursor:pointer;border-radius:10px;transition:all .2s;color:var(--muted);font-size:10px;font-weight:500;min-width:60px;}
+  .mni.active{color:var(--gold);}
+  .mni span:first-child{font-size:20px;}
+  .skeleton{background:linear-gradient(90deg,var(--sf2) 25%,var(--border) 50%,var(--sf2) 75%);background-size:200% 100%;animation:shimmer-load 1.5s infinite;}
+  @keyframes shimmer-load{0%{background-position:200% 0}100%{background-position:-200% 0}}
+  .skeleton-box{border-radius:8px;height:20px;margin-bottom:8px;}
+  @keyframes slideUp{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}
+  @keyframes scaleIn{from{opacity:0;transform:scale(.95)}to{opacity:1;transform:scale(1)}}
+  .slide-up{animation:slideUp .4s ease forwards;}
+  .scale-in{animation:scaleIn .3s ease forwards;}
   @media(max-width:1024px){.g4{grid-template-columns:1fr 1fr;}}
   @media(max-width:800px){.g3{grid-template-columns:1fr 1fr;}}
-  @media(max-width:640px){.sidebar{display:none;}.main{margin-left:0;padding:14px;}.g2,.g3,.g4{grid-template-columns:1fr;}.nav{padding:0 12px;}.hide-m{display:none;}}
+  @media(max-width:640px){
+    .sidebar{display:none;}
+    .mobile-nav{display:block;}
+    .main{margin-left:0 !important;padding:14px;padding-bottom:90px;width:100%;max-width:100vw;overflow-x:hidden;}
+    .g2,.g3,.g4{grid-template-columns:1fr;}
+    .nav{padding:0 12px;}
+    .hide-m{display:none;}
+    body{overflow-x:hidden;}
+    .card{padding:14px;}
+    .tbl{font-size:11px;}
+    .tbl th,.tbl td{padding:8px 6px;}
+    .copy-toast{bottom:90px;}
+  }
+  *{box-sizing:border-box;}
+  html,body{max-width:100vw;overflow-x:hidden;}
   `;
 }
 
@@ -446,7 +474,7 @@ function Landing({ onEnter, dark, onToggle }) {
           <button className="btn-gold" onClick={()=>onEnter("seller")}>Seller Login</button>
         </div>
       </nav>
-      <div className="hero-sec" style={{position:"relative",overflow:"hidden",padding:"80px 40px 68px",textAlign:"center"}}>
+      <div className="hero-sec" style={{position:"relative",overflow:"hidden",padding:"clamp(40px,8vw,80px) clamp(16px,5vw,40px) clamp(40px,6vw,68px)",textAlign:"center",width:"100%",boxSizing:"border-box"}}>
         <div className="hero-glow" style={{background:dark?"rgba(240,180,41,.07)":"rgba(14,165,233,.09)",top:"-80px",left:"50%",transform:"translateX(-50%)"}} />
         <div style={{marginBottom:14}} className="fu"><span className="badge bo" style={{fontSize:12}}>🛡️ India Ka Trusted Escrow Platform</span></div>
         <h1 className="syne fu2" style={{fontSize:"clamp(28px,5.5vw,64px)",fontWeight:800,lineHeight:1.1,marginBottom:16}}>
@@ -622,7 +650,16 @@ function SellerDB({ user, userId, onLogout, dark, onToggle }) {
     else alert("❌ "+r.error);
   };
 
-  const copyLink = (orderId)=>{ navigator.clipboard?.writeText(`${BASE_URL}/pay/${orderId}`); setToast("Link copied! WhatsApp pe bhejo 🚀"); };
+  const copyLink = (orderId) => {
+    const link = `${BASE_URL}/pay/${orderId}`;
+    navigator.clipboard?.writeText(link);
+    setToast("Link copied! WhatsApp pe bhejo 🚀");
+  };
+  const shareWhatsApp = (orderId, productName, tokenAmount) => {
+    const link = `${BASE_URL}/pay/${orderId}`;
+    const msg = `🛡️ *EscaraPay Secure Payment*\n\nProduct: ${productName}\nToken Amount: ₹${tokenAmount}\n\nSecure link se pay karo:\n${link}\n\n_Powered by EscaraPay — Safe Escrow Payments_`;
+    window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, "_blank");
+  };
 
   const nav = [{id:"dashboard",icon:"📊",label:"Dashboard"},{id:"orders",icon:"📦",label:"Orders"},{id:"analytics",icon:"📈",label:"Analytics"},{id:"payments",icon:"💰",label:"Payments"},{id:"settings",icon:"⚙️",label:"Settings"}];
 
@@ -722,9 +759,10 @@ function SellerDB({ user, userId, onLogout, dark, onToggle }) {
                         <td style={{fontWeight:600}}>₹{o.order_amount}</td><td style={{color:"var(--green)",fontWeight:600}}>₹{o.token_amount}</td>
                         <td style={{fontSize:11,fontFamily:"monospace",color:"var(--blue)"}}>{o.tracking_number||"—"}</td>
                         <td><Bdg status={o.status} /></td>
-                        <td><div style={{display:"flex",gap:6}}>
+                        <td><div style={{display:"flex",gap:4,flexWrap:"wrap"}}>
                           <button className="btn-ghost" style={{padding:"4px 10px",fontSize:12}} onClick={()=>setShowOrder(o)}>Manage</button>
-                          {o.status==="pending" && <button className="btn-ghost" style={{padding:"4px 10px",fontSize:12,color:"var(--gold)",borderColor:"rgba(240,180,41,.3)"}} onClick={()=>copyLink(o.id)}>📋 Link</button>}
+                          {o.status==="pending" && <button className="btn-ghost" style={{padding:"4px 8px",fontSize:12,color:"var(--gold)",borderColor:"rgba(240,180,41,.3)"}} onClick={()=>copyLink(o.id)}>📋</button>}
+                          {o.status==="pending" && <button className="btn-whatsapp" style={{padding:"4px 10px",fontSize:12}} onClick={()=>shareWhatsApp(o.id,o.product_name,o.token_amount)}>🟢 WA</button>}
                         </div></td>
                       </tr>
                     ))}
@@ -1774,7 +1812,8 @@ export default function App() {
   const [userName, setUserName] = useState("");
   const [userId, setUserId] = useState(null);
   const [userPhone, setUserPhone] = useState("");
-  const [dark, setDark] = useState(true);
+  const [dark, setDark] = useState(()=> localStorage.getItem("escara_dark")==="true" ? true : false);
+  const toggleDark = () => { const nd = !dark; setDark(nd); localStorage.setItem("escara_dark", nd); };
   const [payOrderId, setPayOrderId] = useState(null);
   const [dealOrderId, setDealOrderId] = useState(null);
 
@@ -1793,7 +1832,7 @@ export default function App() {
 
   const [adminKey, setAdminKey] = useState("");
 
-  const props = { dark, onToggle: ()=>setDark(d=>!d) };
+  const props = { dark, onToggle: toggleDark };
   const handleLogin = (t,n,id,phone)=>{ setUserType(t); setUserName(n); setUserId(id); setUserPhone(phone||""); setScreen("dashboard"); };
   const handleLogout = ()=>{ setScreen("landing"); setUserType(null); setUserId(null); setUserPhone(""); setUserName(""); };
   const goHome = ()=>{ window.history.pushState({},"","/"); setScreen("landing"); setPayOrderId(null); setDealOrderId(null); };
@@ -1801,10 +1840,10 @@ export default function App() {
   return (
     <>
       <style>{getStyle(dark)}</style>
-      {screen==="pay"          && payOrderId  && <PayPage    orderId={payOrderId}  dark={dark} onToggle={()=>setDark(d=>!d)} onGoHome={goHome} />}
-      {screen==="deal"         && dealOrderId && <DealPage   orderId={dealOrderId} dark={dark} onToggle={()=>setDark(d=>!d)} onGoHome={goHome} />}
-      {screen==="admin-login"  && <AdminLogin onLogin={(k)=>{ setAdminKey(k); setScreen("admin"); }} dark={dark} onToggle={()=>setDark(d=>!d)} />}
-      {screen==="admin"        && <AdminPanel adminKey={adminKey} onLogout={()=>{ localStorage.removeItem("adminKey"); setScreen("landing"); }} dark={dark} onToggle={()=>setDark(d=>!d)} />}
+      {screen==="pay"          && payOrderId  && <PayPage    orderId={payOrderId}  dark={dark} onToggle={toggleDark} onGoHome={goHome} />}
+      {screen==="deal"         && dealOrderId && <DealPage   orderId={dealOrderId} dark={dark} onToggle={toggleDark} onGoHome={goHome} />}
+      {screen==="admin-login"  && <AdminLogin onLogin={(k)=>{ setAdminKey(k); setScreen("admin"); }} dark={dark} onToggle={toggleDark} />}
+      {screen==="admin"        && <AdminPanel adminKey={adminKey} onLogout={()=>{ localStorage.removeItem("adminKey"); setScreen("landing"); }} dark={dark} onToggle={toggleDark} />}
       {screen==="privacy"      && <PrivacyPage onBack={()=>setScreen("landing")} {...props} />}
       {screen==="terms"        && <TermsPage   onBack={()=>setScreen("landing")} {...props} />}
       {screen==="contact"      && <ContactPage onBack={()=>setScreen("landing")} {...props} />}
