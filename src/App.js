@@ -163,9 +163,9 @@ function getStyle(dark) {
   .chip:hover{border-color:var(--gold);color:var(--gold);}
   .chip.active{background:rgba(14,165,233,.15);border-color:var(--gold);color:var(--gold);}
   .nav{position:sticky;top:0;z-index:100;background:${dark?"rgba(10,10,15,.9)":"rgba(240,247,255,.93)"};backdrop-filter:blur(22px);border-bottom:1px solid var(--border);padding:0 22px;height:62px;display:flex;align-items:center;justify-content:space-between;gap:10px;}
-  .logo-img{height:36px;width:auto;object-fit:contain;flex-shrink:0;}
-  .logo-wrap{display:flex;align-items:center;gap:8px;cursor:pointer;flex-shrink:0;}
-  .logo-name{font-family:'Syne',sans-serif;font-size:18px;font-weight:800;background:linear-gradient(135deg,var(--gold),var(--gold2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+  .logo-img{height:30px;width:auto;object-fit:contain;flex-shrink:0;}
+  .logo-wrap{display:flex;align-items:center;gap:6px;cursor:pointer;flex-shrink:0;}
+  .logo-name{font-family:'Syne',sans-serif;font-size:16px;font-weight:800;background:linear-gradient(135deg,var(--gold),var(--gold2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
   .toggle-btn{display:flex;align-items:center;gap:6px;padding:6px 12px;border-radius:20px;border:1px solid var(--border);background:var(--sf2);cursor:pointer;font-size:13px;color:var(--muted);transition:all .2s;flex-shrink:0;}
   .toggle-btn:hover{border-color:var(--gold);color:var(--gold);}
   .sidebar{width:220px;background:var(--surface);border-right:1px solid var(--border);padding:18px 10px;position:fixed;top:62px;left:0;bottom:0;overflow-y:auto;display:flex;flex-direction:column;}
@@ -579,11 +579,11 @@ function Landing({ onEnter, dark, onToggle, lang, onLangToggle }) {
     <div style={{minHeight:"100vh"}}>
       <nav className="nav">
         <Logo />
-        <div style={{display:"flex",gap:8,alignItems:"center"}}>
+        <div style={{display:"flex",gap:6,alignItems:"center"}}>
           <LangToggle lang={lang} onToggle={onLangToggle} />
           <ThemeToggle dark={dark} onToggle={onToggle} />
-          <button className="btn-ghost hide-m" onClick={()=>onEnter("buyer")}>{t.buyerBtn.split("—")[0].trim()}</button>
-          <button className="btn-gold" onClick={()=>onEnter("seller")}>Seller Login</button>
+          <button className="btn-ghost" style={{padding:"7px 12px",fontSize:12}} onClick={()=>onEnter("buyer")}>Buyer</button>
+          <button className="btn-gold" style={{padding:"7px 12px",fontSize:12}} onClick={()=>onEnter("seller")}>Seller</button>
         </div>
       </nav>
       <div className="hero-sec" style={{position:"relative",overflow:"hidden",padding:"clamp(40px,8vw,80px) clamp(16px,5vw,40px) clamp(40px,6vw,68px)",textAlign:"center",width:"100%",boxSizing:"border-box"}}>
@@ -609,17 +609,29 @@ function Landing({ onEnter, dark, onToggle, lang, onLangToggle }) {
         </div>
         <div style={{maxWidth:640,margin:"0 auto",display:"flex",flexDirection:"column",gap:10}}>
           {(tab==="seller"?[
-            ["1","var(--gold)","Order Link Banao","Product add karo — token auto calculate hoga"],
-            ["2","var(--blue)","WhatsApp pe Link Bhejo","Buyer click karega → seedha payment page → no login needed"],
-            ["3","var(--green)","Confidently Dispatch Karo","Token secured → tracking ID ke saath dispatch karo"],
+            ["1","var(--gold)",
+              lang==="en"?"Create Order Link":lang==="hi"?"ऑर्डर लिंक बनाएं":"Order Link Banao",
+              lang==="en"?"Add product — token auto calculated":lang==="hi"?"प्रोडक्ट जोड़ें — टोकन अपने आप कैलकुलेट होगा":"Product add karo — token auto calculate hoga"],
+            ["2","var(--blue)",
+              lang==="en"?"Share on WhatsApp":lang==="hi"?"व्हाट्सऐप पर भेजें":"WhatsApp pe Link Bhejo",
+              lang==="en"?"Buyer clicks → direct payment page → no login needed":lang==="hi"?"बायर क्लिक करे → सीधे पेमेंट पेज":"Buyer click karega → seedha payment page → no login needed"],
+            ["3","var(--green)",
+              lang==="en"?"Dispatch Confidently":lang==="hi"?"निश्चिंत होकर भेजें":"Confidently Dispatch Karo",
+              lang==="en"?"Token secured → dispatch with tracking ID":lang==="hi"?"टोकन सुरक्षित → ट्रैकिंग ID के साथ भेजें":"Token secured → tracking ID ke saath dispatch karo"],
           ]:[
-            ["1","var(--gold)","Link pe Click Karo — Ya Deal Banao","Seller ka link aaya → click karo. Ya khud deal banao → seller ko bhejo"],
-            ["2","var(--blue)","Token Pay Karo","UPI / Card / NetBanking — escrow mein lock"],
-            ["3","var(--green)","Safe Delivery","Order aaya → confirm. Nahi aaya → dispute raise karo."],
-          ]).map(([n,c,t,d])=>(
+            ["1","var(--gold)",
+              lang==="en"?"Click Link or Create Deal":lang==="hi"?"लिंक क्लिक करें या डील बनाएं":"Link pe Click Karo — Ya Deal Banao",
+              lang==="en"?"Got seller's link? Click it. Or create your own deal":lang==="hi"?"सेलर का लिंक मिला? क्लिक करें। या खुद डील बनाएं":"Seller ka link aaya → click karo. Ya khud deal banao"],
+            ["2","var(--blue)",
+              lang==="en"?"Pay Token":lang==="hi"?"टोकन पेमेंट करें":"Token Pay Karo",
+              lang==="en"?"UPI / Card / NetBanking — locked in escrow":lang==="hi"?"UPI / कार्ड / नेटबैंकिंग — एस्क्रो में लॉक":"UPI / Card / NetBanking — escrow mein lock"],
+            ["3","var(--green)",
+              lang==="en"?"Safe Delivery":lang==="hi"?"सुरक्षित डिलीवरी":"Safe Delivery",
+              lang==="en"?"Got it? Confirm. Didn't get it? Raise dispute":lang==="hi"?"मिला? कन्फर्म करें। नहीं मिला? विवाद उठाएं":"Order aaya → confirm. Nahi aaya → dispute raise karo."],
+          ]).map(([n,c,st,d])=>(
             <div key={n} className="step">
               <div className="step-num" style={{background:`${c}20`,color:c}}>{n}</div>
-              <div><div style={{fontWeight:600,marginBottom:3,fontSize:14}}>{t}</div><div style={{fontSize:13,color:"var(--muted)"}}>{d}</div></div>
+              <div><div style={{fontWeight:600,marginBottom:3,fontSize:14}}>{st}</div><div style={{fontSize:13,color:"var(--muted)"}}>{d}</div></div>
             </div>
           ))}
         </div>
@@ -1470,8 +1482,8 @@ function DealPage({ orderId, dark, onToggle, onGoHome }) {
 /* ══════════ ADMIN PANEL ══════════ */
 const ADMIN_URL = "https://escarapay-backend-production.up.railway.app";
 
-function AdminPanel({ onLogout, dark, onToggle }) {
-  const [adminKey]       = useState(localStorage.getItem("adminKey") || "");
+function AdminPanel({ adminKey: propKey, onLogout, dark, onToggle }) {
+  const [adminKey] = useState(propKey || localStorage.getItem("adminKey") || "admin123");
   const [page, setPage]  = useState("stats");
   const [stats, setStats]= useState(null);
   const [orders, setOrders] = useState([]);
@@ -1631,7 +1643,13 @@ function AdminPanel({ onLogout, dark, onToggle }) {
           <div className="fu">
             <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:18,flexWrap:"wrap",gap:10}}>
               <h1 className="syne" style={{fontWeight:800,fontSize:"clamp(20px,3vw,26px)"}}>All Orders ({orders.length})</h1>
-              <input className="input" style={{maxWidth:220,padding:"8px 12px"}} placeholder="🔍 Search order/buyer/seller..." value={search} onChange={e=>setSearch(e.target.value)} />
+              <input className="input" style={{maxWidth:220,padding:"8px 12px"}} placeholder="🔍 Search..." value={search} onChange={e=>setSearch(e.target.value)} />
+            </div>
+            {orders.length===0 && !loading && (
+              <div style={{background:"rgba(14,165,233,.1)",border:"1px solid rgba(14,165,233,.3)",borderRadius:10,padding:14,marginBottom:16,fontSize:13}}>
+                ℹ️ <strong>Note:</strong> Railway pe naya database hai — seller ko Railway backend se register karke order banana hoga. Purane local orders yahan nahi dikhenge.
+              </div>
+            )}
             </div>
             <div style={{display:"flex",gap:8,flexWrap:"wrap",marginBottom:14}}>
               {["all","pending","token_paid","dispatched","delivered","disputed","cancelled_buyer","cancelled_seller"].map(s=>(
@@ -1788,10 +1806,10 @@ function AdminLogin({ onLogin, dark, onToggle }) {
       if (data.success) {
         localStorage.setItem("adminKey", password);
         onLogin(password);
-      } else setError("❌ Wrong password! Try: admin123");
+      } else setError("❌ Wrong password!");
     } catch(e) {
       setLoading(false);
-      setError("❌ Backend se connect nahi hua! Try: admin123");
+      setError("❌ Backend se connect nahi hua!");
     }
   };
 
