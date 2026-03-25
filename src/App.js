@@ -1,11 +1,9 @@
+/* eslint-disable */
 import { registerUser, loginUser, createOrder as apiCreateOrder, getSellerOrders, getBuyerOrders, getOrderById, createPaymentOrder, verifyPayment, confirmDelivery, raiseDispute, dispatchOrder } from './api';
-import { useState, useEffect, createContext, useContext } from "react";
+import { useState, useEffect } from "react";
 import LOGO_SRC from "./escarapay-logo.jpg";
 
-// ── Language System ──
-const LangContext = createContext("en");
-const useLang = () => useContext(LangContext);
-
+// Language translations
 const T = {
   en: {
     tagline: "India's Trusted Escrow Platform",
@@ -428,7 +426,7 @@ function PayPage({ orderId, dark, onToggle, onGoHome }) {
                   <div style={{background:"rgba(5,150,105,.08)",border:"1px solid rgba(5,150,105,.2)",borderRadius:10,padding:12,marginBottom:14}}>
                     <div style={{fontSize:12,fontWeight:700,color:"var(--green)",marginBottom:6}}>🛡️ EscaraPay Guarantee</div>
                     {["Token seller ko tab tak nahi milega jab tak deliver na ho","Order nahi aaya? Token wapas milega","Delivery ke 7 din mein dispute raise kar sakte ho","Team 24 ghante mein help karegi"].map(t=>(
-                      <div key={t} style={{display:"flex",gap:7,fontSize:12,color:"var(--muted)",marginBottom:4}}><span style={{color:"var(--green)"}}>✓</span><span>{t}</span></div>
+                      <div key={t} style={{display:"flex",gap:7,fontSize:12,color:"var(--muted)",marginBottom:4}}><span style={{color:"var(--green)"}}>✅</span><span>{t}</span></div>
                     ))}
                   </div>
 
@@ -513,7 +511,7 @@ function OrderModal({ order, isSeller, onClose, onDispatch, onConfirmDelivery, o
 
         {steps.map((s,i)=>(
           <div key={i} className="tl">
-            <div className="tl-dot" style={{background:s.done?"rgba(5,150,105,.2)":"var(--sf2)",color:s.done?"var(--green)":"var(--muted)"}}>{s.done?"✓":s.icon}</div>
+            <div className="tl-dot" style={{background:s.done?"rgba(5,150,105,.2)":"var(--sf2)",color:s.done?"var(--green)":"var(--muted)"}}>{s.done?"✅":s.icon}</div>
             <div style={{paddingTop:6,fontSize:13,fontWeight:s.done?600:400,color:s.done?"var(--text)":"var(--muted)"}}>{s.label}</div>
           </div>
         ))}
@@ -735,7 +733,7 @@ function Auth({ type, onLogin, onBack, dark, onToggle }) {
 }
 
 /* ══════════ SELLER DASHBOARD ══════════ */
-function SellerDB({ user, userId, onLogout, dark, onToggle, lang, onLangToggle }) {
+function SellerDB({ user, userId, onLogout, dark, onToggle }) {
   const [page, setPage] = useState("dashboard");
   const [orders, setOrders] = useState([]);
   const [loadingOrders, setLoadingOrders] = useState(true);
@@ -964,7 +962,7 @@ function SellerDB({ user, userId, onLogout, dark, onToggle, lang, onLangToggle }
                 <div style={{background:"var(--sf2)",borderRadius:10,padding:12,marginBottom:14,border:"1px solid var(--border)",wordBreak:"break-all"}}><code style={{fontSize:12,color:"var(--gold)"}}>{createdLink}</code></div>
                 <div style={{display:"flex",gap:8}}>
                   <button className="btn-ghost" style={{flex:1}} onClick={()=>{ navigator.clipboard?.writeText(createdLink); setToast("Link copied!"); }}>📋 Copy</button>
-                  <button className="btn-gold" style={{flex:1}} onClick={()=>{ setCreatedLink(null); setShowCreate(false); }}>Done ✓</button>
+                  <button className="btn-gold" style={{flex:1}} onClick={()=>{ setCreatedLink(null); setShowCreate(false); }}>Done ✅</button>
                 </div>
               </div>
             )}
@@ -1050,7 +1048,7 @@ function BuyerDB({ user, userId, userPhone, onLogout, dark, onToggle }) {
     if(!dealForm.product||!dealForm.amount){alert("❌ Product aur amount zaroori hain!"); return;}
     setDealCreating(true);
     try {
-      const res = await fetch("http://localhost:5000/api/orders/buyer-create", {
+      const res = await fetch("https://escarapay-backend-production.up.railway.app/api/orders/buyer-create", {
         method:"POST", headers:{"Content-Type":"application/json"},
         body: JSON.stringify({
           buyer_id: userId,
@@ -1311,7 +1309,8 @@ function DealPage({ orderId, dark, onToggle, onGoHome }) {
   const handleConfirm = async () => {
     setConfirming(true);
     try {
-      const res = await fetch(`http://localhost:5000/api/orders/${orderId}/seller-confirm-deal`, {
+       const res = await fetch(`https://escarapay-backend-production.up.railway.app/api/orders/${orderId}/seller-confirm-deal`, 
+{
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ seller_id: 0 }), // Guest seller
@@ -1448,7 +1447,7 @@ function DealPage({ orderId, dark, onToggle, onGoHome }) {
                 <div style={{background:"rgba(124,58,237,.08)",border:"1px solid rgba(124,58,237,.2)",borderRadius:10,padding:12,marginBottom:16}}>
                   <div style={{fontSize:12,fontWeight:700,color:"#a78bfa",marginBottom:6}}>🛡️ EscaraPay Protection (Seller ke liye)</div>
                   {["Token aapke account mein tab aayega jab buyer delivery confirm kare","Buyer cancel kare toh bhi token aapko milega (RTO cover)","Dispute aaye toh EscaraPay 24 ghante mein mediate karegi","Galat delivery claim hone par aap evidence de sakte ho"].map(t=>(
-                    <div key={t} style={{display:"flex",gap:7,fontSize:12,color:"var(--muted)",marginBottom:4}}><span style={{color:"#a78bfa"}}>✓</span><span>{t}</span></div>
+                    <div key={t} style={{display:"flex",gap:7,fontSize:12,color:"var(--muted)",marginBottom:4}}><span style={{color:"#a78bfa"}}>✅</span><span>{t}</span></div>
                   ))}
                 </div>
 
@@ -1650,7 +1649,6 @@ function AdminPanel({ adminKey: propKey, onLogout, dark, onToggle }) {
                 ℹ️ <strong>Note:</strong> Railway pe naya database hai — seller ko Railway backend se register karke order banana hoga. Purane local orders yahan nahi dikhenge.
               </div>
             )}
-            </div>
             <div style={{display:"flex",gap:8,flexWrap:"wrap",marginBottom:14}}>
               {["all","pending","token_paid","dispatched","delivered","disputed","cancelled_buyer","cancelled_seller"].map(s=>(
                 <div key={s} className={`chip ${filterStatus===s?"active":""}`} onClick={()=>setFilter(s)} style={{fontSize:11}}>
@@ -1985,7 +1983,7 @@ export default function App() {
   const goHome = ()=>{ window.history.pushState({},"","/"); setScreen("landing"); setPayOrderId(null); setDealOrderId(null); };
 
   return (
-    <LangContext.Provider value={lang}>
+    <>
       <style>{getStyle(dark)}</style>
       {screen==="pay"          && payOrderId  && <PayPage    orderId={payOrderId}  dark={dark} onToggle={toggleDark} onGoHome={goHome} />}
       {screen==="deal"         && dealOrderId && <DealPage   orderId={dealOrderId} dark={dark} onToggle={toggleDark} onGoHome={goHome} />}
@@ -1998,6 +1996,6 @@ export default function App() {
       {screen==="auth"         && <Auth type={userType} onLogin={handleLogin} onBack={()=>setScreen("landing")} {...props} />}
       {screen==="dashboard"    && userType==="seller" && <SellerDB user={userName||"Seller"} userId={userId} onLogout={handleLogout} {...props} />}
       {screen==="dashboard"    && userType==="buyer"  && <BuyerDB  user={userName||"Buyer"}  userId={userId} userPhone={userPhone} onLogout={handleLogout} {...props} />}
-    </LangContext.Provider>
+    </>
   );
 }
