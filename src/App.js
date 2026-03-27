@@ -1489,39 +1489,56 @@ function UserDetailModal({ user, adminKey, onClose, onUpdate }) {
   const [msg, setMsg] = useState("");
   const [tab, setTab] = useState("details");
 
-  const headers = { "Content-Type":"application/json", "x-admin-key": adminKey };
+  const hdrs = { "Content-Type":"application/json", "x-admin-key": adminKey };
 
   useEffect(()=>{
-    fetch(`${ADMIN_URL}/api/admin/users/${user.id}/orders`, { headers })
-      .then(r=>r.json()).then(d=>{ if(d.success) setUserOrders(d.orders||[]); setLoading(false); })
-      .catch(()=>setLoading(false));
-  },[user.id]);
+    const fetchOrders = async () => {
+      try {
+        const r = await fetch(`${ADMIN_URL}/api/admin/users/${user.id}/orders`, { headers: hdrs });
+        const d = await r.json();
+        if(d.success) setUserOrders(d.orders||[]);
+      } catch(e) {}
+      setLoading(false);
+    };
+    fetchOrders();
+  },[]); // eslint-disable-line
 
   const doAction = async (action) => {
     setActionLoading(action);
     const reason = action==="warn" ? warnReason : banReason;
-    const url = `${ADMIN_URL}/api/admin/users/${user.id}/${action}`;
-    const r = await fetch(url, { method:"POST", headers, body: JSON.stringify({reason}) });
-    const d = await r.json();
-    setActionLoading("");
-    if(d.success) { setMsg(d.message); setTimeout(()=>{ onUpdate(user.id, action); },1200); }
-    else setMsg("❌ "+d.error);
+    try {
+      const r = await fetch(`${ADMIN_URL}/api/admin/users/${user.id}/${action}`, {
+        method:"POST", headers: hdrs, body: JSON.stringify({reason})
+      });
+      const d = await r.json();
+      setActionLoading("");
+      if(d.success) {
+        setMsg(d.message);
+        setTimeout(()=>{ onUpdate(user.id, action); }, 1500);
+      } else setMsg("❌ "+d.error);
+    } catch(e) { setActionLoading(""); setMsg("❌ Network error!"); }
   };
+
+  const isBanned = user.user_status === "banned";
+  const warnCount = user.warning_count || 0;
 
   return (
     <div className="overlay" onClick={onClose}>
       <div className="modal" style={{maxWidth:520}} onClick={e=>e.stopPropagation()}>
+
         {/* Header */}
         <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:16}}>
           <div style={{display:"flex",alignItems:"center",gap:12}}>
-            <div className="avatar" style={{width:44,height:44,fontSize:18,background:user.user_status==="banned"?"var(--red)":"linear-gradient(135deg,var(--gold),var(--accent))"}}>{user.name[0]}</div>
+            <div className="avatar" style={{width:44,height:44,fontSize:18,background:isBanned?"var(--red)":"linear-gradient(135deg,var(--gold),var(--accent))"}}>{user.name[0]}</div>
             <div>
               <div className="syne" style={{fontWeight:800,fontSize:17}}>{user.name}</div>
               <div style={{fontSize:12,color:"var(--muted)"}}>{user.role} • ID: {user.id}</div>
             </div>
           </div>
           <div style={{display:"flex",gap:8,alignItems:"center"}}>
-            <span className={`badge ${user.user_status==="banned"?"br":user.warning_count>0?"borange":"bg"}`}>{user.user_status==="banned"?"🚫 Banned":user.warning_count>0?`⚠️ ${user.warning_count} Warning`:"✅ Active"}</span>
+            <span className={`badge ${isBanned?"br":warnCount>0?"borange":"bg"}`}>
+              {isBanned?"🚫 Banned":warnCount>0?`⚠️ ${warnCount} Warning`:"✅ Active"}
+            </span>
             <button className="btn-ghost" style={{padding:"4px 10px",fontSize:12}} onClick={onClose}>✕</button>
           </div>
         </div>
@@ -1537,21 +1554,21 @@ function UserDetailModal({ user, adminKey, onClose, onUpdate }) {
         {tab==="details" && (
           <div style={{display:"flex",flexDirection:"column",gap:8}}>
             {[
-              ["Name",    user.name],
-              ["Email",   user.email],
-              ["Phone",   user.phone],
-              ["Role",    user.role],
-              ["Password",user.password, "var(--red)"],
-              ["PAN",     user.pan_number||"—", user.pan_number?"var(--green)":undefined],
-              ["GST",     user.gst_number||"—", user.gst_number?"var(--green)":undefined],
-              ["Shop",    user.shop_name||"—"],
-              ["Joined",  (user.created_at||"").split("T")[0]],
-              ["Warnings",user.warning_count||0, user.warning_count>0?"var(--red)":undefined],
-              ["Status",  user.user_status||"active"],
+              ["Name",     user.name,                    undefined],
+              ["Email",    user.email,                   undefined],
+              ["Phone",    user.phone,                   undefined],
+              ["Role",     user.role,                    undefined],
+              ["Password", user.password||"—",           "var(--red)"],
+              ["PAN",      user.pan_number||"—",         user.pan_number?"var(--green)":undefined],
+              ["GST",      user.gst_number||"—",         user.gst_number?"var(--green)":undefined],
+              ["Shop",     user.shop_name||"—",          undefined],
+              ["Joined",   (user.created_at||"").split("T")[0], undefined],
+              ["Warnings", String(warnCount),            warnCount>0?"var(--red)":undefined],
+              ["Status",   isBanned?"Banned":"Active",   isBanned?"var(--red)":"var(--green)"],
             ].map(([label,val,color])=>(
               <div key={label} style={{display:"flex",justifyContent:"space-between",padding:"9px 12px",background:"var(--sf2)",borderRadius:8}}>
                 <span style={{fontSize:12,color:"var(--muted)",fontWeight:500}}>{label}</span>
-                <span style={{fontSize:12,fontWeight:600,fontFamily:label==="Password"||label==="PAN"||label==="GST"?"monospace":"inherit",color:color||"var(--text)"}}>{String(val)}</span>
+                <span style={{fontSize:12,fontWeight:600,fontFamily:label==="Password"||label==="PAN"||label==="GST"?"monospace":"inherit",color:color||"var(--text)"}}>{val}</span>
               </div>
             ))}
           </div>
@@ -1560,57 +1577,66 @@ function UserDetailModal({ user, adminKey, onClose, onUpdate }) {
         {/* Orders Tab */}
         {tab==="orders" && (
           <div>
-            {loading ? <div style={{textAlign:"center",padding:30,color:"var(--muted)"}}>⏳ Loading orders...</div>
-            : userOrders.length===0 ? <div style={{textAlign:"center",padding:30,color:"var(--muted)"}}>Koi orders nahi</div>
-            : <div style={{overflowX:"auto"}}>
-                <table className="tbl">
-                  <thead><tr><th>ID</th><th>Product</th><th>Amount</th><th>Token</th><th>Status</th><th>Date</th></tr></thead>
-                  <tbody>{userOrders.map(o=>(
-                    <tr key={o.id}>
-                      <td style={{fontFamily:"monospace",color:"var(--gold)",fontSize:11}}>{o.id}</td>
-                      <td style={{fontSize:12}}>{o.product_name}</td>
-                      <td style={{fontSize:12,fontWeight:600}}>₹{o.order_amount}</td>
-                      <td style={{fontSize:12,color:"var(--green)"}}>₹{o.token_amount}</td>
-                      <td><Bdg status={o.status} /></td>
-                      <td style={{fontSize:11,color:"var(--muted)"}}>{(o.created_at||"").split("T")[0]}</td>
-                    </tr>
-                  ))}</tbody>
-                </table>
-              </div>}
+            {loading
+              ? <div style={{textAlign:"center",padding:30,color:"var(--muted)"}}>⏳ Loading orders...</div>
+              : userOrders.length===0
+                ? <div style={{textAlign:"center",padding:30,color:"var(--muted)"}}>Koi orders nahi</div>
+                : <div style={{overflowX:"auto"}}>
+                    <table className="tbl">
+                      <thead><tr><th>ID</th><th>Product</th><th>Amount</th><th>Token</th><th>Status</th><th>Date</th></tr></thead>
+                      <tbody>{userOrders.map(o=>(
+                        <tr key={o.id}>
+                          <td style={{fontFamily:"monospace",color:"var(--gold)",fontSize:11}}>{o.id}</td>
+                          <td style={{fontSize:12}}>{o.product_name}</td>
+                          <td style={{fontSize:12,fontWeight:600}}>₹{o.order_amount}</td>
+                          <td style={{fontSize:12,color:"var(--green)"}}>₹{o.token_amount}</td>
+                          <td><Bdg status={o.status} /></td>
+                          <td style={{fontSize:11,color:"var(--muted)"}}>{(o.created_at||"").split("T")[0]}</td>
+                        </tr>
+                      ))}</tbody>
+                    </table>
+                  </div>
+            }
           </div>
         )}
 
         {/* Actions Tab */}
         {tab==="actions" && (
           <div style={{display:"flex",flexDirection:"column",gap:14}}>
+
             {/* Warn */}
             <div style={{background:"rgba(251,146,60,.1)",border:"1px solid rgba(251,146,60,.3)",borderRadius:12,padding:14}}>
               <div style={{fontWeight:700,color:"#fb923c",marginBottom:8,fontSize:13}}>⚠️ Warning Send Karo</div>
               <input className="input" placeholder="Warning reason (e.g. Suspicious activity)" value={warnReason} onChange={e=>setWarnReason(e.target.value)} style={{marginBottom:8}} />
-              <button className="btn-ghost" style={{width:"100%",color:"#fb923c",borderColor:"rgba(251,146,60,.4)"}} onClick={()=>doAction("warn")} disabled={actionLoading==="warn"}>
+              <button className="btn-ghost" style={{width:"100%",color:"#fb923c",borderColor:"rgba(251,146,60,.4)"}} onClick={()=>doAction("warn")} disabled={!!actionLoading}>
                 {actionLoading==="warn"?"⏳ Sending...":"⚠️ Send Warning"}
               </button>
             </div>
 
-            {/* Ban */}
-            {user.user_status!=="banned" ? (
+            {/* Ban / Unban */}
+            {!isBanned ? (
               <div style={{background:"rgba(239,68,68,.1)",border:"1px solid rgba(239,68,68,.3)",borderRadius:12,padding:14}}>
                 <div style={{fontWeight:700,color:"var(--red)",marginBottom:8,fontSize:13}}>🚫 User Ban Karo</div>
                 <input className="input" placeholder="Ban reason (e.g. Fraud, fake orders)" value={banReason} onChange={e=>setBanReason(e.target.value)} style={{marginBottom:8}} />
-                <button className="btn-red" style={{width:"100%"}} onClick={()=>doAction("ban")} disabled={actionLoading==="ban"}>
+                <button className="btn-red" style={{width:"100%"}} onClick={()=>doAction("ban")} disabled={!!actionLoading}>
                   {actionLoading==="ban"?"⏳ Banning...":"🚫 Ban This User"}
                 </button>
               </div>
             ) : (
               <div style={{background:"rgba(5,150,105,.1)",border:"1px solid rgba(5,150,105,.3)",borderRadius:12,padding:14}}>
                 <div style={{fontWeight:700,color:"var(--green)",marginBottom:8,fontSize:13}}>✅ User Unban Karo</div>
-                <button className="btn-green" style={{width:"100%"}} onClick={()=>doAction("unban")} disabled={actionLoading==="unban"}>
+                <button className="btn-green" style={{width:"100%"}} onClick={()=>doAction("unban")} disabled={!!actionLoading}>
                   {actionLoading==="unban"?"⏳ Unbanning...":"✅ Unban This User"}
                 </button>
               </div>
             )}
 
-            {msg && <div style={{padding:12,borderRadius:8,background:"var(--sf2)",fontSize:13,fontWeight:600,color:msg.startsWith("✅")||msg.startsWith("⚠️")||msg.startsWith("🚫")?"var(--text)":"var(--red)",textAlign:"center"}}>{msg}</div>}
+            {msg && (
+              <div style={{padding:12,borderRadius:8,background:"var(--sf2)",fontSize:13,fontWeight:600,textAlign:"center",
+                color:msg.startsWith("✅")?"var(--green)":msg.startsWith("⚠️")?"#fb923c":"var(--red)"}}>
+                {msg}
+              </div>
+            )}
           </div>
         )}
       </div>
