@@ -542,19 +542,77 @@ function Landing({ onEnter, dark, onToggle, lang, onLangToggle }) {
           ))}
         </div>
       </div>
+      {/* WHY ESCARAPAY */}
+      <div style={{padding:"52px clamp(16px,5vw,40px)",background:"var(--sf2)"}}>
+        <h2 className="syne" style={{textAlign:"center",fontSize:"clamp(22px,3vw,34px)",fontWeight:800,marginBottom:8}}>
+          {lang==="en"?"Why EscaraPay?":lang==="hi"?"एस्करापे क्यों?":"Why EscaraPay?"}
+        </h2>
+        <p style={{textAlign:"center",color:"var(--muted)",fontSize:14,marginBottom:32}}>
+          {lang==="en"?"The only escrow platform built for Indian social sellers":lang==="hi"?"भारतीय सोशल सेलर्स के लिए बना एकमात्र एस्क्रो प्लेटफॉर्म":"India ke social sellers ke liye banaya gaya pehla escrow platform"}
+        </p>
+        <div className="g3" style={{maxWidth:900,margin:"0 auto",gap:16}}>
+          {[
+            {icon:"🛡️",color:"rgba(14,165,233,.15)",bdr:"rgba(14,165,233,.3)",
+              en:"Zero Fraud Risk",     hi:"शून्य धोखाधड़ी जोखिम",   hl:"Zero Fraud Risk",
+              de:"Token locked in escrow — neither party can cheat", dh:"टोकन एस्क्रो में — कोई धोखा नहीं",dl:"Token escrow mein lock — koi cheating nahi"},
+            {icon:"💰",color:"rgba(5,150,105,.15)",bdr:"rgba(5,150,105,.3)",
+              en:"RTO Protection",      hi:"RTO सुरक्षा",             hl:"RTO Protection",
+              de:"Buyer cancels? Token still goes to seller", dh:"बायर कैंसिल करे? टोकन सेलर को",dl:"Buyer cancel kare? Token fir bhi seller ko"},
+            {icon:"⚡",color:"rgba(240,180,41,.15)",bdr:"rgba(240,180,41,.3)",
+              en:"2 Min Setup",         hi:"2 मिनट में शुरू",         hl:"2 Min Setup",
+              de:"Create order, share link, done. No app needed", dh:"ऑर्डर बनाएं, लिंक भेजें, बस",dl:"Order banao, link bhejo, ho gaya"},
+            {icon:"📱",color:"rgba(124,58,237,.15)",bdr:"rgba(124,58,237,.3)",
+              en:"WhatsApp Native",     hi:"व्हाट्सऐप नेटिव",        hl:"WhatsApp Native",
+              de:"Direct link sharing on WhatsApp & Instagram", dh:"व्हाट्सऐप और इंस्टाग्राम पर डायरेक्ट",dl:"WhatsApp & Instagram pe direct link share"},
+            {icon:"🔐",color:"rgba(14,165,233,.15)",bdr:"rgba(14,165,233,.3)",
+              en:"Razorpay Secured",    hi:"रेजरपे सुरक्षित",        hl:"Razorpay Secured",
+              de:"RBI-compliant payments, UPI/Card/NetBanking", dh:"RBI अनुपालन, UPI/कार्ड/नेटबैंकिंग",dl:"RBI-compliant, UPI/Card/NetBanking"},
+            {icon:"⚖️",color:"rgba(239,68,68,.15)",bdr:"rgba(239,68,68,.3)",
+              en:"Dispute Resolution",  hi:"विवाद समाधान",            hl:"Dispute Resolution",
+              de:"24-hour investigation. Fair decision, always", dh:"24 घंटे में जांच। हमेशा निष्पक्ष",dl:"24 ghante mein investigation. Fair decision"},
+          ].map(item=>(
+            <div key={item.en} className="card" style={{background:item.color,borderColor:item.bdr,textAlign:"center",padding:20}}>
+              <div style={{fontSize:32,marginBottom:10}}>{item.icon}</div>
+              <div className="syne" style={{fontWeight:700,fontSize:14,marginBottom:6}}>
+                {lang==="en"?item.en:lang==="hi"?item.hi:item.hl}
+              </div>
+              <div style={{fontSize:12,color:"var(--muted)",lineHeight:1.6}}>
+                {lang==="en"?item.de:lang==="hi"?item.dh:item.dl}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* TOKEN RELEASE */}
       <div style={{padding:"52px 40px"}}>
-        <h2 className="syne" style={{textAlign:"center",fontSize:"clamp(20px,3vw,32px)",fontWeight:800,marginBottom:30}}>Token Kab Kiske Paas Jayega?</h2>
+        <h2 className="syne" style={{textAlign:"center",fontSize:"clamp(20px,3vw,32px)",fontWeight:800,marginBottom:30}}>
+          {lang==="en"?"When Does Token Get Released?":lang==="hi"?"टोकन कब और किसे मिलेगा?":"Token Kab Kiske Paas Jayega?"}
+        </h2>
         <div className="g3" style={{maxWidth:820,margin:"0 auto"}}>
           {[
-            {icon:"✅",bg:"rgba(5,150,105,.1)",bdr:"rgba(5,150,105,.22)",title:"Order Deliver Hua",sub:"Token → Seller",desc:"7 din baad auto-release"},
-            {icon:"❌",bg:"rgba(220,38,38,.1)",bdr:"rgba(220,38,38,.22)",title:"Buyer ne Cancel Kiya",sub:"Token → Seller",desc:"Seller ka shipping cover"},
-            {icon:"🚫",bg:"rgba(14,165,233,.1)",bdr:"rgba(14,165,233,.22)",title:"Seller ne Nahi Bheja",sub:"Token → Buyer",desc:"Poora token wapas"},
+            {icon:"✅",bg:"rgba(5,150,105,.1)",bdr:"rgba(5,150,105,.22)",
+             en:"Order Delivered",  hi:"ऑर्डर डिलीवर हुआ",  hl:"Order Deliver Hua",
+             sub:"Token → Seller",
+             de:"Auto-release after 7 days",dh:"7 दिन बाद ऑटो-रिलीज",dl:"7 din baad auto-release"},
+            {icon:"❌",bg:"rgba(220,38,38,.1)",bdr:"rgba(220,38,38,.22)",
+             en:"Buyer Cancels",   hi:"बायर ने कैंसिल किया",hl:"Buyer ne Cancel Kiya",
+             sub:"Token → Seller",
+             de:"Seller's shipping cover",dh:"सेलर का शिपिंग कवर",dl:"Seller ka shipping cover"},
+            {icon:"🚫",bg:"rgba(14,165,233,.1)",bdr:"rgba(14,165,233,.22)",
+             en:"Seller Didn't Ship",hi:"सेलर ने नहीं भेजा", hl:"Seller ne Nahi Bheja",
+             sub:"Token → Buyer",
+             de:"Full token refunded",dh:"पूरा टोकन वापस",dl:"Poora token wapas"},
           ].map(item=>(
-            <div key={item.title} className="card" style={{background:item.bg,borderColor:item.bdr,textAlign:"center"}}>
+            <div key={item.hl} className="card" style={{background:item.bg,borderColor:item.bdr,textAlign:"center"}}>
               <div style={{fontSize:30,marginBottom:10}}>{item.icon}</div>
-              <div className="syne" style={{fontWeight:700,marginBottom:4,fontSize:14}}>{item.title}</div>
+              <div className="syne" style={{fontWeight:700,marginBottom:4,fontSize:14}}>
+                {lang==="en"?item.en:lang==="hi"?item.hi:item.hl}
+              </div>
               <div style={{color:"var(--gold)",fontWeight:700,marginBottom:8,fontSize:13}}>{item.sub}</div>
-              <div style={{fontSize:13,color:"var(--muted)",lineHeight:1.6}}>{item.desc}</div>
+              <div style={{fontSize:13,color:"var(--muted)",lineHeight:1.6}}>
+                {lang==="en"?item.de:lang==="hi"?item.dh:item.dl}
+              </div>
             </div>
           ))}
         </div>
@@ -1421,6 +1479,145 @@ function DealPage({ orderId, dark, onToggle, onGoHome }) {
 /* ══════════ ADMIN ══════════ */
 const ADMIN_URL = BACKEND_URL;
 
+/* ══════════ USER DETAIL MODAL (Admin) ══════════ */
+function UserDetailModal({ user, adminKey, onClose, onUpdate }) {
+  const [userOrders, setUserOrders] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [actionLoading, setActionLoading] = useState("");
+  const [warnReason, setWarnReason] = useState("");
+  const [banReason, setBanReason] = useState("");
+  const [msg, setMsg] = useState("");
+  const [tab, setTab] = useState("details");
+
+  const headers = { "Content-Type":"application/json", "x-admin-key": adminKey };
+
+  useEffect(()=>{
+    fetch(`${ADMIN_URL}/api/admin/users/${user.id}/orders`, { headers })
+      .then(r=>r.json()).then(d=>{ if(d.success) setUserOrders(d.orders||[]); setLoading(false); })
+      .catch(()=>setLoading(false));
+  },[user.id]);
+
+  const doAction = async (action) => {
+    setActionLoading(action);
+    const reason = action==="warn" ? warnReason : banReason;
+    const url = `${ADMIN_URL}/api/admin/users/${user.id}/${action}`;
+    const r = await fetch(url, { method:"POST", headers, body: JSON.stringify({reason}) });
+    const d = await r.json();
+    setActionLoading("");
+    if(d.success) { setMsg(d.message); setTimeout(()=>{ onUpdate(user.id, action); },1200); }
+    else setMsg("❌ "+d.error);
+  };
+
+  return (
+    <div className="overlay" onClick={onClose}>
+      <div className="modal" style={{maxWidth:520}} onClick={e=>e.stopPropagation()}>
+        {/* Header */}
+        <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:16}}>
+          <div style={{display:"flex",alignItems:"center",gap:12}}>
+            <div className="avatar" style={{width:44,height:44,fontSize:18,background:user.user_status==="banned"?"var(--red)":"linear-gradient(135deg,var(--gold),var(--accent))"}}>{user.name[0]}</div>
+            <div>
+              <div className="syne" style={{fontWeight:800,fontSize:17}}>{user.name}</div>
+              <div style={{fontSize:12,color:"var(--muted)"}}>{user.role} • ID: {user.id}</div>
+            </div>
+          </div>
+          <div style={{display:"flex",gap:8,alignItems:"center"}}>
+            <span className={`badge ${user.user_status==="banned"?"br":user.warning_count>0?"borange":"bg"}`}>{user.user_status==="banned"?"🚫 Banned":user.warning_count>0?`⚠️ ${user.warning_count} Warning`:"✅ Active"}</span>
+            <button className="btn-ghost" style={{padding:"4px 10px",fontSize:12}} onClick={onClose}>✕</button>
+          </div>
+        </div>
+
+        {/* Tabs */}
+        <div style={{display:"flex",gap:4,marginBottom:16,background:"var(--sf2)",padding:4,borderRadius:10}}>
+          {[["details","👤 Details"],["orders","📦 Orders"],["actions","⚙️ Actions"]].map(([id,label])=>(
+            <button key={id} onClick={()=>setTab(id)} style={{flex:1,padding:"7px",border:"none",borderRadius:8,cursor:"pointer",background:tab===id?"var(--gold)":"transparent",color:tab===id?"#fff":"var(--muted)",fontFamily:"'Syne',sans-serif",fontWeight:600,fontSize:12,transition:"all .2s"}}>{label}</button>
+          ))}
+        </div>
+
+        {/* Details Tab */}
+        {tab==="details" && (
+          <div style={{display:"flex",flexDirection:"column",gap:8}}>
+            {[
+              ["Name",    user.name],
+              ["Email",   user.email],
+              ["Phone",   user.phone],
+              ["Role",    user.role],
+              ["Password",user.password, "var(--red)"],
+              ["PAN",     user.pan_number||"—", user.pan_number?"var(--green)":undefined],
+              ["GST",     user.gst_number||"—", user.gst_number?"var(--green)":undefined],
+              ["Shop",    user.shop_name||"—"],
+              ["Joined",  (user.created_at||"").split("T")[0]],
+              ["Warnings",user.warning_count||0, user.warning_count>0?"var(--red)":undefined],
+              ["Status",  user.user_status||"active"],
+            ].map(([label,val,color])=>(
+              <div key={label} style={{display:"flex",justifyContent:"space-between",padding:"9px 12px",background:"var(--sf2)",borderRadius:8}}>
+                <span style={{fontSize:12,color:"var(--muted)",fontWeight:500}}>{label}</span>
+                <span style={{fontSize:12,fontWeight:600,fontFamily:label==="Password"||label==="PAN"||label==="GST"?"monospace":"inherit",color:color||"var(--text)"}}>{String(val)}</span>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* Orders Tab */}
+        {tab==="orders" && (
+          <div>
+            {loading ? <div style={{textAlign:"center",padding:30,color:"var(--muted)"}}>⏳ Loading orders...</div>
+            : userOrders.length===0 ? <div style={{textAlign:"center",padding:30,color:"var(--muted)"}}>Koi orders nahi</div>
+            : <div style={{overflowX:"auto"}}>
+                <table className="tbl">
+                  <thead><tr><th>ID</th><th>Product</th><th>Amount</th><th>Token</th><th>Status</th><th>Date</th></tr></thead>
+                  <tbody>{userOrders.map(o=>(
+                    <tr key={o.id}>
+                      <td style={{fontFamily:"monospace",color:"var(--gold)",fontSize:11}}>{o.id}</td>
+                      <td style={{fontSize:12}}>{o.product_name}</td>
+                      <td style={{fontSize:12,fontWeight:600}}>₹{o.order_amount}</td>
+                      <td style={{fontSize:12,color:"var(--green)"}}>₹{o.token_amount}</td>
+                      <td><Bdg status={o.status} /></td>
+                      <td style={{fontSize:11,color:"var(--muted)"}}>{(o.created_at||"").split("T")[0]}</td>
+                    </tr>
+                  ))}</tbody>
+                </table>
+              </div>}
+          </div>
+        )}
+
+        {/* Actions Tab */}
+        {tab==="actions" && (
+          <div style={{display:"flex",flexDirection:"column",gap:14}}>
+            {/* Warn */}
+            <div style={{background:"rgba(251,146,60,.1)",border:"1px solid rgba(251,146,60,.3)",borderRadius:12,padding:14}}>
+              <div style={{fontWeight:700,color:"#fb923c",marginBottom:8,fontSize:13}}>⚠️ Warning Send Karo</div>
+              <input className="input" placeholder="Warning reason (e.g. Suspicious activity)" value={warnReason} onChange={e=>setWarnReason(e.target.value)} style={{marginBottom:8}} />
+              <button className="btn-ghost" style={{width:"100%",color:"#fb923c",borderColor:"rgba(251,146,60,.4)"}} onClick={()=>doAction("warn")} disabled={actionLoading==="warn"}>
+                {actionLoading==="warn"?"⏳ Sending...":"⚠️ Send Warning"}
+              </button>
+            </div>
+
+            {/* Ban */}
+            {user.user_status!=="banned" ? (
+              <div style={{background:"rgba(239,68,68,.1)",border:"1px solid rgba(239,68,68,.3)",borderRadius:12,padding:14}}>
+                <div style={{fontWeight:700,color:"var(--red)",marginBottom:8,fontSize:13}}>🚫 User Ban Karo</div>
+                <input className="input" placeholder="Ban reason (e.g. Fraud, fake orders)" value={banReason} onChange={e=>setBanReason(e.target.value)} style={{marginBottom:8}} />
+                <button className="btn-red" style={{width:"100%"}} onClick={()=>doAction("ban")} disabled={actionLoading==="ban"}>
+                  {actionLoading==="ban"?"⏳ Banning...":"🚫 Ban This User"}
+                </button>
+              </div>
+            ) : (
+              <div style={{background:"rgba(5,150,105,.1)",border:"1px solid rgba(5,150,105,.3)",borderRadius:12,padding:14}}>
+                <div style={{fontWeight:700,color:"var(--green)",marginBottom:8,fontSize:13}}>✅ User Unban Karo</div>
+                <button className="btn-green" style={{width:"100%"}} onClick={()=>doAction("unban")} disabled={actionLoading==="unban"}>
+                  {actionLoading==="unban"?"⏳ Unbanning...":"✅ Unban This User"}
+                </button>
+              </div>
+            )}
+
+            {msg && <div style={{padding:12,borderRadius:8,background:"var(--sf2)",fontSize:13,fontWeight:600,color:msg.startsWith("✅")||msg.startsWith("⚠️")||msg.startsWith("🚫")?"var(--text)":"var(--red)",textAlign:"center"}}>{msg}</div>}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
 function AdminPanel({ adminKey: propKey, onLogout, dark, onToggle }) {
   const [adminKey] = useState(()=> propKey || localStorage.getItem("adminKey") || "admin123");
   const [page, setPage] = useState("dashboard");
@@ -1433,6 +1630,7 @@ function AdminPanel({ adminKey: propKey, onLogout, dark, onToggle }) {
   const [filterStatus, setFilter] = useState("all");
   const [search, setSearch] = useState("");
   const [authError, setAuthError] = useState("");
+  const [selectedUser, setSelectedUser] = useState(null);
 
   const headers = { "Content-Type":"application/json", "x-admin-key": adminKey };
 
@@ -1540,11 +1738,31 @@ function AdminPanel({ adminKey: propKey, onLogout, dark, onToggle }) {
             {loading?<div style={{textAlign:"center",padding:30,color:"var(--muted)"}}>⏳ Loading...</div>:(
               <div className="card" style={{padding:0,overflowX:"auto"}}>
                 <table className="tbl">
-                  <thead><tr><th>ID</th><th>Name</th><th>Email</th><th>Phone</th><th>Role</th><th>PAN</th><th>GST</th><th>Joined</th></tr></thead>
-                  <tbody>{users.map(u=>(<tr key={u.id}><td style={{color:"var(--muted)",fontSize:12}}>{u.id}</td><td style={{fontWeight:600,fontSize:13}}>{u.name}</td><td style={{fontSize:12,color:"var(--muted)"}}>{u.email}</td><td style={{fontSize:12}}>{u.phone}</td><td><span className={`badge ${u.role==="seller"?"bg":"bo"}`} style={{fontSize:11}}>{u.role}</span></td><td style={{fontFamily:"monospace",fontSize:11,color:u.pan_number?"var(--green)":"var(--muted)"}}>{u.pan_number||"—"}</td><td style={{fontFamily:"monospace",fontSize:11,color:u.gst_number?"var(--green)":"var(--muted)"}}>{u.gst_number||"—"}</td><td style={{fontSize:11,color:"var(--muted)"}}>{(u.created_at||"").split("T")[0]}</td></tr>))}</tbody>
+                  <thead><tr><th>ID</th><th>Name</th><th>Email</th><th>Phone</th><th>Password</th><th>Role</th><th>PAN</th><th>GST</th><th>Status</th><th>Joined</th><th>Action</th></tr></thead>
+                  <tbody>{users.map(u=>(
+                    <tr key={u.id} style={{cursor:"pointer"}} onClick={()=>setSelectedUser(u)}>
+                      <td style={{color:"var(--muted)",fontSize:12}}>{u.id}</td>
+                      <td style={{fontWeight:600,fontSize:13}}>{u.name}{u.warning_count>0&&<span className="badge borange" style={{fontSize:10,marginLeft:4}}>⚠️ {u.warning_count}</span>}</td>
+                      <td style={{fontSize:12,color:"var(--muted)"}}>{u.email}</td>
+                      <td style={{fontSize:12}}>{u.phone}</td>
+                      <td style={{fontFamily:"monospace",fontSize:11,color:"var(--red)"}}>{u.password||"—"}</td>
+                      <td><span className={`badge ${u.role==="seller"?"bg":"bo"}`} style={{fontSize:11}}>{u.role}</span></td>
+                      <td style={{fontFamily:"monospace",fontSize:11,color:u.pan_number?"var(--green)":"var(--muted)"}}>{u.pan_number||"—"}</td>
+                      <td style={{fontFamily:"monospace",fontSize:11,color:u.gst_number?"var(--green)":"var(--muted)"}}>{u.gst_number||"—"}</td>
+                      <td><span className={`badge ${u.user_status==="banned"?"br":u.warning_count>0?"borange":"bg"}`} style={{fontSize:10}}>{u.user_status==="banned"?"🚫 Banned":u.warning_count>0?"⚠️ Warned":"✅ Active"}</span></td>
+                      <td style={{fontSize:11,color:"var(--muted)"}}>{(u.created_at||"").split("T")[0]}</td>
+                      <td onClick={e=>e.stopPropagation()}><div style={{display:"flex",gap:4}}>
+                        <button className="btn-ghost" style={{padding:"3px 8px",fontSize:11}} onClick={()=>setSelectedUser(u)}>View</button>
+                      </div></td>
+                    </tr>
+                  ))}</tbody>
                 </table>
               </div>
             )}
+            {selectedUser && <UserDetailModal user={selectedUser} adminKey={adminKey} onClose={()=>setSelectedUser(null)} onUpdate={(uid,action)=>{
+              setUsers(users.map(u=>u.id===uid ? {...u, user_status: action==="ban"?"banned":"active", warning_count: action==="warn"?(u.warning_count||0)+1:u.warning_count} : u));
+              setSelectedUser(null);
+            }} />}
           </div>
         )}
         {page==="disputes" && (
@@ -1604,24 +1822,31 @@ function AdminLogin({ onLogin, dark, onToggle }) {
 }
 
 /* ══════════ PRIVACY / TERMS / CONTACT ══════════ */
-function AboutPage({ onBack, dark, onToggle }) {
+function AboutPage({ onBack, dark, onToggle, lang, onLangToggle }) {
+  const L = (en,hi,hl) => lang==="en"?en:lang==="hi"?hi:hl;
   return (
     <div style={{minHeight:"100vh"}}>
-      <nav className="nav"><Logo /><div style={{display:"flex",gap:8,alignItems:"center"}}><ThemeToggle dark={dark} onToggle={onToggle} /><button className="btn-ghost" onClick={onBack}>← Back</button></div></nav>
+      <nav className="nav"><Logo /><div style={{display:"flex",gap:8,alignItems:"center"}}><LangToggle lang={lang} onToggle={onLangToggle} /><ThemeToggle dark={dark} onToggle={onToggle} /><button className="btn-ghost" onClick={onBack}>← Back</button></div></nav>
       <div style={{maxWidth:820,margin:"0 auto",padding:"40px 20px"}}>
 
         {/* Hero */}
         <div style={{textAlign:"center",marginBottom:48}}>
           <img src={LOGO_SRC} alt="EscaraPay" style={{height:64,marginBottom:16,objectFit:"contain"}} onError={e=>e.target.style.display="none"} />
           <h1 className="syne" style={{fontWeight:800,fontSize:"clamp(28px,4vw,42px)",marginBottom:12}}>About <span className="shimmer">EscaraPay</span></h1>
-          <p style={{color:"var(--muted)",fontSize:16,maxWidth:560,margin:"0 auto",lineHeight:1.8}}>India ka pehla escrow payment platform specifically designed for WhatsApp & Instagram sellers</p>
+          <p style={{color:"var(--muted)",fontSize:16,maxWidth:560,margin:"0 auto",lineHeight:1.8}}>
+            {L("India's first escrow payment platform specifically designed for WhatsApp & Instagram sellers","भारत का पहला एस्क्रो पेमेंट प्लेटफॉर्म, खासतौर पर व्हाट्सऐप और इंस्टाग्राम सेलर्स के लिए","India ka pehla escrow payment platform specifically designed for WhatsApp & Instagram sellers")}
+          </p>
         </div>
 
         {/* Mission */}
         <div className="card" style={{marginBottom:16,background:"rgba(14,165,233,.05)",borderColor:"rgba(14,165,233,.25)"}}>
-          <h2 className="syne" style={{fontWeight:800,fontSize:20,marginBottom:12}}>🎯 Hamara Mission</h2>
+          <h2 className="syne" style={{fontWeight:800,fontSize:20,marginBottom:12}}>🎯 {L("Our Mission","हमारा मिशन","Hamara Mission")}</h2>
           <p style={{fontSize:14,color:"var(--muted)",lineHeight:1.9}}>
-            India mein lakho sellers WhatsApp aur Instagram pe business karte hain — lekin unhe RTO ka darr rehta hai aur buyers ko fraud ka. EscaraPay ne yeh problem solve ki ek simple escrow system se: <strong style={{color:"var(--text)"}}>token pehle lock hota hai, delivery ke baad release hota hai.</strong>
+            {L(
+              "Millions of sellers do business on WhatsApp and Instagram in India — but they fear RTO losses and buyers fear fraud. EscaraPay solved this with a simple escrow system: token is locked first, released after delivery.",
+              "भारत में लाखों सेलर व्हाट्सऐप और इंस्टाग्राम पर बिजनेस करते हैं — लेकिन उन्हें RTO का डर रहता है और बायर को फ्रॉड का। एस्करापे ने यह समस्या एक सरल एस्क्रो सिस्टम से हल की।",
+              "India mein lakho sellers WhatsApp aur Instagram pe business karte hain — lekin unhe RTO ka darr rehta hai aur buyers ko fraud ka. EscaraPay ne yeh problem solve ki ek simple escrow system se: token pehle lock hota hai, delivery ke baad release hota hai."
+            )}
           </p>
         </div>
 
@@ -1629,39 +1854,54 @@ function AboutPage({ onBack, dark, onToggle }) {
         <div className="g2" style={{marginBottom:16}}>
           <div className="card" style={{background:"rgba(239,68,68,.05)",borderColor:"rgba(239,68,68,.2)"}}>
             <div style={{fontSize:28,marginBottom:10}}>😰</div>
-            <h3 className="syne" style={{fontWeight:700,fontSize:15,marginBottom:8,color:"var(--red)"}}>Pehle ki Problem</h3>
+            <h3 className="syne" style={{fontWeight:700,fontSize:15,marginBottom:8,color:"var(--red)"}}>{L("Before EscaraPay","पहले की समस्या","Pehle ki Problem")}</h3>
             <div style={{fontSize:13,color:"var(--muted)",lineHeight:1.8}}>
-              ❌ Seller ship kare, buyer cancel kare → RTO loss<br/>
-              ❌ Buyer pay kare, seller ship na kare → fraud<br/>
-              ❌ Koi proof nahi, koi protection nahi<br/>
-              ❌ WhatsApp pe deals completely unsafe
+              ❌ {L("Seller ships, buyer cancels → RTO loss","सेलर भेजे, बायर कैंसिल करे → RTO नुकसान","Seller ship kare, buyer cancel kare → RTO loss")}<br/>
+              ❌ {L("Buyer pays, seller doesn't ship → fraud","बायर पे करे, सेलर न भेजे → फ्रॉड","Buyer pay kare, seller ship na kare → fraud")}<br/>
+              ❌ {L("No proof, no protection","कोई सुबूत नहीं, कोई सुरक्षा नहीं","Koi proof nahi, koi protection nahi")}<br/>
+              ❌ {L("WhatsApp deals completely unsafe","व्हाट्सऐप डील पूरी तरह असुरक्षित","WhatsApp pe deals completely unsafe")}
             </div>
           </div>
           <div className="card" style={{background:"rgba(5,150,105,.05)",borderColor:"rgba(5,150,105,.2)"}}>
             <div style={{fontSize:28,marginBottom:10}}>✅</div>
-            <h3 className="syne" style={{fontWeight:700,fontSize:15,marginBottom:8,color:"var(--green)"}}>EscaraPay ke Saath</h3>
+            <h3 className="syne" style={{fontWeight:700,fontSize:15,marginBottom:8,color:"var(--green)"}}>{L("With EscaraPay","एस्करापे के साथ","EscaraPay ke Saath")}</h3>
             <div style={{fontSize:13,color:"var(--muted)",lineHeight:1.8}}>
-              ✅ Token escrow mein lock — kisi ko nahi milta jab tak deal complete na ho<br/>
-              ✅ Seller cancel kare bhi toh token seller ko milta hai (RTO cover)<br/>
-              ✅ Seller ship na kare toh buyer ko full refund<br/>
-              ✅ Dispute system — 24 ghante mein resolution
+              ✅ {L("Token locked in escrow — neither party can cheat","टोकन एस्क्रो में — कोई धोखा नहीं","Token escrow mein lock — kisi ko nahi milta jab tak deal complete na ho")}<br/>
+              ✅ {L("Buyer cancels? Token still goes to seller (RTO cover)","बायर कैंसिल करे? टोकन सेलर को (RTO कवर)","Seller cancel kare bhi toh token seller ko milta hai")}<br/>
+              ✅ {L("Seller doesn't ship? Full refund to buyer","सेलर न भेजे? बायर को पूरा रिफंड","Seller ship na kare toh buyer ko full refund")}<br/>
+              ✅ {L("Dispute system — 24 hour resolution","विवाद सिस्टम — 24 घंटे में समाधान","Dispute system — 24 ghante mein resolution")}
             </div>
           </div>
         </div>
 
-        {/* How it works detail */}
+        {/* How it works */}
         <div className="card" style={{marginBottom:16}}>
-          <h2 className="syne" style={{fontWeight:800,fontSize:18,marginBottom:16}}>⚙️ Kaise Kaam Karta Hai</h2>
+          <h2 className="syne" style={{fontWeight:800,fontSize:18,marginBottom:16}}>⚙️ {L("How It Works","यह कैसे काम करता है","Kaise Kaam Karta Hai")}</h2>
           <div style={{display:"flex",flexDirection:"column",gap:12}}>
             {[
-              {n:"1",c:"var(--gold)",   title:"Seller Order Link Banata Hai", desc:"Product name, amount aur token percentage set karta hai. Minimum ₹200 token automatically calculate hota hai."},
-              {n:"2",c:"var(--blue)",   title:"Buyer Token Pay Karta Hai",    desc:"Razorpay ke through UPI/Card/NetBanking se token pay karta hai. 2% gateway fee buyer deta hai. Token EscaraPay ke escrow mein lock ho jaata hai."},
-              {n:"3",c:"var(--accent)", title:"Seller Dispatch Karta Hai",    desc:"Token secure hone ke baad seller confidently ship karta hai. Tracking number add karta hai — buyer ko automatically pata chalta hai."},
-              {n:"4",c:"var(--green)",  title:"Delivery & Release",           desc:"Buyer delivery confirm karta hai → 7 din hold → token seller ko release. Agar dispute hua toh EscaraPay 24 ghante mein investigate karta hai."},
+              {n:"1",c:"var(--gold)", en:"Seller Creates Order Link", hi:"सेलर ऑर्डर लिंक बनाता है", hl:"Seller Order Link Banata Hai",
+               de:"Sets product name, amount, token percentage. Minimum ₹200 token auto-calculated.",
+               dh:"प्रोडक्ट नाम, राशि और टोकन प्रतिशत सेट करता है। न्यूनतम ₹200 टोकन।",
+               dl:"Product name, amount aur token percentage set karta hai. Minimum ₹200 token auto calculate."},
+              {n:"2",c:"var(--blue)", en:"Buyer Pays Token", hi:"बायर टोकन पेमेंट करता है", hl:"Buyer Token Pay Karta Hai",
+               de:"Pays via UPI/Card/NetBanking. Token locked in EscaraPay escrow.",
+               dh:"UPI/कार्ड से भुगतान करता है। टोकन एस्क्रो में लॉक।",
+               dl:"Razorpay ke through UPI/Card/NetBanking se pay. Token EscaraPay escrow mein lock."},
+              {n:"3",c:"var(--accent)", en:"Seller Dispatches", hi:"सेलर भेजता है", hl:"Seller Dispatch Karta Hai",
+               de:"Token secured → seller ships confidently with tracking ID.",
+               dh:"टोकन सुरक्षित → सेलर निश्चिंत होकर ट्रैकिंग ID के साथ भेजता है।",
+               dl:"Token secure hone ke baad seller confidently ship karta hai tracking number ke saath."},
+              {n:"4",c:"var(--green)", en:"Delivery & Release", hi:"डिलीवरी और रिलीज", hl:"Delivery & Release",
+               de:"Buyer confirms → 7 day hold → token released to seller.",
+               dh:"बायर कन्फर्म करे → 7 दिन होल्ड → टोकन सेलर को।",
+               dl:"Buyer delivery confirm karta hai → 7 din hold → token seller ko release."},
             ].map(s=>(
               <div key={s.n} className="step">
                 <div className="step-num" style={{background:`${s.c}20`,color:s.c,width:34,height:34,fontSize:15}}>{s.n}</div>
-                <div><div style={{fontWeight:700,marginBottom:4,fontSize:14}}>{s.title}</div><div style={{fontSize:13,color:"var(--muted)",lineHeight:1.7}}>{s.desc}</div></div>
+                <div>
+                  <div style={{fontWeight:700,marginBottom:4,fontSize:14}}>{L(s.en,s.hi,s.hl)}</div>
+                  <div style={{fontSize:13,color:"var(--muted)",lineHeight:1.7}}>{L(s.de,s.dh,s.dl)}</div>
+                </div>
               </div>
             ))}
           </div>
@@ -1670,28 +1910,30 @@ function AboutPage({ onBack, dark, onToggle }) {
         {/* Stats */}
         <div className="g3" style={{marginBottom:16}}>
           {[
-            {icon:"🚀",title:"Startup Stage",desc:"Actively building & growing"},
-            {icon:"🛡️",title:"Escrow Protected",desc:"100% secure token system"},
-            {icon:"⚡",title:"Instant Setup",desc:"5 minute mein start karo"},
+            {icon:"🚀",en:"Startup Stage",hi:"स्टार्टअप स्टेज",hl:"Startup Stage",de:"Actively building & growing",dh:"सक्रिय रूप से बना रहे हैं",dl:"Actively building & growing"},
+            {icon:"🛡️",en:"Escrow Protected",hi:"एस्क्रो सुरक्षित",hl:"Escrow Protected",de:"100% secure token system",dh:"100% सुरक्षित टोकन सिस्टम",dl:"100% secure token system"},
+            {icon:"⚡",en:"Instant Setup",hi:"तुरंत शुरू",hl:"Instant Setup",de:"Ready in 5 minutes",dh:"5 मिनट में तैयार",dl:"5 minute mein start karo"},
           ].map(s=>(
-            <div key={s.title} className="card" style={{textAlign:"center"}}>
+            <div key={s.en} className="card" style={{textAlign:"center"}}>
               <div style={{fontSize:32,marginBottom:10}}>{s.icon}</div>
-              <div className="syne" style={{fontWeight:700,fontSize:14,marginBottom:6}}>{s.title}</div>
-              <div style={{fontSize:12,color:"var(--muted)"}}>{s.desc}</div>
+              <div className="syne" style={{fontWeight:700,fontSize:14,marginBottom:6}}>{L(s.en,s.hi,s.hl)}</div>
+              <div style={{fontSize:12,color:"var(--muted)"}}>{L(s.de,s.dh,s.dl)}</div>
             </div>
           ))}
         </div>
 
-        {/* Team / Founder */}
+        {/* Team */}
         <div className="card" style={{marginBottom:16,background:"rgba(124,58,237,.05)",borderColor:"rgba(124,58,237,.2)"}}>
-          <h2 className="syne" style={{fontWeight:800,fontSize:18,marginBottom:16}}>👥 Team</h2>
+          <h2 className="syne" style={{fontWeight:800,fontSize:18,marginBottom:16}}>👥 {L("Our Team","हमारी टीम","Hamari Team")}</h2>
           <div style={{display:"flex",flexDirection:"column",gap:16}}>
             <div style={{display:"flex",alignItems:"center",gap:16}}>
               <div style={{width:56,height:56,borderRadius:"50%",background:"linear-gradient(135deg,var(--gold),var(--accent))",display:"flex",alignItems:"center",justifyContent:"center",fontSize:22,fontWeight:800,color:"#fff",flexShrink:0}}>M</div>
               <div>
                 <div className="syne" style={{fontWeight:700,fontSize:16}}>Madhav Gupta</div>
-                <div style={{color:"var(--gold)",fontSize:13,marginBottom:4}}>Founder & Developer</div>
-                <div style={{fontSize:13,color:"var(--muted)",lineHeight:1.7}}>WhatsApp sellers ki real problems dekhi aur EscaraPay build kiya. Ek chhote startup se shuruat — badi khwaish se aage badhna!</div>
+                <div style={{color:"var(--gold)",fontSize:13,marginBottom:4}}>{L("Founder & Developer","संस्थापक और डेवलपर","Founder & Developer")}</div>
+                <div style={{fontSize:13,color:"var(--muted)",lineHeight:1.7}}>
+                  {L("Saw real problems of WhatsApp sellers and built EscaraPay. Starting small, dreaming big!","व्हाट्सऐप सेलर्स की असली समस्याएं देखीं और एस्करापे बनाया। छोटे से शुरुआत, बड़े सपने!","WhatsApp sellers ki real problems dekhi aur EscaraPay build kiya. Chhote se shuruat, badi khwaish!")}
+                </div>
               </div>
             </div>
             <div style={{height:1,background:"var(--border)"}} />
@@ -1699,8 +1941,10 @@ function AboutPage({ onBack, dark, onToggle }) {
               <div style={{width:56,height:56,borderRadius:"50%",background:"linear-gradient(135deg,#ec4899,#a855f7)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:22,fontWeight:800,color:"#fff",flexShrink:0}}>M</div>
               <div>
                 <div className="syne" style={{fontWeight:700,fontSize:16}}>Mahima Gupta</div>
-                <div style={{color:"#ec4899",fontSize:13,marginBottom:4}}>Head of Marketing</div>
-                <div style={{fontSize:13,color:"var(--muted)",lineHeight:1.7}}>Brand strategy, seller outreach aur social media — EscaraPay ki awaaz! Sellers tak platform pahunchana inki zimmedari hai.</div>
+                <div style={{color:"#ec4899",fontSize:13,marginBottom:4}}>{L("Head of Marketing","मार्केटिंग हेड","Head of Marketing")}</div>
+                <div style={{fontSize:13,color:"var(--muted)",lineHeight:1.7}}>
+                  {L("Brand strategy, seller outreach and social media — the voice of EscaraPay!","ब्रांड स्ट्रेटेजी, सेलर आउटरीच और सोशल मीडिया — एस्करापे की आवाज़!","Brand strategy, seller outreach aur social media — EscaraPay ki awaaz! Sellers tak platform pahunchana inki zimmedari hai.")}
+                </div>
               </div>
             </div>
           </div>
@@ -1708,25 +1952,32 @@ function AboutPage({ onBack, dark, onToggle }) {
 
         {/* Values */}
         <div className="card" style={{marginBottom:24}}>
-          <h2 className="syne" style={{fontWeight:800,fontSize:18,marginBottom:16}}>💎 Hamari Values</h2>
+          <h2 className="syne" style={{fontWeight:800,fontSize:18,marginBottom:16}}>💎 {L("Our Values","हमारी मूल्य","Hamari Values")}</h2>
           <div className="g2">
             {[
-              {icon:"🔒",t:"Trust First",d:"Har transaction mein transparency. Koi hidden fees nahi."},
-              {icon:"⚡",t:"Speed",d:"Order create karo, link bhejo, 2 minute mein payment secure."},
-              {icon:"🛡️",t:"Protection",d:"Buyer aur seller dono ke liye equal protection."},
-              {icon:"🇮🇳",t:"Made for India",d:"Hinglish support, UPI integration, Indian business ke liye."},
+              {icon:"🔒",en:"Trust First",hi:"विश्वास पहले",hl:"Trust First",
+               de:"Full transparency in every transaction. No hidden fees.",dh:"हर ट्रांज़ैक्शन में पारदर्शिता।",dl:"Har transaction mein transparency. Koi hidden fees nahi."},
+              {icon:"⚡",en:"Speed",hi:"गति",hl:"Speed",
+               de:"Create order, share link, payment secured in 2 minutes.",dh:"ऑर्डर बनाएं, लिंक भेजें, 2 मिनट में।",dl:"Order create karo, link bhejo, 2 minute mein payment secure."},
+              {icon:"🛡️",en:"Equal Protection",hi:"समान सुरक्षा",hl:"Equal Protection",
+               de:"Fair protection for both buyer and seller.",dh:"बायर और सेलर दोनों के लिए सुरक्षा।",dl:"Buyer aur seller dono ke liye equal protection."},
+              {icon:"🇮🇳",en:"Made for India",hi:"भारत के लिए",hl:"Made for India",
+               de:"Hinglish support, UPI, built for Indian business.",dh:"हिंग्लिश, UPI, भारतीय बिज़नेस के लिए।",dl:"Hinglish support, UPI integration, Indian business ke liye."},
             ].map(v=>(
-              <div key={v.t} style={{display:"flex",gap:12,alignItems:"flex-start",padding:12,background:"var(--sf2)",borderRadius:10}}>
+              <div key={v.en} style={{display:"flex",gap:12,alignItems:"flex-start",padding:12,background:"var(--sf2)",borderRadius:10}}>
                 <span style={{fontSize:22,flexShrink:0}}>{v.icon}</span>
-                <div><div style={{fontWeight:700,fontSize:13,marginBottom:3}}>{v.t}</div><div style={{fontSize:12,color:"var(--muted)",lineHeight:1.6}}>{v.d}</div></div>
+                <div>
+                  <div style={{fontWeight:700,fontSize:13,marginBottom:3}}>{L(v.en,v.hi,v.hl)}</div>
+                  <div style={{fontSize:12,color:"var(--muted)",lineHeight:1.6}}>{L(v.de,v.dh,v.dl)}</div>
+                </div>
               </div>
             ))}
           </div>
         </div>
 
         <div style={{textAlign:"center",marginBottom:12}}>
-          <button className="btn-gold" style={{marginRight:10}} onClick={()=>window._goToPage("contact")}>📞 Contact Us</button>
-          <button className="btn-ghost" onClick={onBack}>← Back to Home</button>
+          <button className="btn-gold" style={{marginRight:10}} onClick={()=>window._goToPage("contact")}>📞 {L("Contact Us","संपर्क करें","Contact Karo")}</button>
+          <button className="btn-ghost" onClick={onBack}>← {L("Back to Home","होम पर वापस","Back to Home")}</button>
         </div>
       </div>
     </div>
