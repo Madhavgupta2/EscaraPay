@@ -563,7 +563,7 @@ function Landing({ onEnter, dark, onToggle, lang, onLangToggle }) {
         <Logo />
         <div style={{color:"var(--muted)",fontSize:12}}>© 2026 EscaraPay. Secure Token-Based Payments for India.</div>
         <div style={{display:"flex",gap:16}}>
-          {[["🔒 Privacy","privacy"],["📋 Terms","terms"],["📞 Contact","contact"]].map(([l,s])=>(
+          {[["🏢 About","about"],["🔒 Privacy","privacy"],["📋 Terms","terms"],["📞 Contact","contact"]].map(([l,s])=>(
             <span key={l} style={{color:"var(--muted)",fontSize:12,cursor:"pointer"}} onClick={()=>window._goToPage(s)}>{l}</span>
           ))}
         </div>
@@ -573,14 +573,120 @@ function Landing({ onEnter, dark, onToggle, lang, onLangToggle }) {
 }
 
 /* ══════════ AUTH ══════════ */
+// ── Validation helpers ──
+const validateEmail = (e) => /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(e);
+const validatePhone = (p) => /^\d{10}$/.test(p);
+const validatePAN   = (p) => /^[A-Z]{5}[0-9]{4}[A-Z]{1}$/.test(p);
+const validateGST   = (g) => /^\d{2}[A-Z]{5}\d{4}[A-Z]{1}[A-Z\d]{1}Z[A-Z\d]{1}$/.test(g);
+const validatePass  = (p) => /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z\d]).{6,}$/.test(p);
+
+function FieldError({ msg }) {
+  if (!msg) return null;
+  return <div style={{fontSize:11,color:"var(--red)",marginTop:3}}>⚠️ {msg}</div>;
+}
+
+/* ══════════ PROFILE MODAL ══════════ */
+function ProfileModal({ user, userId, userType, onClose, onUpdate }) {
+  const [form, setForm] = useState({ name: user, email: "", phone: "", password: "", newPass: "" });
+  const [loading, setLoading] = useState(false);
+  const [msg, setMsg] = useState("");
+  const [errors, setErrors] = useState({});
+
+  const validate = () => {
+    const e = {};
+    if (!form.name.trim()) e.name = "Naam zaroori hai";
+    if (form.email && !validateEmail(form.email)) e.email = "Valid email daalo";
+    if (form.phone && !validatePhone(form.phone)) e.phone = "Phone 10 digits ka hona chahiye";
+    if (form.newPass && !validatePass(form.newPass)) e.newPass = "Min 6 chars, 1 capital, 1 small, 1 number, 1 special (!@#$)";
+    return e;
+  };
+
+  const handleSave = async () => {
+    const e = validate();
+    setErrors(e);
+    if (Object.keys(e).length > 0) return;
+    setLoading(true);
+    try {
+      const res = await fetch(`${BACKEND_URL}/api/users/${userId}/update`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name: form.name, email: form.email || undefined, phone: form.phone || undefined, password: form.newPass || undefined }),
+      });
+      const data = await res.json();
+      setLoading(false);
+      if (data.success) { setMsg("✅ Profile update ho gaya!"); onUpdate(form.name); }
+      else setMsg("❌ " + data.error);
+    } catch(e) { setLoading(false); setMsg("❌ Backend se connect nahi hua!"); }
+  };
+
+  return (
+    <div className="overlay" onClick={onClose}>
+      <div className="modal" style={{maxWidth:380}} onClick={e=>e.stopPropagation()}>
+        <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:20}}>
+          <h3 className="syne" style={{fontWeight:800,fontSize:18}}>My Profile</h3>
+          <button className="btn-ghost" style={{padding:"4px 10px",fontSize:12}} onClick={onClose}>✕</button>
+        </div>
+        <div style={{display:"flex",alignItems:"center",gap:12,marginBottom:20,padding:12,background:"var(--sf2)",borderRadius:12}}>
+          <div className="avatar" style={{width:44,height:44,fontSize:18}}>{user[0]}</div>
+          <div><div style={{fontWeight:700,fontSize:15}}>{user}</div><div style={{fontSize:12,color:"var(--muted)",marginTop:2}}>{userType === "seller" ? "🏪 Seller" : "🛍️ Buyer"}</div></div>
+        </div>
+        <div style={{display:"flex",flexDirection:"column",gap:12}}>
+          <div>
+            <label className="label">Full Name *</label>
+            <input className="input" value={form.name} onChange={e=>{setForm({...form,name:e.target.value});setErrors({...errors,name:""});}} />
+            <FieldError msg={errors.name} />
+          </div>
+          <div>
+            <label className="label">Email (change karo)</label>
+            <input className="input" placeholder="naya@email.com" value={form.email} onChange={e=>{setForm({...form,email:e.target.value});setErrors({...errors,email:""});}} />
+            <FieldError msg={errors.email} />
+          </div>
+          <div>
+            <label className="label">Phone (change karo)</label>
+            <input className="input" placeholder="10 digit number" maxLength={10} value={form.phone} onChange={e=>{setForm({...form,phone:e.target.value.replace(/\D/g,"")});setErrors({...errors,phone:""});}} />
+            <FieldError msg={errors.phone} />
+          </div>
+          <div>
+            <label className="label">Naya Password (optional)</label>
+            <input className="input" type="password" placeholder="••••••••" value={form.newPass} onChange={e=>{setForm({...form,newPass:e.target.value});setErrors({...errors,newPass:""});}} />
+            <FieldError msg={errors.newPass} />
+            <div style={{fontSize:11,color:"var(--muted)",marginTop:3}}>Min 6 chars, 1 capital, 1 small, 1 number, 1 special</div>
+          </div>
+          {msg && <div style={{padding:10,borderRadius:8,background:"var(--sf2)",fontSize:13,color:msg.startsWith("✅")?"var(--green)":"var(--red)"}}>{msg}</div>}
+          <button className="btn-gold" style={{width:"100%",padding:12}} onClick={handleSave}>{loading?"⏳ Saving...":"💾 Save Changes"}</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function Auth({ type, onLogin, onBack, dark, onToggle }) {
   const [mode, setMode] = useState("login");
   const [form, setForm] = useState({name:"",email:"",password:"",shop:"",phone:"",pan:"",gst:""});
   const [loading, setLoading] = useState(false);
+  const [errors, setErrors] = useState({});
+
+  const validate = () => {
+    const e = {};
+    if (mode === "register") {
+      if (!form.name.trim()) e.name = "Naam zaroori hai";
+      if (!validateEmail(form.email)) e.email = "Valid email daalo (example@gmail.com)";
+      if (!validatePhone(form.phone)) e.phone = "Sirf 10 digits — koi alphabet nahi";
+      if (!validatePass(form.password)) e.password = "Min 6 chars, 1 capital, 1 small, 1 number, 1 special char (!@#$%)";
+      if (type === "seller" && form.pan && !validatePAN(form.pan)) e.pan = "PAN format: ABCDE1234F (5 letters, 4 digits, 1 letter)";
+      if (type === "seller" && form.gst && !validateGST(form.gst)) e.gst = "GST 15 characters ka hona chahiye";
+      if (type === "seller" && !form.pan && !form.gst) e.pan = "PAN ya GST mein se ek zaroori hai";
+    } else {
+      if (!validateEmail(form.email)) e.email = "Valid email daalo";
+      if (!form.password) e.password = "Password daalo";
+    }
+    return e;
+  };
 
   const handle = async () => {
-    if (mode==="register"&&!form.phone){alert("❌ Phone number zaroori hai!"); return;}
-    if (mode==="register"&&type==="seller"&&!form.pan&&!form.gst){alert("❌ PAN Card ya GST Number mein se ek zaroori hai!"); return;}
+    const e = validate();
+    setErrors(e);
+    if (Object.keys(e).length > 0) return;
     setLoading(true);
     const result = mode==="register"
       ? await registerUser(form.name,form.email,form.phone,type,form.password,form.shop||"",form.pan||"",form.gst||"")
@@ -591,6 +697,8 @@ function Auth({ type, onLogin, onBack, dark, onToggle }) {
       onLogin(type, u.name, u.id, u.phone||form.phone||"");
     } else alert("❌ " + result.error);
   };
+
+  const setField = (field, val) => { setForm({...form,[field]:val}); setErrors({...errors,[field]:""}); };
 
   return (
     <div style={{minHeight:"100vh"}}>
@@ -603,21 +711,55 @@ function Auth({ type, onLogin, onBack, dark, onToggle }) {
           </div>
           <div style={{display:"flex",gap:5,marginBottom:20,background:"var(--sf2)",padding:4,borderRadius:10}}>
             {["login","register"].map(m=>(
-              <button key={m} onClick={()=>setMode(m)} style={{flex:1,padding:"8px",border:"none",borderRadius:8,cursor:"pointer",background:mode===m?"var(--gold)":"transparent",color:mode===m?(dark?"#0a0a0f":"#fff"):"var(--muted)",fontFamily:"'Syne',sans-serif",fontWeight:600,fontSize:13,transition:"all .2s"}}>{m==="login"?"Login":"Register"}</button>
+              <button key={m} onClick={()=>{setMode(m);setErrors({});}} style={{flex:1,padding:"8px",border:"none",borderRadius:8,cursor:"pointer",background:mode===m?"var(--gold)":"transparent",color:mode===m?(dark?"#0a0a0f":"#fff"):"var(--muted)",fontFamily:"'Syne',sans-serif",fontWeight:600,fontSize:13,transition:"all .2s"}}>{m==="login"?"Login":"Register"}</button>
             ))}
           </div>
           <div style={{display:"flex",flexDirection:"column",gap:12}}>
-            {mode==="register" && <div><label className="label">Full Name</label><input className="input" placeholder="Meena Devi" value={form.name} onChange={e=>setForm({...form,name:e.target.value})} /></div>}
-            {mode==="register"&&type==="seller" && <div><label className="label">Shop Name</label><input className="input" placeholder="Meena Crafts" value={form.shop} onChange={e=>setForm({...form,shop:e.target.value})} /></div>}
-            <div><label className="label">Email</label><input className="input" placeholder="aapki@email.com" value={form.email} onChange={e=>setForm({...form,email:e.target.value})} /></div>
-            <div><label className="label">Phone Number</label><input className="input" placeholder="9876543210" value={form.phone} onChange={e=>setForm({...form,phone:e.target.value})} /></div>
-            <div><label className="label">Password</label><input className="input" type="password" placeholder="••••••••" value={form.password} onChange={e=>setForm({...form,password:e.target.value})} /></div>
+            {mode==="register" && (
+              <div>
+                <label className="label">Full Name *</label>
+                <input className="input" placeholder="Meena Devi" value={form.name} onChange={e=>setField("name",e.target.value)} />
+                <FieldError msg={errors.name} />
+              </div>
+            )}
+            {mode==="register"&&type==="seller" && (
+              <div>
+                <label className="label">Shop Name</label>
+                <input className="input" placeholder="Meena Crafts" value={form.shop} onChange={e=>setField("shop",e.target.value)} />
+              </div>
+            )}
+            <div>
+              <label className="label">Email *</label>
+              <input className="input" placeholder="aapki@email.com" type="email" value={form.email} onChange={e=>setField("email",e.target.value)} />
+              <FieldError msg={errors.email} />
+            </div>
+            {mode==="register" && (
+              <div>
+                <label className="label">Phone Number * (10 digits)</label>
+                <input className="input" placeholder="9876543210" maxLength={10} value={form.phone} onChange={e=>setField("phone",e.target.value.replace(/\D/g,""))} />
+                <FieldError msg={errors.phone} />
+              </div>
+            )}
+            <div>
+              <label className="label">Password *</label>
+              <input className="input" type="password" placeholder="••••••••" value={form.password} onChange={e=>setField("password",e.target.value)} />
+              <FieldError msg={errors.password} />
+              {mode==="register" && !errors.password && <div style={{fontSize:11,color:"var(--muted)",marginTop:3}}>Min 6 chars, 1 capital, 1 small, 1 number, 1 special (!@#$%)</div>}
+            </div>
             {mode==="register"&&type==="seller" && (
               <div style={{background:"rgba(14,165,233,.08)",border:"1px solid rgba(14,165,233,.2)",borderRadius:10,padding:12}}>
                 <div style={{fontSize:12,fontWeight:600,marginBottom:8,color:"var(--gold)"}}>📋 KYC (Dono mein se ek zaroori)</div>
-                <div><label className="label">PAN Card</label><input className="input" placeholder="ABCDE1234F" value={form.pan} onChange={e=>setForm({...form,pan:e.target.value.toUpperCase()})} maxLength={10} style={{marginBottom:8}} /></div>
-                <div style={{textAlign:"center",fontSize:12,color:"var(--muted)",marginBottom:8}}>— ya —</div>
-                <div><label className="label">GST Number</label><input className="input" placeholder="27ABCDE1234F1Z5" value={form.gst} onChange={e=>setForm({...form,gst:e.target.value.toUpperCase()})} maxLength={15} /></div>
+                <div>
+                  <label className="label">PAN Card (ABCDE1234F)</label>
+                  <input className="input" placeholder="ABCDE1234F" value={form.pan} maxLength={10} onChange={e=>setField("pan",e.target.value.replace(/[^A-Z0-9]/g,"").toUpperCase())} style={{marginBottom:4}} />
+                  <FieldError msg={errors.pan} />
+                </div>
+                <div style={{textAlign:"center",fontSize:12,color:"var(--muted)",margin:"8px 0"}}>— ya —</div>
+                <div>
+                  <label className="label">GST Number (15 chars)</label>
+                  <input className="input" placeholder="27ABCDE1234F1Z5" value={form.gst} maxLength={15} onChange={e=>setField("gst",e.target.value.replace(/[^A-Z0-9]/g,"").toUpperCase())} style={{marginBottom:4}} />
+                  <FieldError msg={errors.gst} />
+                </div>
               </div>
             )}
             <button className="btn-gold" style={{width:"100%",padding:12}} onClick={handle}>{loading?"⏳ Processing...":mode==="login"?"Login Karo":"Account Banao"}</button>
@@ -636,6 +778,8 @@ function SellerDB({ user, userId, onLogout, dark, onToggle }) {
   const [filterStatus, setFilterStatus] = useState("all");
   const [showCreate, setShowCreate] = useState(false);
   const [showOrder, setShowOrder] = useState(null);
+  const [showProfile, setShowProfile] = useState(false);
+  const [userName, setUserName] = useState(user);
   const [newOrder, setNewOrder] = useState({product:"",amount:"",buyer_name:"",buyer_phone:"",token_pct:"10"});
   const [createdLink, setCreatedLink] = useState(null);
   const [creating, setCreating] = useState(false);
@@ -679,13 +823,14 @@ function SellerDB({ user, userId, onLogout, dark, onToggle }) {
   return (
     <div style={{minHeight:"100vh"}}>
       {toast && <Toast msg={toast} onDone={()=>setToast("")} />}
+      {showProfile && <ProfileModal user={userName} userId={userId} userType="seller" onClose={()=>setShowProfile(false)} onUpdate={(n)=>setUserName(n)} />}
       <nav className="nav">
         <Logo />
         <div style={{display:"flex",gap:8,alignItems:"center"}}>
           <ThemeToggle dark={dark} onToggle={onToggle} />
           <span className="badge bg hide-m">● Live</span>
-          <div className="avatar">{user[0]}</div>
-          <span className="hide-m" style={{fontSize:13,fontWeight:500}}>{user}</span>
+          <div className="avatar" style={{cursor:"pointer"}} onClick={()=>setShowProfile(true)} title="Profile">{userName[0]}</div>
+          <span className="hide-m" style={{fontSize:13,fontWeight:500,cursor:"pointer"}} onClick={()=>setShowProfile(true)}>{userName}</span>
           <button className="btn-ghost" style={{fontSize:12,padding:"6px 12px"}} onClick={onLogout}>Logout</button>
         </div>
       </nav>
@@ -806,7 +951,87 @@ function SellerDB({ user, userId, onLogout, dark, onToggle }) {
             </div>
           </div>
         )}
-        {page==="payments" && <div className="fu"><h1 className="syne" style={{fontSize:"clamp(18px,3vw,26px)",fontWeight:800,marginBottom:22}}>Payments</h1><div className="card" style={{textAlign:"center",padding:50}}><div style={{fontSize:48,marginBottom:12}}>🏦</div><div className="syne" style={{fontWeight:700,fontSize:18}}>Payout System Coming Soon!</div></div></div>}
+        {page==="payments" && (
+          <div className="fu">
+            <h1 className="syne" style={{fontSize:"clamp(18px,3vw,26px)",fontWeight:800,marginBottom:6}}>Payments & Earnings 💰</h1>
+            <p style={{color:"var(--muted)",fontSize:13,marginBottom:22}}>Tumhare saare transactions aur earnings ka overview</p>
+
+            {/* Summary Cards */}
+            <div className="g3" style={{marginBottom:20}}>
+              {[
+                {label:"Total Token Collected",value:`₹${orders.filter(o=>o.status!=="pending").reduce((a,o)=>a+(o.token_amount||0),0).toLocaleString()}`,icon:"💰",color:"var(--gold)"},
+                {label:"Earnings Released",value:`₹${orders.filter(o=>o.status==="delivered").reduce((a,o)=>a+(o.seller_receives||0),0).toLocaleString()}`,icon:"✅",color:"var(--green)"},
+                {label:"In Escrow (Hold)",value:`₹${orders.filter(o=>["token_paid","dispatched"].includes(o.status)).reduce((a,o)=>a+(o.seller_receives||0),0).toLocaleString()}`,icon:"🔐",color:"var(--blue)"},
+              ].map(s=>(
+                <div key={s.label} className="stat-card">
+                  <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start"}}>
+                    <div><div style={{fontSize:11,color:"var(--muted)",marginBottom:6}}>{s.label}</div><div className="syne" style={{fontSize:22,fontWeight:800,color:s.color}}>{s.value}</div></div>
+                    <span style={{fontSize:22}}>{s.icon}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Fee Structure */}
+            <div className="card" style={{marginBottom:16}}>
+              <h3 className="syne" style={{fontWeight:700,fontSize:15,marginBottom:16}}>💡 Fee Structure</h3>
+              <div style={{display:"flex",flexDirection:"column",gap:0}}>
+                {[
+                  {label:"Token Amount (min)", value:"₹200", color:"var(--text)"},
+                  {label:"Gateway Fee (Buyer pays)", value:"2%", color:"var(--muted)"},
+                  {label:"EscaraPay Commission", value:"5%", color:"var(--red)"},
+                  {label:"Seller ko milta hai", value:"95% of token", color:"var(--green)", bold:true},
+                  {label:"Buyer Cancel hone par", value:"Token → Seller ✅", color:"var(--green)"},
+                  {label:"Seller ship na kare", value:"Token → Buyer ↩️", color:"var(--blue)"},
+                ].map(r=>(
+                  <div key={r.label} style={{display:"flex",justifyContent:"space-between",padding:"11px 0",borderBottom:"1px solid var(--border)"}}>
+                    <span style={{fontSize:13,color:"var(--muted)"}}>{r.label}</span>
+                    <span style={{fontSize:13,fontWeight:r.bold?700:600,color:r.color}}>{r.value}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Transaction History */}
+            <div className="card" style={{marginBottom:16}}>
+              <h3 className="syne" style={{fontWeight:700,fontSize:15,marginBottom:16}}>📋 Order-wise Earnings</h3>
+              {orders.length===0 ? (
+                <div style={{textAlign:"center",padding:30,color:"var(--muted)"}}>Koi orders nahi abhi</div>
+              ) : (
+                <div style={{overflowX:"auto"}}>
+                  <table className="tbl">
+                    <thead><tr><th>Order ID</th><th>Product</th><th>Order Amt</th><th>Token</th><th>Commission</th><th>Tumhe Milega</th><th>Status</th></tr></thead>
+                    <tbody>
+                      {orders.map(o=>(
+                        <tr key={o.id}>
+                          <td><span style={{fontFamily:"monospace",color:"var(--gold)",fontSize:11}}>{o.id}</span></td>
+                          <td style={{fontSize:12,color:"var(--muted)"}}>{o.product_name}</td>
+                          <td style={{fontSize:12}}>₹{o.order_amount}</td>
+                          <td style={{color:"var(--blue)",fontWeight:600,fontSize:12}}>₹{o.token_amount}</td>
+                          <td style={{color:"var(--red)",fontSize:12}}>-₹{o.escara_commission||0}</td>
+                          <td style={{color:"var(--green)",fontWeight:700,fontSize:12}}>₹{o.seller_receives||0}</td>
+                          <td><Bdg status={o.status} /></td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </div>
+
+            {/* Payout Info */}
+            <div style={{background:"rgba(14,165,233,.08)",border:"1px solid rgba(14,165,233,.2)",borderRadius:12,padding:16}}>
+              <div className="syne" style={{fontWeight:700,fontSize:14,marginBottom:10}}>🏦 Payout System — Aata Hai Jaldi!</div>
+              <div style={{fontSize:13,color:"var(--muted)",lineHeight:1.8}}>
+                Abhi test mode mein hain — payments simulate hoti hain. Jab Razorpay KYC complete hoga tab:<br/>
+                ✅ Direct bank transfer within 2-3 business days<br/>
+                ✅ UPI instant payout<br/>
+                ✅ Withdrawal history dashboard<br/>
+                ✅ GST invoice generation
+              </div>
+            </div>
+          </div>
+        )}
         {page==="settings" && (
           <div className="fu">
             <h1 className="syne" style={{fontSize:"clamp(18px,3vw,26px)",fontWeight:800,marginBottom:22}}>Settings</h1>
@@ -872,6 +1097,8 @@ function BuyerDB({ user, userId, userPhone, onLogout, dark, onToggle }) {
   const [loadingOrders, setLoadingOrders] = useState(true);
   const [filterStatus, setFilterStatus] = useState("all");
   const [showOrder, setShowOrder] = useState(null);
+  const [showProfile, setShowProfile] = useState(false);
+  const [userName, setUserName] = useState(user);
   const [payStep, setPayStep] = useState(0);
   const [payError, setPayError] = useState("");
   const [linkInput, setLinkInput] = useState("");
@@ -953,12 +1180,13 @@ function BuyerDB({ user, userId, userPhone, onLogout, dark, onToggle }) {
   return (
     <div style={{minHeight:"100vh"}}>
       {toast && <Toast msg={toast} onDone={()=>setToast("")} />}
+      {showProfile && <ProfileModal user={userName} userId={userId} userType="buyer" onClose={()=>setShowProfile(false)} onUpdate={(n)=>setUserName(n)} />}
       <nav className="nav">
         <Logo />
         <div style={{display:"flex",gap:8,alignItems:"center"}}>
           <ThemeToggle dark={dark} onToggle={onToggle} />
-          <div className="avatar" style={{background:"linear-gradient(135deg,var(--blue),var(--accent))"}}>{user[0]}</div>
-          <span className="hide-m" style={{fontSize:13,fontWeight:500}}>{user}</span>
+          <div className="avatar" style={{background:"linear-gradient(135deg,var(--blue),var(--accent))",cursor:"pointer"}} onClick={()=>setShowProfile(true)} title="Profile">{userName[0]}</div>
+          <span className="hide-m" style={{fontSize:13,fontWeight:500,cursor:"pointer"}} onClick={()=>setShowProfile(true)}>{userName}</span>
           <button className="btn-ghost" style={{fontSize:12,padding:"6px 12px"}} onClick={onLogout}>Logout</button>
         </div>
       </nav>
@@ -1376,18 +1604,270 @@ function AdminLogin({ onLogin, dark, onToggle }) {
 }
 
 /* ══════════ PRIVACY / TERMS / CONTACT ══════════ */
+function AboutPage({ onBack, dark, onToggle }) {
+  return (
+    <div style={{minHeight:"100vh"}}>
+      <nav className="nav"><Logo /><div style={{display:"flex",gap:8,alignItems:"center"}}><ThemeToggle dark={dark} onToggle={onToggle} /><button className="btn-ghost" onClick={onBack}>← Back</button></div></nav>
+      <div style={{maxWidth:820,margin:"0 auto",padding:"40px 20px"}}>
+
+        {/* Hero */}
+        <div style={{textAlign:"center",marginBottom:48}}>
+          <img src={LOGO_SRC} alt="EscaraPay" style={{height:64,marginBottom:16,objectFit:"contain"}} onError={e=>e.target.style.display="none"} />
+          <h1 className="syne" style={{fontWeight:800,fontSize:"clamp(28px,4vw,42px)",marginBottom:12}}>About <span className="shimmer">EscaraPay</span></h1>
+          <p style={{color:"var(--muted)",fontSize:16,maxWidth:560,margin:"0 auto",lineHeight:1.8}}>India ka pehla escrow payment platform specifically designed for WhatsApp & Instagram sellers</p>
+        </div>
+
+        {/* Mission */}
+        <div className="card" style={{marginBottom:16,background:"rgba(14,165,233,.05)",borderColor:"rgba(14,165,233,.25)"}}>
+          <h2 className="syne" style={{fontWeight:800,fontSize:20,marginBottom:12}}>🎯 Hamara Mission</h2>
+          <p style={{fontSize:14,color:"var(--muted)",lineHeight:1.9}}>
+            India mein lakho sellers WhatsApp aur Instagram pe business karte hain — lekin unhe RTO ka darr rehta hai aur buyers ko fraud ka. EscaraPay ne yeh problem solve ki ek simple escrow system se: <strong style={{color:"var(--text)"}}>token pehle lock hota hai, delivery ke baad release hota hai.</strong>
+          </p>
+        </div>
+
+        {/* Problem we solve */}
+        <div className="g2" style={{marginBottom:16}}>
+          <div className="card" style={{background:"rgba(239,68,68,.05)",borderColor:"rgba(239,68,68,.2)"}}>
+            <div style={{fontSize:28,marginBottom:10}}>😰</div>
+            <h3 className="syne" style={{fontWeight:700,fontSize:15,marginBottom:8,color:"var(--red)"}}>Pehle ki Problem</h3>
+            <div style={{fontSize:13,color:"var(--muted)",lineHeight:1.8}}>
+              ❌ Seller ship kare, buyer cancel kare → RTO loss<br/>
+              ❌ Buyer pay kare, seller ship na kare → fraud<br/>
+              ❌ Koi proof nahi, koi protection nahi<br/>
+              ❌ WhatsApp pe deals completely unsafe
+            </div>
+          </div>
+          <div className="card" style={{background:"rgba(5,150,105,.05)",borderColor:"rgba(5,150,105,.2)"}}>
+            <div style={{fontSize:28,marginBottom:10}}>✅</div>
+            <h3 className="syne" style={{fontWeight:700,fontSize:15,marginBottom:8,color:"var(--green)"}}>EscaraPay ke Saath</h3>
+            <div style={{fontSize:13,color:"var(--muted)",lineHeight:1.8}}>
+              ✅ Token escrow mein lock — kisi ko nahi milta jab tak deal complete na ho<br/>
+              ✅ Seller cancel kare bhi toh token seller ko milta hai (RTO cover)<br/>
+              ✅ Seller ship na kare toh buyer ko full refund<br/>
+              ✅ Dispute system — 24 ghante mein resolution
+            </div>
+          </div>
+        </div>
+
+        {/* How it works detail */}
+        <div className="card" style={{marginBottom:16}}>
+          <h2 className="syne" style={{fontWeight:800,fontSize:18,marginBottom:16}}>⚙️ Kaise Kaam Karta Hai</h2>
+          <div style={{display:"flex",flexDirection:"column",gap:12}}>
+            {[
+              {n:"1",c:"var(--gold)",   title:"Seller Order Link Banata Hai", desc:"Product name, amount aur token percentage set karta hai. Minimum ₹200 token automatically calculate hota hai."},
+              {n:"2",c:"var(--blue)",   title:"Buyer Token Pay Karta Hai",    desc:"Razorpay ke through UPI/Card/NetBanking se token pay karta hai. 2% gateway fee buyer deta hai. Token EscaraPay ke escrow mein lock ho jaata hai."},
+              {n:"3",c:"var(--accent)", title:"Seller Dispatch Karta Hai",    desc:"Token secure hone ke baad seller confidently ship karta hai. Tracking number add karta hai — buyer ko automatically pata chalta hai."},
+              {n:"4",c:"var(--green)",  title:"Delivery & Release",           desc:"Buyer delivery confirm karta hai → 7 din hold → token seller ko release. Agar dispute hua toh EscaraPay 24 ghante mein investigate karta hai."},
+            ].map(s=>(
+              <div key={s.n} className="step">
+                <div className="step-num" style={{background:`${s.c}20`,color:s.c,width:34,height:34,fontSize:15}}>{s.n}</div>
+                <div><div style={{fontWeight:700,marginBottom:4,fontSize:14}}>{s.title}</div><div style={{fontSize:13,color:"var(--muted)",lineHeight:1.7}}>{s.desc}</div></div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Stats */}
+        <div className="g3" style={{marginBottom:16}}>
+          {[
+            {icon:"🚀",title:"Startup Stage",desc:"Actively building & growing"},
+            {icon:"🛡️",title:"Escrow Protected",desc:"100% secure token system"},
+            {icon:"⚡",title:"Instant Setup",desc:"5 minute mein start karo"},
+          ].map(s=>(
+            <div key={s.title} className="card" style={{textAlign:"center"}}>
+              <div style={{fontSize:32,marginBottom:10}}>{s.icon}</div>
+              <div className="syne" style={{fontWeight:700,fontSize:14,marginBottom:6}}>{s.title}</div>
+              <div style={{fontSize:12,color:"var(--muted)"}}>{s.desc}</div>
+            </div>
+          ))}
+        </div>
+
+        {/* Team / Founder */}
+        <div className="card" style={{marginBottom:16,background:"rgba(124,58,237,.05)",borderColor:"rgba(124,58,237,.2)"}}>
+          <h2 className="syne" style={{fontWeight:800,fontSize:18,marginBottom:16}}>👥 Team</h2>
+          <div style={{display:"flex",flexDirection:"column",gap:16}}>
+            <div style={{display:"flex",alignItems:"center",gap:16}}>
+              <div style={{width:56,height:56,borderRadius:"50%",background:"linear-gradient(135deg,var(--gold),var(--accent))",display:"flex",alignItems:"center",justifyContent:"center",fontSize:22,fontWeight:800,color:"#fff",flexShrink:0}}>M</div>
+              <div>
+                <div className="syne" style={{fontWeight:700,fontSize:16}}>Madhav Gupta</div>
+                <div style={{color:"var(--gold)",fontSize:13,marginBottom:4}}>Founder & Developer</div>
+                <div style={{fontSize:13,color:"var(--muted)",lineHeight:1.7}}>WhatsApp sellers ki real problems dekhi aur EscaraPay build kiya. Ek chhote startup se shuruat — badi khwaish se aage badhna!</div>
+              </div>
+            </div>
+            <div style={{height:1,background:"var(--border)"}} />
+            <div style={{display:"flex",alignItems:"center",gap:16}}>
+              <div style={{width:56,height:56,borderRadius:"50%",background:"linear-gradient(135deg,#ec4899,#a855f7)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:22,fontWeight:800,color:"#fff",flexShrink:0}}>M</div>
+              <div>
+                <div className="syne" style={{fontWeight:700,fontSize:16}}>Mahima Gupta</div>
+                <div style={{color:"#ec4899",fontSize:13,marginBottom:4}}>Head of Marketing</div>
+                <div style={{fontSize:13,color:"var(--muted)",lineHeight:1.7}}>Brand strategy, seller outreach aur social media — EscaraPay ki awaaz! Sellers tak platform pahunchana inki zimmedari hai.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Values */}
+        <div className="card" style={{marginBottom:24}}>
+          <h2 className="syne" style={{fontWeight:800,fontSize:18,marginBottom:16}}>💎 Hamari Values</h2>
+          <div className="g2">
+            {[
+              {icon:"🔒",t:"Trust First",d:"Har transaction mein transparency. Koi hidden fees nahi."},
+              {icon:"⚡",t:"Speed",d:"Order create karo, link bhejo, 2 minute mein payment secure."},
+              {icon:"🛡️",t:"Protection",d:"Buyer aur seller dono ke liye equal protection."},
+              {icon:"🇮🇳",t:"Made for India",d:"Hinglish support, UPI integration, Indian business ke liye."},
+            ].map(v=>(
+              <div key={v.t} style={{display:"flex",gap:12,alignItems:"flex-start",padding:12,background:"var(--sf2)",borderRadius:10}}>
+                <span style={{fontSize:22,flexShrink:0}}>{v.icon}</span>
+                <div><div style={{fontWeight:700,fontSize:13,marginBottom:3}}>{v.t}</div><div style={{fontSize:12,color:"var(--muted)",lineHeight:1.6}}>{v.d}</div></div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div style={{textAlign:"center",marginBottom:12}}>
+          <button className="btn-gold" style={{marginRight:10}} onClick={()=>window._goToPage("contact")}>📞 Contact Us</button>
+          <button className="btn-ghost" onClick={onBack}>← Back to Home</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function PrivacyPage({ onBack, dark, onToggle }) {
-  return (<div style={{minHeight:"100vh"}}><nav className="nav"><Logo /><div style={{display:"flex",gap:8,alignItems:"center"}}><ThemeToggle dark={dark} onToggle={onToggle} /><button className="btn-ghost" onClick={onBack}>← Back</button></div></nav><div style={{maxWidth:760,margin:"0 auto",padding:"40px 20px"}}><h1 className="syne" style={{fontWeight:800,fontSize:"clamp(24px,4vw,36px)",marginBottom:8}}>Privacy Policy</h1><p style={{color:"var(--muted)",fontSize:13,marginBottom:32}}>Last updated: March 2026</p>{[{t:"1. Information We Collect",c:"Name, email, phone, UPI ID, transaction history, device info for security."},{t:"2. How We Use It",c:"Process escrow transactions, verify identity, send notifications, resolve disputes, comply with legal requirements."},{t:"3. Payment Info",c:"Razorpay handles all payments — RBI-compliant, PCI-DSS certified. We don't store card/banking credentials."},{t:"4. Sharing",c:"We don't sell your data. We may share with Razorpay, law enforcement when required, dispute partners."},{t:"5. Security",c:"SSL/TLS encryption, secure storage, regular audits, password hashing."},{t:"6. Contact",c:"support@escarapay.in | privacy@escarapay.in"}].map(s=>(<div key={s.t} className="card" style={{marginBottom:14}}><h3 className="syne" style={{fontWeight:700,fontSize:15,marginBottom:10,color:"var(--gold)"}}>{s.t}</h3><p style={{fontSize:13,color:"var(--muted)",lineHeight:1.8}}>{s.c}</p></div>))}<div style={{textAlign:"center",marginTop:24}}><button className="btn-ghost" onClick={onBack}>← Back to Home</button></div></div></div>);
+  return (
+    <div style={{minHeight:"100vh"}}>
+      <nav className="nav"><Logo /><div style={{display:"flex",gap:8,alignItems:"center"}}><ThemeToggle dark={dark} onToggle={onToggle} /><button className="btn-ghost" onClick={onBack}>← Back</button></div></nav>
+      <div style={{maxWidth:760,margin:"0 auto",padding:"40px 20px"}}>
+        <h1 className="syne" style={{fontWeight:800,fontSize:"clamp(24px,4vw,36px)",marginBottom:8}}>Privacy Policy</h1>
+        <p style={{color:"var(--muted)",fontSize:13,marginBottom:32}}>Last updated: March 2026 | Effective immediately</p>
+        {[
+          {t:"1. Information We Collect", c:"EscaraPay collects the following information when you register or use our services: Full name, email address, phone number (10 digits), PAN card or GST number (for sellers only), UPI ID (optional, for payouts), transaction history and order details, device information and IP address for security purposes."},
+          {t:"2. How We Use Your Information", c:"Your information is used strictly to: process and manage escrow transactions securely, verify your identity to prevent fraud, send transaction notifications and alerts, resolve disputes between buyers and sellers, comply with Indian financial regulations and legal requirements, improve our platform and services."},
+          {t:"3. Payment & Financial Data", c:"EscaraPay uses Razorpay as our payment gateway. Razorpay is fully RBI-compliant and PCI-DSS Level 1 certified. We do NOT store your card numbers, CVV, or banking credentials. Token amounts are held in escrow accounts managed through Razorpay's NBFC partner. All financial transactions are encrypted using 256-bit SSL."},
+          {t:"4. KYC & Seller Verification", c:"Sellers are required to provide either PAN Card or GST Number for KYC purposes as required by Indian financial regulations. This data is stored securely, encrypted, and is only accessed for payout verification and legal compliance. We never share KYC data for marketing purposes."},
+          {t:"5. Data Sharing Policy", c:"We do NOT sell or rent your personal information to any third party. We may share data only with: Razorpay for payment processing, law enforcement agencies when legally required by Indian courts, dispute resolution partners when investigating fraud. We will always notify you (where legally permitted) before sharing your data."},
+          {t:"6. Data Security", c:"We implement: SSL/TLS encryption for all data in transit, AES-256 encryption for sensitive data at rest, regular security audits and penetration testing, strict access controls — only authorized personnel can access user data, password hashing using industry-standard algorithms."},
+          {t:"7. Your Rights", c:"You have the right to: access all personal data we hold about you, request correction of inaccurate information, request deletion of your account (subject to legal retention requirements), opt out of non-essential communications, raise privacy concerns at privacy@escarapay.in. We respond to all requests within 30 days."},
+          {t:"8. Data Retention", c:"Transaction records are retained for 7 years as mandated by Indian financial laws (PMLA 2002). Account data is retained until you request deletion. After deletion, anonymized statistical data may be retained for platform analytics."},
+          {t:"9. Contact", c:"Privacy Officer: privacy@escarapay.in | General Support: support@escarapay.in | Website: escara-pay.vercel.app"},
+        ].map(s=>(
+          <div key={s.t} className="card" style={{marginBottom:14}}>
+            <h3 className="syne" style={{fontWeight:700,fontSize:15,marginBottom:10,color:"var(--gold)"}}>{s.t}</h3>
+            <p style={{fontSize:13,color:"var(--muted)",lineHeight:1.9}}>{s.c}</p>
+          </div>
+        ))}
+        <div style={{textAlign:"center",marginTop:24}}><button className="btn-ghost" onClick={onBack}>← Back to Home</button></div>
+      </div>
+    </div>
+  );
 }
 
 function TermsPage({ onBack, dark, onToggle }) {
-  return (<div style={{minHeight:"100vh"}}><nav className="nav"><Logo /><div style={{display:"flex",gap:8,alignItems:"center"}}><ThemeToggle dark={dark} onToggle={onToggle} /><button className="btn-ghost" onClick={onBack}>← Back</button></div></nav><div style={{maxWidth:760,margin:"0 auto",padding:"40px 20px"}}><h1 className="syne" style={{fontWeight:800,fontSize:"clamp(24px,4vw,36px)",marginBottom:8}}>Terms & Conditions</h1><p style={{color:"var(--muted)",fontSize:13,marginBottom:32}}>Last updated: March 2026</p>{[{t:"1. Acceptance",c:"By using EscaraPay, you agree to these terms."},{t:"2. Eligibility",c:"Must be 18+, have valid Indian bank/UPI ID, provide accurate info."},{t:"3. Fees",c:"Min ₹200 token. 2% gateway fee (non-refundable). 5% EscaraPay commission. Sellers receive 95% of token."},{t:"4. Token Release",c:"Delivered → Token to seller (7-day hold). Buyer cancels → Token to seller. Seller doesn't ship → Refund to buyer."},{t:"5. Prohibited",c:"Illegal goods, fraud, money laundering, fake accounts. Violations = immediate suspension."},{t:"6. Disputes",c:"Raise within 48 hours. EscaraPay investigates within 24 hours. Decision is final."},{t:"7. Governing Law",c:"Indian law. Complies with IT Act 2000, Payment and Settlement Systems Act 2007, RBI guidelines."}].map(s=>(<div key={s.t} className="card" style={{marginBottom:14}}><h3 className="syne" style={{fontWeight:700,fontSize:15,marginBottom:10,color:"var(--gold)"}}>{s.t}</h3><p style={{fontSize:13,color:"var(--muted)",lineHeight:1.8}}>{s.c}</p></div>))}<div style={{textAlign:"center",marginTop:24}}><button className="btn-ghost" onClick={onBack}>← Back to Home</button></div></div></div>);
+  return (
+    <div style={{minHeight:"100vh"}}>
+      <nav className="nav"><Logo /><div style={{display:"flex",gap:8,alignItems:"center"}}><ThemeToggle dark={dark} onToggle={onToggle} /><button className="btn-ghost" onClick={onBack}>← Back</button></div></nav>
+      <div style={{maxWidth:760,margin:"0 auto",padding:"40px 20px"}}>
+        <h1 className="syne" style={{fontWeight:800,fontSize:"clamp(24px,4vw,36px)",marginBottom:8}}>Terms & Conditions</h1>
+        <p style={{color:"var(--muted)",fontSize:13,marginBottom:32}}>Last updated: March 2026 | Effective immediately upon registration</p>
+
+        {[
+          {t:"1. Acceptance of Terms", c:"By registering for or using EscaraPay, you agree to be bound by these Terms & Conditions. If you do not agree, please do not use our services. These terms apply to both buyers and sellers using the EscaraPay platform on any device or interface."},
+          {t:"2. Eligibility", c:"To use EscaraPay you must: be at least 18 years of age, have a valid Indian bank account or UPI ID, provide accurate and truthful registration information including valid PAN/GST (for sellers), not be prohibited from using financial services under any Indian law or court order."},
+          {t:"3. Fee Structure", c:"Minimum token amount: ₹200 per transaction. Gateway fee: 2% charged to the buyer (non-refundable in all cases). EscaraPay commission: 5% deducted from token amount. Seller receives: 95% of token amount upon successful delivery. All fees are clearly displayed before any transaction is confirmed."},
+          {t:"4. Token Release Conditions", c:"Condition 1 — Order Delivered: Buyer confirms delivery → token held for 7 days → auto-released to seller. Condition 2 — Buyer Cancels Before Dispatch: Token goes to seller as shipping cover compensation. Condition 3 — Seller Fails to Ship: If seller does not dispatch within agreed time, full token is refunded to buyer. Gateway fee and EscaraPay commission are non-refundable in all scenarios."},
+        ].map(s=>(
+          <div key={s.t} className="card" style={{marginBottom:14}}>
+            <h3 className="syne" style={{fontWeight:700,fontSize:15,marginBottom:10,color:"var(--gold)"}}>{s.t}</h3>
+            <p style={{fontSize:13,color:"var(--muted)",lineHeight:1.9}}>{s.c}</p>
+          </div>
+        ))}
+
+        {/* Dispute section highlighted */}
+        <div className="card" style={{marginBottom:14,background:"rgba(239,68,68,.05)",borderColor:"rgba(239,68,68,.3)"}}>
+          <h3 className="syne" style={{fontWeight:700,fontSize:15,marginBottom:12,color:"var(--red)"}}>5. Dispute Policy (Vistar mein)</h3>
+          <div style={{display:"flex",flexDirection:"column",gap:10}}>
+            {[
+              {icon:"⏰",t:"Dispute Window",d:"Buyers must raise a dispute within 48 hours of expected delivery date. After 48 hours, token auto-releases to seller."},
+              {icon:"📋",t:"How to Raise Dispute",d:"Open your order → Click 'Dispute Raise Karo' → Select reason → Submit evidence if any. Seller will be notified immediately."},
+              {icon:"🔍",t:"Investigation Process",d:"EscaraPay team investigates within 24 business hours. Both buyer and seller must provide evidence (photos, screenshots, tracking info). During investigation, token remains frozen."},
+              {icon:"⚖️",t:"Resolution",d:"EscaraPay's decision is final and binding. If buyer is right → full token refunded to buyer. If seller is right → token released to seller. Partial resolutions may be made at EscaraPay's discretion."},
+              {icon:"🚫",t:"Invalid Disputes",d:"Disputes raised after 48 hours, disputes without valid reason, or repeated false disputes may result in account suspension."},
+              {icon:"📞",t:"Escalation",d:"If unsatisfied with resolution, email legal@escarapay.in with transaction ID. We escalate unresolved cases within 7 business days."},
+            ].map(d=>(
+              <div key={d.t} style={{display:"flex",gap:12,padding:10,background:"var(--sf2)",borderRadius:10}}>
+                <span style={{fontSize:18,flexShrink:0}}>{d.icon}</span>
+                <div><div style={{fontWeight:600,fontSize:13,marginBottom:3}}>{d.t}</div><div style={{fontSize:12,color:"var(--muted)",lineHeight:1.7}}>{d.d}</div></div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {[
+          {t:"6. Prohibited Activities", c:"Users may not use EscaraPay for: sale of illegal, counterfeit, or prohibited goods, fraudulent transactions or identity theft, money laundering or financial fraud, creating multiple accounts to abuse the platform, harassment or threatening other users. Violations result in immediate account suspension, fund freeze, and may be reported to law enforcement under IT Act 2000 and IPC."},
+          {t:"7. Seller Responsibilities", c:"Sellers must: accurately describe products and their condition, ship within the timeframe mentioned during order creation, provide valid tracking information after dispatch, respond to buyer queries within 24 hours, honor the deal terms agreed upon during order creation. Failure to meet these responsibilities may result in token refund to buyer and account suspension."},
+          {t:"8. Buyer Responsibilities", c:"Buyers must: provide accurate delivery address and contact information, respond to delivery confirmation requests within 48 hours, raise disputes only for genuine reasons with evidence, not attempt chargebacks through their bank while EscaraPay dispute is active. False chargeback attempts will result in immediate account suspension."},
+          {t:"9. Limitation of Liability", c:"EscaraPay's liability is strictly limited to the token amount held in escrow for that specific transaction. We are not liable for: quality, safety, or legality of products exchanged, indirect or consequential damages, losses due to network failures or payment gateway downtime, disputes arising from incorrect information provided by either party."},
+          {t:"10. Governing Law & Jurisdiction", c:"These Terms are governed by the laws of India. All disputes are subject to the exclusive jurisdiction of courts in India. These terms comply with: Information Technology Act 2000, Payment and Settlement Systems Act 2007, Prevention of Money Laundering Act 2002, Applicable RBI guidelines on payment aggregators."},
+          {t:"11. Contact for Legal Matters", c:"Legal queries: legal@escarapay.in | Dispute escalation: disputes@escarapay.in | General support: support@escarapay.in"},
+        ].map(s=>(
+          <div key={s.t} className="card" style={{marginBottom:14}}>
+            <h3 className="syne" style={{fontWeight:700,fontSize:15,marginBottom:10,color:"var(--gold)"}}>{s.t}</h3>
+            <p style={{fontSize:13,color:"var(--muted)",lineHeight:1.9}}>{s.c}</p>
+          </div>
+        ))}
+        <div style={{textAlign:"center",marginTop:24}}><button className="btn-ghost" onClick={onBack}>← Back to Home</button></div>
+      </div>
+    </div>
+  );
 }
 
 function ContactPage({ onBack, dark, onToggle }) {
   const [form, setForm] = useState({name:"",email:"",subject:"",message:""});
   const [sent, setSent] = useState(false);
-  return (<div style={{minHeight:"100vh"}}><nav className="nav"><Logo /><div style={{display:"flex",gap:8,alignItems:"center"}}><ThemeToggle dark={dark} onToggle={onToggle} /><button className="btn-ghost" onClick={onBack}>← Back</button></div></nav><div style={{maxWidth:680,margin:"0 auto",padding:"40px 20px"}}><div style={{textAlign:"center",marginBottom:40}}><h1 className="syne" style={{fontWeight:800,fontSize:"clamp(24px,4vw,36px)",marginBottom:8}}>Contact Us</h1><p style={{color:"var(--muted)",fontSize:14}}>24 ghante mein jawaab denge!</p></div><div className="g3" style={{marginBottom:32}}>{[{icon:"📧",title:"Support",value:"support@escarapay.in"},{icon:"⚖️",title:"Legal",value:"legal@escarapay.in"},{icon:"📱",title:"WhatsApp",value:"+91-99999-ESCARA"}].map(c=>(<div key={c.title} className="card" style={{textAlign:"center"}}><div style={{fontSize:28,marginBottom:10}}>{c.icon}</div><div className="syne" style={{fontWeight:700,fontSize:13,marginBottom:4}}>{c.title}</div><div style={{fontSize:12,color:"var(--gold)",wordBreak:"break-all"}}>{c.value}</div></div>))}</div>{!sent?(<div className="card"><h3 className="syne" style={{fontWeight:700,fontSize:18,marginBottom:20}}>Message Bhejo</h3><div style={{display:"flex",flexDirection:"column",gap:14}}><div className="g2"><div><label className="label">Naam *</label><input className="input" value={form.name} onChange={e=>setForm({...form,name:e.target.value})} /></div><div><label className="label">Email *</label><input className="input" value={form.email} onChange={e=>setForm({...form,email:e.target.value})} /></div></div><div><label className="label">Subject *</label><select className="select" value={form.subject} onChange={e=>setForm({...form,subject:e.target.value})}><option value="">-- Select --</option><option>Payment Issue</option><option>Dispute Help</option><option>Refund Request</option><option>Other</option></select></div><div><label className="label">Message *</label><textarea className="input" rows={5} value={form.message} onChange={e=>setForm({...form,message:e.target.value})} style={{resize:"vertical"}} /></div><button className="btn-gold" style={{width:"100%",padding:12}} onClick={()=>{ if(form.name&&form.email&&form.subject&&form.message) setSent(true); else alert("Sab fields bharo!"); }}>📨 Message Bhejo</button></div></div>):(<div className="card" style={{textAlign:"center",padding:50}}><div style={{fontSize:52,marginBottom:16}}>✅</div><div className="syne" style={{fontWeight:800,fontSize:22,marginBottom:8}}>Message Mila!</div><div style={{color:"var(--muted)",fontSize:14,marginBottom:24}}>Ref: <strong style={{color:"var(--gold)"}}>ESC-{Date.now().toString().slice(-6)}</strong></div><button className="btn-ghost" onClick={()=>setSent(false)}>← Wapas Jao</button></div>)}<div style={{textAlign:"center",marginTop:24}}><button className="btn-ghost" onClick={onBack}>← Back</button></div></div></div>);
+  return (
+    <div style={{minHeight:"100vh"}}>
+      <nav className="nav"><Logo /><div style={{display:"flex",gap:8,alignItems:"center"}}><ThemeToggle dark={dark} onToggle={onToggle} /><button className="btn-ghost" onClick={onBack}>← Back</button></div></nav>
+      <div style={{maxWidth:680,margin:"0 auto",padding:"40px 20px"}}>
+        <div style={{textAlign:"center",marginBottom:40}}>
+          <h1 className="syne" style={{fontWeight:800,fontSize:"clamp(24px,4vw,36px)",marginBottom:8}}>Contact Us</h1>
+          <p style={{color:"var(--muted)",fontSize:14}}>24 ghante mein jawaab denge!</p>
+        </div>
+        <div className="g3" style={{marginBottom:32}}>
+          {[{icon:"📧",title:"Support",value:"support@escarapay.in",sub:"General queries"},{icon:"⚖️",title:"Legal / Dispute",value:"legal@escarapay.in",sub:"Legal & escalation"},{icon:"📱",title:"WhatsApp",value:"+91-99999-ESCARA",sub:"Quick support"}].map(c=>(
+            <div key={c.title} className="card" style={{textAlign:"center"}}><div style={{fontSize:28,marginBottom:10}}>{c.icon}</div><div className="syne" style={{fontWeight:700,fontSize:13,marginBottom:4}}>{c.title}</div><div style={{fontSize:12,color:"var(--gold)",wordBreak:"break-all",marginBottom:2}}>{c.value}</div><div style={{fontSize:11,color:"var(--muted)"}}>{c.sub}</div></div>
+          ))}
+        </div>
+        {!sent ? (
+          <div className="card">
+            <h3 className="syne" style={{fontWeight:700,fontSize:18,marginBottom:20}}>Message Bhejo</h3>
+            <div style={{display:"flex",flexDirection:"column",gap:14}}>
+              <div className="g2">
+                <div><label className="label">Naam *</label><input className="input" value={form.name} onChange={e=>setForm({...form,name:e.target.value})} /></div>
+                <div><label className="label">Email *</label><input className="input" value={form.email} onChange={e=>setForm({...form,email:e.target.value})} /></div>
+              </div>
+              <div><label className="label">Subject *</label>
+                <select className="select" value={form.subject} onChange={e=>setForm({...form,subject:e.target.value})}>
+                  <option value="">-- Select --</option>
+                  <option>Payment Issue</option><option>Dispute Help</option><option>Refund Request</option>
+                  <option>Account Problem</option><option>Technical Bug</option><option>Partnership</option><option>Other</option>
+                </select>
+              </div>
+              <div><label className="label">Message *</label><textarea className="input" placeholder="Apni problem ya sawaal yahan likhein..." rows={5} value={form.message} onChange={e=>setForm({...form,message:e.target.value})} style={{resize:"vertical"}} /></div>
+              <button className="btn-gold" style={{width:"100%",padding:12}} onClick={()=>{ if(form.name&&form.email&&form.subject&&form.message) setSent(true); else alert("Sab fields bharo!"); }}>📨 Message Bhejo</button>
+            </div>
+          </div>
+        ) : (
+          <div className="card" style={{textAlign:"center",padding:50}}>
+            <div style={{fontSize:52,marginBottom:16}}>✅</div>
+            <div className="syne" style={{fontWeight:800,fontSize:22,marginBottom:8}}>Message Mila!</div>
+            <div style={{color:"var(--muted)",fontSize:14,marginBottom:24}}>Hum 24 ghante mein jawaab denge.<br/>Reference: <strong style={{color:"var(--gold)"}}>ESC-{Date.now().toString().slice(-6)}</strong></div>
+            <button className="btn-ghost" onClick={()=>setSent(false)}>← Wapas Jao</button>
+          </div>
+        )}
+        <div style={{textAlign:"center",marginTop:24}}><button className="btn-ghost" onClick={onBack}>← Back</button></div>
+      </div>
+    </div>
+  );
 }
 
 /* ══════════ MAIN APP ══════════ */
@@ -1425,6 +1905,7 @@ export default function App() {
       {screen==="deal"        && dealOrderId && <DealPage   orderId={dealOrderId} dark={dark} onToggle={toggleDark} onGoHome={goHome} />}
       {screen==="admin-login" && <AdminLogin  onLogin={(k)=>{setAdminKey(k);setScreen("admin");}} dark={dark} onToggle={toggleDark} />}
       {screen==="admin"       && <AdminPanel  adminKey={adminKey} onLogout={()=>{localStorage.removeItem("adminKey");setScreen("landing");}} dark={dark} onToggle={toggleDark} />}
+      {screen==="about"       && <AboutPage   onBack={()=>setScreen("landing")} {...props} />}
       {screen==="privacy"     && <PrivacyPage onBack={()=>setScreen("landing")} {...props} />}
       {screen==="terms"       && <TermsPage   onBack={()=>setScreen("landing")} {...props} />}
       {screen==="contact"     && <ContactPage onBack={()=>setScreen("landing")} {...props} />}
