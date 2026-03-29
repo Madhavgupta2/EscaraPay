@@ -617,15 +617,69 @@ function Landing({ onEnter, dark, onToggle, lang, onLangToggle }) {
           ))}
         </div>
       </div>
-      <div style={{borderTop:"1px solid var(--border)",padding:"18px 40px",display:"flex",justifyContent:"space-between",alignItems:"center",flexWrap:"wrap",gap:10}}>
-        <Logo />
-        <div style={{color:"var(--muted)",fontSize:12}}>© 2026 EscaraPay. Secure Token-Based Payments for India.</div>
-        <div style={{display:"flex",gap:16}}>
-          {[["🏢 About","about"],["🔒 Privacy","privacy"],["📋 Terms","terms"],["📞 Contact","contact"]].map(([l,s])=>(
-            <span key={l} style={{color:"var(--muted)",fontSize:12,cursor:"pointer"}} onClick={()=>window._goToPage(s)}>{l}</span>
+
+      {/* TRUST BAR */}
+      <div style={{background:dark?"rgba(14,165,233,.08)":"rgba(14,165,233,.06)",borderTop:"1px solid var(--border)",borderBottom:"1px solid var(--border)",padding:"14px 20px"}}>
+        <div style={{maxWidth:900,margin:"0 auto",display:"flex",justifyContent:"center",alignItems:"center",gap:"clamp(16px,4vw,48px)",flexWrap:"wrap"}}>
+          {[
+            {icon:"🔒",text:"Secure Payments"},
+            {icon:"🛡️",text:"Escrow Protection"},
+            {icon:"⚡",text:"Fast & Safe"},
+            {icon:"✅",text:"Powered by Razorpay (RBI Compliant)"},
+          ].map(b=>(
+            <div key={b.text} style={{display:"flex",alignItems:"center",gap:6,fontSize:12,fontWeight:600,color:"var(--gold)",whiteSpace:"nowrap"}}>
+              <span>{b.icon}</span><span>{b.text}</span>
+            </div>
           ))}
         </div>
       </div>
+
+      {/* PROFESSIONAL FOOTER */}
+      <footer style={{background:dark?"#08080f":"#0c2340",padding:"40px 20px 24px",color:"#fff"}}>
+        <div style={{maxWidth:960,margin:"0 auto"}}>
+          <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(180px,1fr))",gap:32,marginBottom:32}}>
+            {/* Brand */}
+            <div>
+              <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:12}}>
+                <img src={LOGO_SRC} alt="EscaraPay" style={{height:28,objectFit:"contain"}} onError={e=>e.target.style.display="none"} />
+                <span style={{fontFamily:"'Syne',sans-serif",fontWeight:800,fontSize:16,color:"#fff"}}>EscaraPay</span>
+              </div>
+              <p style={{fontSize:12,color:"rgba(255,255,255,.55)",lineHeight:1.8,marginBottom:12}}>India's trusted escrow payment platform for WhatsApp & Instagram sellers.</p>
+              <div style={{fontSize:11,color:"rgba(255,255,255,.4)"}}>CIN: Applied for Registration<br/>GST: Applied</div>
+            </div>
+            {/* Company */}
+            <div>
+              <div style={{fontSize:12,fontWeight:700,color:"rgba(255,255,255,.5)",textTransform:"uppercase",letterSpacing:1,marginBottom:12}}>Company</div>
+              {[["About Us","about"],["Contact Us","contact"],["How It Works","landing"]].map(([l,s])=>(
+                <div key={l} style={{fontSize:13,color:"rgba(255,255,255,.7)",marginBottom:8,cursor:"pointer"}} onClick={()=>window._goToPage(s)}>{l}</div>
+              ))}
+            </div>
+            {/* Legal */}
+            <div>
+              <div style={{fontSize:12,fontWeight:700,color:"rgba(255,255,255,.5)",textTransform:"uppercase",letterSpacing:1,marginBottom:12}}>Legal</div>
+              {[["Terms & Conditions","terms"],["Privacy Policy","privacy"],["Refund Policy","refund"],["Dispute Resolution","dispute"]].map(([l,s])=>(
+                <div key={l} style={{fontSize:13,color:"rgba(255,255,255,.7)",marginBottom:8,cursor:"pointer"}} onClick={()=>window._goToPage(s)}>{l}</div>
+              ))}
+            </div>
+            {/* Contact */}
+            <div>
+              <div style={{fontSize:12,fontWeight:700,color:"rgba(255,255,255,.5)",textTransform:"uppercase",letterSpacing:1,marginBottom:12}}>Contact</div>
+              <div style={{fontSize:13,color:"rgba(255,255,255,.7)",marginBottom:6}}>📧 support@escarapay.in</div>
+              <div style={{fontSize:13,color:"rgba(255,255,255,.7)",marginBottom:6}}>⚖️ legal@escarapay.in</div>
+              <div style={{fontSize:12,color:"rgba(255,255,255,.4)",marginTop:12,lineHeight:1.7}}>Response time: 24 hours<br/>Mon–Sat, 10AM–6PM IST</div>
+            </div>
+          </div>
+          {/* Bottom bar */}
+          <div style={{borderTop:"1px solid rgba(255,255,255,.1)",paddingTop:20,display:"flex",justifyContent:"space-between",alignItems:"center",flexWrap:"wrap",gap:10}}>
+            <div style={{fontSize:11,color:"rgba(255,255,255,.4)"}}>© 2026 EscaraPay (India). All rights reserved. | Jurisdiction: Uttar Pradesh, India</div>
+            <div style={{display:"flex",gap:16}}>
+              {[["Terms","terms"],["Privacy","privacy"],["Refund","refund"],["Dispute","dispute"]].map(([l,s])=>(
+                <span key={l} style={{fontSize:11,color:"rgba(255,255,255,.4)",cursor:"pointer"}} onClick={()=>window._goToPage(s)}>{l}</span>
+              ))}
+            </div>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 }
@@ -1487,7 +1541,7 @@ function UserDetailModal({ user, adminKey, onClose, onUpdate }) {
   const [warnReason, setWarnReason] = useState("");
   const [banReason, setBanReason] = useState("");
   const [msg, setMsg] = useState("");
-  const [tab, setTab] = useState("details");
+  const [tab, setTab] = useState("actions");
 
   const hdrs = { "Content-Type":"application/json", "x-admin-key": adminKey };
 
@@ -2010,23 +2064,190 @@ function AboutPage({ onBack, dark, onToggle, lang, onLangToggle }) {
   );
 }
 
-function PrivacyPage({ onBack, dark, onToggle }) {
+/* ══════════ LEGAL NAV ══════════ */
+function LegalNav({ active, onNav, dark, onToggle }) {
+  const links = [
+    ["home","🏠 Home"],
+    ["about","About"],
+    ["terms","Terms"],
+    ["privacy","Privacy"],
+    ["refund","Refund"],
+    ["dispute","Dispute"],
+    ["contact","Contact"],
+  ];
+  return (
+    <nav className="nav" style={{gap:0}}>
+      <Logo onClick={()=>onNav("landing")} />
+      <div style={{display:"flex",gap:4,alignItems:"center",flexWrap:"nowrap",overflow:"auto"}}>
+        <div className="hide-m" style={{display:"flex",gap:2}}>
+          {links.map(([s,l])=>(
+            <button key={s} onClick={()=>onNav(s==="home"?"landing":s)}
+              style={{background:active===s?"var(--gold)":"transparent",color:active===s?(dark?"#0a0a0f":"#fff"):"var(--muted)",
+                border:"none",borderRadius:7,padding:"5px 10px",cursor:"pointer",fontSize:12,fontWeight:600,whiteSpace:"nowrap",fontFamily:"'DM Sans',sans-serif",transition:"all .2s"}}>
+              {l}
+            </button>
+          ))}
+        </div>
+        <ThemeToggle dark={dark} onToggle={onToggle} />
+      </div>
+    </nav>
+  );
+}
+
+/* ══════════ REFUND POLICY PAGE ══════════ */
+function RefundPage({ onBack, dark, onToggle }) {
+  const nav = (s) => { window._goToPage(s); };
   return (
     <div style={{minHeight:"100vh"}}>
-      <nav className="nav"><Logo /><div style={{display:"flex",gap:8,alignItems:"center"}}><ThemeToggle dark={dark} onToggle={onToggle} /><button className="btn-ghost" onClick={onBack}>← Back</button></div></nav>
+      <LegalNav active="refund" onNav={nav} dark={dark} onToggle={onToggle} />
       <div style={{maxWidth:760,margin:"0 auto",padding:"40px 20px"}}>
-        <h1 className="syne" style={{fontWeight:800,fontSize:"clamp(24px,4vw,36px)",marginBottom:8}}>Privacy Policy</h1>
-        <p style={{color:"var(--muted)",fontSize:13,marginBottom:32}}>Last updated: March 2026 | Effective immediately</p>
+        <div style={{textAlign:"center",marginBottom:40}}>
+          <div style={{fontSize:48,marginBottom:12}}>↩️</div>
+          <h1 className="syne" style={{fontWeight:800,fontSize:"clamp(24px,4vw,36px)",marginBottom:8}}>Refund Policy</h1>
+          <p style={{color:"var(--muted)",fontSize:13}}>EscaraPay (India) | Last updated: March 2026</p>
+        </div>
+
+        <div style={{background:"rgba(5,150,105,.08)",border:"1px solid rgba(5,150,105,.3)",borderRadius:14,padding:20,marginBottom:24}}>
+          <div style={{fontWeight:700,fontSize:15,color:"var(--green)",marginBottom:8}}>✅ Our Refund Promise</div>
+          <p style={{fontSize:13,color:"var(--muted)",lineHeight:1.8}}>EscaraPay is an escrow-based platform. We hold payments in trust and release them only when delivery is confirmed. If delivery does not happen, your money comes back. Simple.</p>
+        </div>
+
         {[
-          {t:"1. Information We Collect", c:"EscaraPay collects the following information when you register or use our services: Full name, email address, phone number (10 digits), PAN card or GST number (for sellers only), UPI ID (optional, for payouts), transaction history and order details, device information and IP address for security purposes."},
-          {t:"2. How We Use Your Information", c:"Your information is used strictly to: process and manage escrow transactions securely, verify your identity to prevent fraud, send transaction notifications and alerts, resolve disputes between buyers and sellers, comply with Indian financial regulations and legal requirements, improve our platform and services."},
-          {t:"3. Payment & Financial Data", c:"EscaraPay uses Razorpay as our payment gateway. Razorpay is fully RBI-compliant and PCI-DSS Level 1 certified. We do NOT store your card numbers, CVV, or banking credentials. Token amounts are held in escrow accounts managed through Razorpay's NBFC partner. All financial transactions are encrypted using 256-bit SSL."},
-          {t:"4. KYC & Seller Verification", c:"Sellers are required to provide either PAN Card or GST Number for KYC purposes as required by Indian financial regulations. This data is stored securely, encrypted, and is only accessed for payout verification and legal compliance. We never share KYC data for marketing purposes."},
-          {t:"5. Data Sharing Policy", c:"We do NOT sell or rent your personal information to any third party. We may share data only with: Razorpay for payment processing, law enforcement agencies when legally required by Indian courts, dispute resolution partners when investigating fraud. We will always notify you (where legally permitted) before sharing your data."},
-          {t:"6. Data Security", c:"We implement: SSL/TLS encryption for all data in transit, AES-256 encryption for sensitive data at rest, regular security audits and penetration testing, strict access controls — only authorized personnel can access user data, password hashing using industry-standard algorithms."},
-          {t:"7. Your Rights", c:"You have the right to: access all personal data we hold about you, request correction of inaccurate information, request deletion of your account (subject to legal retention requirements), opt out of non-essential communications, raise privacy concerns at privacy@escarapay.in. We respond to all requests within 30 days."},
-          {t:"8. Data Retention", c:"Transaction records are retained for 7 years as mandated by Indian financial laws (PMLA 2002). Account data is retained until you request deletion. After deletion, anonymized statistical data may be retained for platform analytics."},
-          {t:"9. Contact", c:"Privacy Officer: privacy@escarapay.in | General Support: support@escarapay.in | Website: escara-pay.vercel.app"},
+          {t:"1. When You Get a Refund",icon:"✅",color:"var(--green)",sections:[
+            {head:"Non-Delivery by Seller",body:"If the seller does not dispatch your order within the agreed time, 100% of your token amount is refunded to your original payment method. Processing time: 5–7 business days."},
+            {head:"Seller Cancellation",body:"If the seller cancels the order before dispatch, your full token is refunded. The 2% gateway fee is non-refundable as it is charged by Razorpay directly."},
+            {head:"Successful Dispute Resolution (Buyer)",body:"If EscaraPay's dispute team determines the seller is at fault (e.g., item not received, wrong item, damaged goods), the token amount is refunded to you within 5–7 business days."},
+          ]},
+          {t:"2. When You Do NOT Get a Refund",icon:"❌",color:"var(--red)",sections:[
+            {head:"Delivery Confirmed by Buyer",body:"Once you confirm delivery, the payment is permanently released to the seller. This action cannot be reversed."},
+            {head:"Auto-Release After 7 Days",body:"If you do not raise a dispute within 48 hours of expected delivery, the token auto-releases to the seller after 7 days. No refund after auto-release."},
+            {head:"Gateway Fee (2%)",body:"The 2% payment gateway fee charged by Razorpay is non-refundable in all cases, as it is collected by the payment processor, not by EscaraPay."},
+            {head:"EscaraPay Commission (5%)",body:"EscaraPay's 5% service commission is non-refundable once a transaction is initiated, as it covers platform infrastructure and dispute resolution services."},
+          ]},
+          {t:"3. Refund Timeline",icon:"⏱️",color:"var(--blue)",sections:[
+            {head:"Standard Refunds",body:"5–7 business days from approval date to original payment method (UPI/Card/NetBanking)."},
+            {head:"Dispute-Based Refunds",body:"Up to 10 business days — includes 24-hour investigation period plus 5–7 days processing."},
+            {head:"Bank Processing",body:"Once EscaraPay initiates the refund, your bank may take additional 2–3 business days to reflect in your account."},
+          ]},
+          {t:"4. How to Request a Refund",icon:"📋",color:"var(--accent)",sections:[
+            {head:"Step 1 — Raise a Dispute",body:"Open your order in the EscaraPay app → Click 'Dispute Raise Karo' → Provide reason and evidence."},
+            {head:"Step 2 — Investigation",body:"Our team investigates within 24 business hours. We may contact both buyer and seller for clarification."},
+            {head:"Step 3 — Resolution",body:"If resolved in your favor, refund is initiated within 2 business days. You'll receive a confirmation email."},
+            {head:"Step 4 — Contact Support",body:"For any refund queries: support@escarapay.in | Response time: within 24 hours."},
+          ]},
+          {t:"5. EscaraPay's Role",icon:"🛡️",color:"var(--muted)",sections:[
+            {head:"Facilitator Only",body:"EscaraPay is a payment escrow facilitator. We do not manufacture, sell, or ship any products. We are responsible only for holding and releasing the escrow amount as per our policy."},
+            {head:"Payments via Razorpay",body:"All payments are processed through Razorpay, an RBI-authorized payment aggregator. EscaraPay does not directly hold or process payment card data."},
+          ]},
+        ].map(section=>(
+          <div key={section.t} className="card" style={{marginBottom:16}}>
+            <h2 className="syne" style={{fontWeight:700,fontSize:16,marginBottom:14,color:section.color}}>{section.icon} {section.t}</h2>
+            <div style={{display:"flex",flexDirection:"column",gap:12}}>
+              {section.sections.map(s=>(
+                <div key={s.head} style={{padding:"12px 14px",background:"var(--sf2)",borderRadius:10}}>
+                  <div style={{fontWeight:600,fontSize:13,marginBottom:4}}>{s.head}</div>
+                  <div style={{fontSize:13,color:"var(--muted)",lineHeight:1.8}}>{s.body}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+        ))}
+
+        <div className="card" style={{background:"rgba(14,165,233,.06)",borderColor:"rgba(14,165,233,.3)",textAlign:"center",marginBottom:24}}>
+          <div style={{fontWeight:700,fontSize:14,marginBottom:6}}>📧 Refund Queries</div>
+          <div style={{fontSize:13,color:"var(--muted)"}}>Email: <strong>support@escarapay.in</strong> | Response within 24 hours</div>
+          <div style={{fontSize:12,color:"var(--muted)",marginTop:4}}>EscaraPay (India) | Jurisdiction: Uttar Pradesh, India</div>
+        </div>
+        <div style={{textAlign:"center"}}><button className="btn-ghost" onClick={onBack}>← Back to Home</button></div>
+      </div>
+    </div>
+  );
+}
+
+/* ══════════ DISPUTE RESOLUTION PAGE ══════════ */
+function DisputePage({ onBack, dark, onToggle }) {
+  const nav = (s) => { window._goToPage(s); };
+  return (
+    <div style={{minHeight:"100vh"}}>
+      <LegalNav active="dispute" onNav={nav} dark={dark} onToggle={onToggle} />
+      <div style={{maxWidth:760,margin:"0 auto",padding:"40px 20px"}}>
+        <div style={{textAlign:"center",marginBottom:40}}>
+          <div style={{fontSize:48,marginBottom:12}}>⚖️</div>
+          <h1 className="syne" style={{fontWeight:800,fontSize:"clamp(24px,4vw,36px)",marginBottom:8}}>Dispute Resolution Policy</h1>
+          <p style={{color:"var(--muted)",fontSize:13}}>EscaraPay (India) | Last updated: March 2026</p>
+        </div>
+
+        <div style={{background:"rgba(124,58,237,.08)",border:"1px solid rgba(124,58,237,.3)",borderRadius:14,padding:20,marginBottom:24}}>
+          <div style={{fontWeight:700,fontSize:15,color:"#a78bfa",marginBottom:8}}>🛡️ Fair. Transparent. Final.</div>
+          <p style={{fontSize:13,color:"var(--muted)",lineHeight:1.8}}>EscaraPay is committed to fair dispute resolution. Our team reviews all evidence objectively and makes a binding decision within 24 business hours. Both buyer and seller are heard before any decision is made.</p>
+        </div>
+
+        {/* Timeline */}
+        <div className="card" style={{marginBottom:16}}>
+          <h2 className="syne" style={{fontWeight:700,fontSize:16,marginBottom:16}}>📋 Dispute Process Step by Step</h2>
+          {[
+            {n:"1",c:"var(--gold)",   t:"Raise Dispute",       d:"Open your order → Click 'Dispute Raise Karo' → Select reason → Add any evidence (photos, screenshots). Must be raised within 48 hours of expected delivery."},
+            {n:"2",c:"var(--blue)",   t:"Notification",         d:"Both buyer and seller are notified immediately. The escrow token is frozen — no one can access it during investigation."},
+            {n:"3",c:"var(--accent)", t:"Evidence Collection",  d:"Both parties must submit evidence within 24 hours: photos of item received, tracking screenshots, chat screenshots, any proof of delivery or non-delivery."},
+            {n:"4",c:"var(--red)",    t:"Investigation",        d:"EscaraPay's dispute team reviews all evidence. We may contact courier partners for tracking verification. Investigation completes within 24 business hours."},
+            {n:"5",c:"var(--green)",  t:"Decision & Release",   d:"EscaraPay makes a final, binding decision. Token is released to the winning party within 2 business days. Both parties are notified via email."},
+          ].map(s=>(
+            <div key={s.n} className="step" style={{marginBottom:10}}>
+              <div className="step-num" style={{background:`${s.c}20`,color:s.c,width:34,height:34,fontSize:15,flexShrink:0}}>{s.n}</div>
+              <div><div style={{fontWeight:700,fontSize:14,marginBottom:3}}>{s.t}</div><div style={{fontSize:13,color:"var(--muted)",lineHeight:1.7}}>{s.d}</div></div>
+            </div>
+          ))}
+        </div>
+
+        {[
+          {t:"1. Eligibility to Raise Dispute",icon:"⏰",color:"var(--gold)",c:"A dispute can only be raised within 48 hours of the expected delivery date. After 48 hours, the token automatically releases to the seller. Disputes raised after this window will not be considered. Emergency cases (e.g., seller fraud) may be escalated to legal@escarapay.in."},
+          {t:"2. Valid Grounds for Dispute",icon:"📋",color:"var(--blue)",c:"Valid reasons include: Item not received despite tracking showing delivered, Wrong item received (different from description), Item received in damaged condition, Counterfeit or fake product received, Seller has not dispatched within agreed time. Invalid reasons: Change of mind, Item meets description but buyer doesn't like it, Buyer provided wrong delivery address."},
+          {t:"3. Evidence Requirements",icon:"📸",color:"var(--accent)",c:"Buyers must provide: Photos/video of the item received (or proof of non-receipt), Screenshot of tracking showing non-delivery or wrong delivery, Original order confirmation from EscaraPay. Sellers must provide: Proof of dispatch (courier receipt, tracking ID), Photos of item packed and shipped, Any communication with buyer confirming order details."},
+          {t:"4. EscaraPay's Decision — Final & Binding",icon:"⚖️",color:"var(--red)",c:"EscaraPay's dispute team makes the final decision based on evidence. This decision is binding on both parties and cannot be appealed within the platform. Possible outcomes: (a) Full refund to buyer, (b) Full token release to seller, (c) Partial resolution at EscaraPay's discretion. EscaraPay acts as a neutral facilitator — we are not liable for product quality, authenticity, or any loss beyond the escrowed token amount."},
+          {t:"5. Escalation",icon:"📞",color:"var(--muted)",c:"If you believe the decision was unfair due to procedural error, you may escalate within 7 days by emailing legal@escarapay.in with: Your Order ID, Evidence not previously submitted, Reason for escalation. Escalated cases are reviewed by senior team within 7 business days. EscaraPay's escalation decision is final."},
+          {t:"6. Anti-Abuse Policy",icon:"🚫",color:"var(--red)",c:"Repeated false disputes, submission of fake evidence, or attempts to manipulate the dispute process will result in: Immediate account suspension, Permanent ban from the platform, Reporting to relevant law enforcement under IPC Section 420 (Cheating) and IT Act 2000. EscaraPay reserves the right to charge a dispute processing fee of ₹99 for disputes found to be frivolous."},
+          {t:"7. Governing Law",icon:"🇮🇳",color:"var(--green)",c:"All disputes and their resolution are subject to Indian law. In case of legal proceedings, jurisdiction lies exclusively with courts in Uttar Pradesh, India. Users agree to resolve disputes through EscaraPay's internal process before approaching courts."},
+        ].map(s=>(
+          <div key={s.t} className="card" style={{marginBottom:14}}>
+            <h3 className="syne" style={{fontWeight:700,fontSize:15,marginBottom:10,color:s.color}}>{s.icon} {s.t}</h3>
+            <p style={{fontSize:13,color:"var(--muted)",lineHeight:1.9}}>{s.c}</p>
+          </div>
+        ))}
+
+        <div className="card" style={{background:"rgba(14,165,233,.06)",borderColor:"rgba(14,165,233,.3)",textAlign:"center",marginBottom:24}}>
+          <div style={{fontWeight:700,fontSize:14,marginBottom:8}}>📞 Contact Dispute Team</div>
+          <div style={{fontSize:13,color:"var(--muted)",marginBottom:4}}>General: <strong>support@escarapay.in</strong></div>
+          <div style={{fontSize:13,color:"var(--muted)",marginBottom:4}}>Legal Escalation: <strong>legal@escarapay.in</strong></div>
+          <div style={{fontSize:12,color:"var(--muted)",marginTop:8}}>EscaraPay (India) | Uttar Pradesh, India | Response: 24 hours</div>
+        </div>
+        <div style={{textAlign:"center"}}><button className="btn-ghost" onClick={onBack}>← Back to Home</button></div>
+      </div>
+    </div>
+  );
+}
+
+function PrivacyPage({ onBack, dark, onToggle }) {
+  const nav = (s) => { window._goToPage(s); };
+  return (
+    <div style={{minHeight:"100vh"}}>
+      <LegalNav active="privacy" onNav={nav} dark={dark} onToggle={onToggle} />
+      <div style={{maxWidth:760,margin:"0 auto",padding:"40px 20px"}}>
+        <div style={{textAlign:"center",marginBottom:40}}>
+          <div style={{fontSize:48,marginBottom:12}}>🔒</div>
+          <h1 className="syne" style={{fontWeight:800,fontSize:"clamp(24px,4vw,36px)",marginBottom:8}}>Privacy Policy</h1>
+          <p style={{color:"var(--muted)",fontSize:13}}>EscaraPay (India) | Last updated: March 2026 | Effective immediately</p>
+        </div>
+        {[
+          {t:"1. Information We Collect", c:"EscaraPay collects the following when you register or transact: Full name, email address, phone number (10 digits), PAN card or GST number (sellers only, for KYC), UPI ID (optional, for payouts), transaction history and order details, device information and IP address for security and fraud prevention."},
+          {t:"2. How We Use Your Information", c:"Your data is used strictly to: process and manage escrow transactions securely, verify identity to prevent fraud and unauthorized access, send transaction notifications, alerts, and OTPs, resolve disputes between buyers and sellers, comply with Indian financial regulations (IT Act 2000, PMLA 2002, RBI guidelines), improve platform performance and user experience."},
+          {t:"3. Payment Data & Razorpay", c:"EscaraPay uses Razorpay as our payment gateway — an RBI-authorized and PCI-DSS Level 1 certified payment aggregator. EscaraPay does NOT store card numbers, CVV, or banking credentials. Token amounts are held in trust/escrow accounts. All transactions are encrypted using 256-bit SSL/TLS."},
+          {t:"4. KYC & Seller Data", c:"Sellers must provide PAN Card or GST Number for KYC as required by Indian financial laws. This data is encrypted at rest (AES-256), accessible only by authorized compliance personnel, never shared for marketing, and retained for 7 years as per PMLA 2002 requirements."},
+          {t:"5. Data Sharing", c:"We do NOT sell, rent, or trade your personal data. Data is shared only with: Razorpay (payment processing), law enforcement agencies when legally required by Indian courts or regulators, dispute resolution partners during fraud investigations. We notify you where legally permissible before sharing."},
+          {t:"6. Data Security", c:"Our security measures include: SSL/TLS encryption in transit, AES-256 encryption at rest, strict role-based access controls, regular third-party security audits, industry-standard password hashing (bcrypt). However, no method of internet transmission is 100% secure."},
+          {t:"7. Your Rights", c:"Under Indian data protection principles, you have the right to: access all personal data we hold about you, request correction of inaccurate information, request account deletion (subject to legal retention requirements), withdraw consent for non-essential data use, raise concerns at privacy@escarapay.in. We respond to all requests within 30 days."},
+          {t:"8. Data Retention", c:"Transaction records are retained for 7 years as mandated by PMLA 2002. Account data is retained as long as your account is active. On deletion request, personal data is anonymized — anonymized statistical data may be retained for analytics."},
+          {t:"9. Cookies", c:"EscaraPay uses only essential cookies for session management and security. We do not use tracking, advertising, or third-party analytics cookies."},
+          {t:"10. Contact — Privacy Officer", c:"Email: privacy@escarapay.in | General Support: support@escarapay.in | EscaraPay (India), Uttar Pradesh, India"},
         ].map(s=>(
           <div key={s.t} className="card" style={{marginBottom:14}}>
             <h3 className="syne" style={{fontWeight:700,fontSize:15,marginBottom:10,color:"var(--gold)"}}>{s.t}</h3>
@@ -2040,12 +2261,16 @@ function PrivacyPage({ onBack, dark, onToggle }) {
 }
 
 function TermsPage({ onBack, dark, onToggle }) {
+  const nav = (s) => { window._goToPage(s); };
   return (
     <div style={{minHeight:"100vh"}}>
-      <nav className="nav"><Logo /><div style={{display:"flex",gap:8,alignItems:"center"}}><ThemeToggle dark={dark} onToggle={onToggle} /><button className="btn-ghost" onClick={onBack}>← Back</button></div></nav>
+      <LegalNav active="terms" onNav={nav} dark={dark} onToggle={onToggle} />
       <div style={{maxWidth:760,margin:"0 auto",padding:"40px 20px"}}>
-        <h1 className="syne" style={{fontWeight:800,fontSize:"clamp(24px,4vw,36px)",marginBottom:8}}>Terms & Conditions</h1>
-        <p style={{color:"var(--muted)",fontSize:13,marginBottom:32}}>Last updated: March 2026 | Effective immediately upon registration</p>
+        <div style={{textAlign:"center",marginBottom:40}}>
+          <div style={{fontSize:48,marginBottom:12}}>📋</div>
+          <h1 className="syne" style={{fontWeight:800,fontSize:"clamp(24px,4vw,36px)",marginBottom:8}}>Terms & Conditions</h1>
+          <p style={{color:"var(--muted)",fontSize:13}}>EscaraPay (India) | Last updated: March 2026 | Effective immediately upon registration</p>
+        </div>
 
         {[
           {t:"1. Acceptance of Terms", c:"By registering for or using EscaraPay, you agree to be bound by these Terms & Conditions. If you do not agree, please do not use our services. These terms apply to both buyers and sellers using the EscaraPay platform on any device or interface."},
@@ -2084,7 +2309,7 @@ function TermsPage({ onBack, dark, onToggle }) {
           {t:"7. Seller Responsibilities", c:"Sellers must: accurately describe products and their condition, ship within the timeframe mentioned during order creation, provide valid tracking information after dispatch, respond to buyer queries within 24 hours, honor the deal terms agreed upon during order creation. Failure to meet these responsibilities may result in token refund to buyer and account suspension."},
           {t:"8. Buyer Responsibilities", c:"Buyers must: provide accurate delivery address and contact information, respond to delivery confirmation requests within 48 hours, raise disputes only for genuine reasons with evidence, not attempt chargebacks through their bank while EscaraPay dispute is active. False chargeback attempts will result in immediate account suspension."},
           {t:"9. Limitation of Liability", c:"EscaraPay's liability is strictly limited to the token amount held in escrow for that specific transaction. We are not liable for: quality, safety, or legality of products exchanged, indirect or consequential damages, losses due to network failures or payment gateway downtime, disputes arising from incorrect information provided by either party."},
-          {t:"10. Governing Law & Jurisdiction", c:"These Terms are governed by the laws of India. All disputes are subject to the exclusive jurisdiction of courts in India. These terms comply with: Information Technology Act 2000, Payment and Settlement Systems Act 2007, Prevention of Money Laundering Act 2002, Applicable RBI guidelines on payment aggregators."},
+          {t:"10. Governing Law & Jurisdiction", c:"These Terms are governed by the laws of India. All disputes arising from use of EscaraPay are subject to the exclusive jurisdiction of courts in Uttar Pradesh, India. EscaraPay (India) is a facilitator only — not a party to any transaction between buyers and sellers. These terms comply with: Information Technology Act 2000, Payment and Settlement Systems Act 2007, Prevention of Money Laundering Act 2002, Consumer Protection Act 2019, and applicable RBI guidelines on payment aggregators."},
           {t:"11. Contact for Legal Matters", c:"Legal queries: legal@escarapay.in | Dispute escalation: disputes@escarapay.in | General support: support@escarapay.in"},
         ].map(s=>(
           <div key={s.t} className="card" style={{marginBottom:14}}>
@@ -2101,18 +2326,36 @@ function TermsPage({ onBack, dark, onToggle }) {
 function ContactPage({ onBack, dark, onToggle }) {
   const [form, setForm] = useState({name:"",email:"",subject:"",message:""});
   const [sent, setSent] = useState(false);
+  const nav = (s) => { window._goToPage(s); };
   return (
     <div style={{minHeight:"100vh"}}>
-      <nav className="nav"><Logo /><div style={{display:"flex",gap:8,alignItems:"center"}}><ThemeToggle dark={dark} onToggle={onToggle} /><button className="btn-ghost" onClick={onBack}>← Back</button></div></nav>
-      <div style={{maxWidth:680,margin:"0 auto",padding:"40px 20px"}}>
+      <LegalNav active="contact" onNav={nav} dark={dark} onToggle={onToggle} />
+      <div style={{maxWidth:720,margin:"0 auto",padding:"40px 20px"}}>
         <div style={{textAlign:"center",marginBottom:40}}>
+          <div style={{fontSize:48,marginBottom:12}}>📞</div>
           <h1 className="syne" style={{fontWeight:800,fontSize:"clamp(24px,4vw,36px)",marginBottom:8}}>Contact Us</h1>
-          <p style={{color:"var(--muted)",fontSize:14}}>24 ghante mein jawaab denge!</p>
+          <p style={{color:"var(--muted)",fontSize:14}}>EscaraPay (India) | We respond within 24 hours | Mon–Sat, 10AM–6PM IST</p>
         </div>
-        <div className="g3" style={{marginBottom:32}}>
-          {[{icon:"📧",title:"Support",value:"support@escarapay.in",sub:"General queries"},{icon:"⚖️",title:"Legal / Dispute",value:"legal@escarapay.in",sub:"Legal & escalation"},{icon:"📱",title:"WhatsApp",value:"+91-99999-ESCARA",sub:"Quick support"}].map(c=>(
-            <div key={c.title} className="card" style={{textAlign:"center"}}><div style={{fontSize:28,marginBottom:10}}>{c.icon}</div><div className="syne" style={{fontWeight:700,fontSize:13,marginBottom:4}}>{c.title}</div><div style={{fontSize:12,color:"var(--gold)",wordBreak:"break-all",marginBottom:2}}>{c.value}</div><div style={{fontSize:11,color:"var(--muted)"}}>{c.sub}</div></div>
+
+        {/* Response time banner */}
+        <div style={{background:"rgba(5,150,105,.08)",border:"1px solid rgba(5,150,105,.3)",borderRadius:12,padding:14,marginBottom:24,textAlign:"center"}}>
+          <span style={{fontSize:13,fontWeight:600,color:"var(--green)"}}>⚡ Average response time: under 4 hours during business hours</span>
+        </div>
+
+        <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(180px,1fr))",gap:14,marginBottom:32}}>
+          {[
+            {icon:"📧",title:"General Support",value:"support@escarapay.in",sub:"Orders, accounts, general queries"},
+            {icon:"⚖️",title:"Legal & Disputes",value:"legal@escarapay.in",sub:"Dispute escalation, legal matters"},
+            {icon:"🔒",title:"Privacy Officer",value:"privacy@escarapay.in",sub:"Data requests, privacy concerns"},
+          ].map(c=>(
+            <div key={c.title} className="card" style={{textAlign:"center"}}>
+              <div style={{fontSize:28,marginBottom:10}}>{c.icon}</div>
+              <div className="syne" style={{fontWeight:700,fontSize:13,marginBottom:4}}>{c.title}</div>
+              <div style={{fontSize:12,color:"var(--gold)",wordBreak:"break-all",marginBottom:4}}>{c.value}</div>
+              <div style={{fontSize:11,color:"var(--muted)"}}>{c.sub}</div>
+            </div>
           ))}
+        </div>
         </div>
         {!sent ? (
           <div className="card">
@@ -2143,7 +2386,7 @@ function ContactPage({ onBack, dark, onToggle }) {
         )}
         <div style={{textAlign:"center",marginTop:24}}><button className="btn-ghost" onClick={onBack}>← Back</button></div>
       </div>
-    </div>
+    
   );
 }
 
@@ -2185,6 +2428,8 @@ export default function App() {
       {screen==="about"       && <AboutPage   onBack={()=>setScreen("landing")} {...props} />}
       {screen==="privacy"     && <PrivacyPage onBack={()=>setScreen("landing")} {...props} />}
       {screen==="terms"       && <TermsPage   onBack={()=>setScreen("landing")} {...props} />}
+      {screen==="refund"      && <RefundPage  onBack={()=>setScreen("landing")} {...props} />}
+      {screen==="dispute"     && <DisputePage onBack={()=>setScreen("landing")} {...props} />}
       {screen==="contact"     && <ContactPage onBack={()=>setScreen("landing")} {...props} />}
       {screen==="landing"     && <Landing     onEnter={t=>{setUserType(t);setScreen("auth");}} {...props} />}
       {screen==="auth"        && <Auth        type={userType} onLogin={handleLogin} onBack={()=>setScreen("landing")} {...props} />}
