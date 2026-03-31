@@ -1,5 +1,5 @@
 /* eslint-disable */
-import { registerUser, loginUser, createOrder as apiCreateOrder, getSellerOrders, getBuyerOrders, getOrderById, createPaymentOrder, verifyPayment, confirmDelivery, raiseDispute, dispatchOrder } from './api';
+import { registerUser, loginUser, createOrder as apiCreateOrder, getSellerOrders, getBuyerOrders, getOrderById, createPaymentOrder, verifyPayment, confirmDelivery, raiseDispute, dispatchOrder, sendOTP, verifyOTP } from './api';
 import { useState, useEffect } from "react";
 import LOGO_SRC from "./escarapay-logo.jpg";
 
@@ -773,10 +773,23 @@ function ProfileModal({ user, userId, userType, onClose, onUpdate }) {
 }
 
 function Auth({ type, onLogin, onBack, dark, onToggle }) {
-  const [mode, setMode] = useState("login");
+  const [mode, setMode] = useState("login");        // login | register
+  const [loginMethod, setLoginMethod] = useState("password"); // password | otp
   const [form, setForm] = useState({name:"",email:"",password:"",shop:"",phone:"",pan:"",gst:""});
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
+  // OTP states
+  const [otpSent, setOtpSent] = useState(false);
+  const [otp, setOtp] = useState("");
+  const [otpTimer, setOtpTimer] = useState(0);
+  const [otpMsg, setOtpMsg] = useState("");
+
+  // OTP countdown timer
+  useEffect(() => {
+    if (otpTimer <= 0) return;
+    const t = setTimeout(() => setOtpTimer(otpTimer - 1), 1000);
+    return () => clearTimeout(t);
+  }, [otpTimer]);
 
   const validate = () => {
     const e = {};
@@ -785,22 +798,23 @@ function Auth({ type, onLogin, onBack, dark, onToggle }) {
       if (!validateEmail(form.email)) e.email = "Valid email daalo (example@gmail.com)";
       if (!validatePhone(form.phone)) e.phone = "Sirf 10 digits — koi alphabet nahi";
       if (!validatePass(form.password)) e.password = "Min 6 chars, 1 capital, 1 small, 1 number, 1 special char (!@#$%)";
-      if (type === "seller" && form.pan && !validatePAN(form.pan)) e.pan = "PAN format: ABCDE1234F (5 letters, 4 digits, 1 letter)";
+      if (type === "seller" && form.pan && !validatePAN(form.pan)) e.pan = "PAN format: ABCDE1234F";
       if (type === "seller" && form.gst && !validateGST(form.gst)) e.gst = "GST 15 characters ka hona chahiye";
       if (type === "seller" && !form.pan && !form.gst) e.pan = "PAN ya GST mein se ek zaroori hai";
     } else {
       if (!validateEmail(form.email)) e.email = "Valid email daalo";
-      if (!form.password) e.password = "Password daalo";
+      if (loginMethod === "password" && !form.password) e.password = "Password daalo";
     }
     return e;
   };
 
+  // Password login / Register
   const handle = async () => {
     const e = validate();
     setErrors(e);
     if (Object.keys(e).length > 0) return;
     setLoading(true);
-    const result = mode==="register"
+    const result = mode === "register"
       ? await registerUser(form.name,form.email,form.phone,type,form.password,form.shop||"",form.pan||"",form.gst||"")
       : await loginUser(form.email,form.password,type);
     setLoading(false);
@@ -808,6 +822,35 @@ function Auth({ type, onLogin, onBack, dark, onToggle }) {
       const u = result.data.user;
       onLogin(type, u.name, u.id, u.phone||form.phone||"");
     } else alert("❌ " + result.error);
+  };
+
+  // Send OTP
+  const handleSendOTP = async () => {
+    if (!validateEmail(form.email)) { setErrors({email:"Valid email daalo"}); return; }
+    setLoading(true); setOtpMsg("");
+    const r = await sendOTP(form.email, type);
+    setLoading(false);
+    if (r.success) {
+      setOtpSent(true);
+      setOtpTimer(60);
+      setOtpMsg("✅ " + r.message);
+    } else {
+      setOtpMsg("❌ " + r.error);
+    }
+  };
+
+  // Verify OTP
+  const handleVerifyOTP = async () => {
+    if (!otp || otp.length !== 6) { setOtpMsg("❌ 6-digit OTP daalo"); return; }
+    setLoading(true); setOtpMsg("");
+    const r = await verifyOTP(form.email, type, otp);
+    setLoading(false);
+    if (r.success) {
+      const u = r.data.user;
+      onLogin(type, u.name, u.id, u.phone||"");
+    } else {
+      setOtpMsg("❌ " + r.error);
+    }
   };
 
   const setField = (field, val) => { setForm({...form,[field]:val}); setErrors({...errors,[field]:""}); };
@@ -819,14 +862,42 @@ function Auth({ type, onLogin, onBack, dark, onToggle }) {
         <div className="modal" style={{maxWidth:410}}>
           <div style={{textAlign:"center",marginBottom:22}}>
             <img src={LOGO_SRC} alt="EscaraPay" style={{height:52,marginBottom:12,objectFit:"contain"}} onError={e=>e.target.style.display="none"} />
-            <h2 className="syne" style={{fontWeight:800,fontSize:21,marginBottom:4}}>{mode==="login"?"Welcome Back!":`${type==="seller"?"Seller":"Buyer"} Register Karo`}</h2>
+            <h2 className="syne" style={{fontWeight:800,fontSize:21,marginBottom:4}}>
+              {mode==="login"?"Welcome Back!":`${type==="seller"?"Seller":"Buyer"} Register Karo`}
+            </h2>
           </div>
+
+          {/* Login / Register tabs */}
           <div style={{display:"flex",gap:5,marginBottom:20,background:"var(--sf2)",padding:4,borderRadius:10}}>
             {["login","register"].map(m=>(
-              <button key={m} onClick={()=>{setMode(m);setErrors({});}} style={{flex:1,padding:"8px",border:"none",borderRadius:8,cursor:"pointer",background:mode===m?"var(--gold)":"transparent",color:mode===m?(dark?"#0a0a0f":"#fff"):"var(--muted)",fontFamily:"'Syne',sans-serif",fontWeight:600,fontSize:13,transition:"all .2s"}}>{m==="login"?"Login":"Register"}</button>
+              <button key={m} onClick={()=>{setMode(m);setErrors({});setOtpSent(false);setOtp("");setOtpMsg("");}}
+                style={{flex:1,padding:"8px",border:"none",borderRadius:8,cursor:"pointer",
+                  background:mode===m?"var(--gold)":"transparent",
+                  color:mode===m?(dark?"#0a0a0f":"#fff"):"var(--muted)",
+                  fontFamily:"'Syne',sans-serif",fontWeight:600,fontSize:13,transition:"all .2s"}}>
+                {m==="login"?"Login":"Register"}
+              </button>
             ))}
           </div>
+
+          {/* Login Method toggle — only on login mode */}
+          {mode==="login" && (
+            <div style={{display:"flex",gap:5,marginBottom:16,background:"var(--sf2)",padding:3,borderRadius:8}}>
+              {[["password","🔑 Password"],["otp","📧 Email OTP"]].map(([m,l])=>(
+                <button key={m} onClick={()=>{setLoginMethod(m);setOtpSent(false);setOtp("");setOtpMsg("");setErrors({});}}
+                  style={{flex:1,padding:"6px",border:"none",borderRadius:6,cursor:"pointer",fontSize:12,fontWeight:600,
+                    background:loginMethod===m?"var(--surface)":"transparent",
+                    color:loginMethod===m?"var(--gold)":"var(--muted)",
+                    boxShadow:loginMethod===m?"0 1px 4px rgba(0,0,0,.1)":"none",
+                    fontFamily:"'DM Sans',sans-serif",transition:"all .2s"}}>
+                  {l}
+                </button>
+              ))}
+            </div>
+          )}
+
           <div style={{display:"flex",flexDirection:"column",gap:12}}>
+            {/* Register fields */}
             {mode==="register" && (
               <div>
                 <label className="label">Full Name *</label>
@@ -840,41 +911,106 @@ function Auth({ type, onLogin, onBack, dark, onToggle }) {
                 <input className="input" placeholder="Meena Crafts" value={form.shop} onChange={e=>setField("shop",e.target.value)} />
               </div>
             )}
+
+            {/* Email — always show */}
             <div>
               <label className="label">Email *</label>
-              <input className="input" placeholder="aapki@email.com" type="email" value={form.email} onChange={e=>setField("email",e.target.value)} />
+              <input className="input" placeholder="aapki@email.com" type="email" value={form.email}
+                onChange={e=>setField("email",e.target.value)} />
               <FieldError msg={errors.email} />
             </div>
+
+            {/* Phone — register only */}
             {mode==="register" && (
               <div>
                 <label className="label">Phone Number * (10 digits)</label>
-                <input className="input" placeholder="9876543210" maxLength={10} value={form.phone} onChange={e=>setField("phone",e.target.value.replace(/\D/g,""))} />
+                <input className="input" placeholder="9876543210" maxLength={10} value={form.phone}
+                  onChange={e=>setField("phone",e.target.value.replace(/\D/g,""))} />
                 <FieldError msg={errors.phone} />
               </div>
             )}
-            <div>
-              <label className="label">Password *</label>
-              <input className="input" type="password" placeholder="••••••••" value={form.password} onChange={e=>setField("password",e.target.value)} />
-              <FieldError msg={errors.password} />
-              {mode==="register" && !errors.password && <div style={{fontSize:11,color:"var(--muted)",marginTop:3}}>Min 6 chars, 1 capital, 1 small, 1 number, 1 special (!@#$%)</div>}
-            </div>
+
+            {/* Password login */}
+            {(mode==="register" || loginMethod==="password") && (
+              <div>
+                <label className="label">Password *</label>
+                <input className="input" type="password" placeholder="••••••••" value={form.password}
+                  onChange={e=>setField("password",e.target.value)} />
+                <FieldError msg={errors.password} />
+                {mode==="register" && !errors.password && <div style={{fontSize:11,color:"var(--muted)",marginTop:3}}>Min 6 chars, 1 capital, 1 small, 1 number, 1 special (!@#$%)</div>}
+              </div>
+            )}
+
+            {/* KYC for seller register */}
             {mode==="register"&&type==="seller" && (
               <div style={{background:"rgba(14,165,233,.08)",border:"1px solid rgba(14,165,233,.2)",borderRadius:10,padding:12}}>
                 <div style={{fontSize:12,fontWeight:600,marginBottom:8,color:"var(--gold)"}}>📋 KYC (Dono mein se ek zaroori)</div>
                 <div>
                   <label className="label">PAN Card (ABCDE1234F)</label>
-                  <input className="input" placeholder="ABCDE1234F" value={form.pan} maxLength={10} onChange={e=>setField("pan",e.target.value.replace(/[^A-Z0-9]/g,"").toUpperCase())} style={{marginBottom:4}} />
+                  <input className="input" placeholder="ABCDE1234F" value={form.pan} maxLength={10}
+                    onChange={e=>setField("pan",e.target.value.replace(/[^A-Z0-9]/g,"").toUpperCase())} style={{marginBottom:4}} />
                   <FieldError msg={errors.pan} />
                 </div>
                 <div style={{textAlign:"center",fontSize:12,color:"var(--muted)",margin:"8px 0"}}>— ya —</div>
                 <div>
                   <label className="label">GST Number (15 chars)</label>
-                  <input className="input" placeholder="27ABCDE1234F1Z5" value={form.gst} maxLength={15} onChange={e=>setField("gst",e.target.value.replace(/[^A-Z0-9]/g,"").toUpperCase())} style={{marginBottom:4}} />
+                  <input className="input" placeholder="27ABCDE1234F1Z5" value={form.gst} maxLength={15}
+                    onChange={e=>setField("gst",e.target.value.replace(/[^A-Z0-9]/g,"").toUpperCase())} style={{marginBottom:4}} />
                   <FieldError msg={errors.gst} />
                 </div>
               </div>
             )}
-            <button className="btn-gold" style={{width:"100%",padding:12}} onClick={handle}>{loading?"⏳ Processing...":mode==="login"?"Login Karo":"Account Banao"}</button>
+
+            {/* OTP login flow */}
+            {mode==="login" && loginMethod==="otp" && (
+              <div>
+                {!otpSent ? (
+                  <button className="btn-gold" style={{width:"100%",padding:12}} onClick={handleSendOTP} disabled={loading}>
+                    {loading?"⏳ OTP bhej raha hai...":"📧 OTP Bhejo Mere Email Pe"}
+                  </button>
+                ) : (
+                  <div style={{display:"flex",flexDirection:"column",gap:10}}>
+                    <div style={{background:"rgba(5,150,105,.08)",border:"1px solid rgba(5,150,105,.3)",borderRadius:10,padding:12,fontSize:13,color:"var(--green)"}}>
+                      ✅ OTP bheja gaya — <strong>{form.email}</strong> check karo!
+                    </div>
+                    <div>
+                      <label className="label">6-Digit OTP *</label>
+                      <input className="input" placeholder="123456" maxLength={6} value={otp}
+                        onChange={e=>setOtp(e.target.value.replace(/\D/g,""))}
+                        style={{fontSize:22,letterSpacing:6,textAlign:"center",fontWeight:700}}
+                        onKeyDown={e=>e.key==="Enter"&&handleVerifyOTP()} />
+                    </div>
+                    <button className="btn-gold" style={{width:"100%",padding:12}} onClick={handleVerifyOTP} disabled={loading}>
+                      {loading?"⏳ Verify ho raha hai...":"✅ OTP Verify Karo & Login"}
+                    </button>
+                    <div style={{textAlign:"center"}}>
+                      {otpTimer > 0 ? (
+                        <span style={{fontSize:12,color:"var(--muted)"}}>⏰ Resend in {otpTimer}s</span>
+                      ) : (
+                        <button className="btn-ghost" style={{fontSize:12,padding:"4px 12px"}} onClick={handleSendOTP}>
+                          🔄 Resend OTP
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Password login button */}
+            {(mode==="register" || loginMethod==="password") && (
+              <button className="btn-gold" style={{width:"100%",padding:12}} onClick={handle} disabled={loading}>
+                {loading?"⏳ Processing...":mode==="login"?"Login Karo":"Account Banao"}
+              </button>
+            )}
+
+            {/* OTP message */}
+            {otpMsg && (
+              <div style={{padding:10,borderRadius:8,background:"var(--sf2)",fontSize:13,
+                color:otpMsg.startsWith("✅")?"var(--green)":"var(--red)",fontWeight:500}}>
+                {otpMsg}
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -2356,7 +2492,6 @@ function ContactPage({ onBack, dark, onToggle }) {
             </div>
           ))}
         </div>
-        </div>
         {!sent ? (
           <div className="card">
             <h3 className="syne" style={{fontWeight:700,fontSize:18,marginBottom:20}}>Message Bhejo</h3>
@@ -2386,7 +2521,7 @@ function ContactPage({ onBack, dark, onToggle }) {
         )}
         <div style={{textAlign:"center",marginTop:24}}><button className="btn-ghost" onClick={onBack}>← Back</button></div>
       </div>
-    
+    </div>
   );
 }
 

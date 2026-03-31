@@ -155,3 +155,27 @@ export const getSellerAnalytics = async (sellerId) => {
     return { success: true, data };
   } catch (err) { return { success: false, error: "Backend se connect nahi hua." }; }
 };
+
+export const sendOTP = async (email, role) => {
+  try {
+    const res = await fetch(`${BASE_URL}/api/auth/send-otp`, {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, role }),
+    });
+    const data = await res.json();
+    if (!res.ok) return { success: false, error: data.error || "OTP send nahi hua" };
+    return { success: true, message: data.message };
+  } catch (err) { return { success: false, error: "Backend se connect nahi hua." }; }
+};
+
+export const verifyOTP = async (email, role, otp) => {
+  try {
+    const res = await fetch(`${BASE_URL}/api/auth/verify-otp`, {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, role, otp }),
+    });
+    const data = await res.json();
+    if (!res.ok) return { success: false, error: data.error || "OTP verify nahi hua" };
+    return { success: true, data };
+  } catch (err) { return { success: false, error: "Backend se connect nahi hua." }; }
+};
