@@ -1,3 +1,4 @@
+
 const BASE_URL = "https://escarapay-backend-production.up.railway.app";
 
 /* ── Auth ── */
@@ -177,5 +178,29 @@ export const verifyOTP = async (email, role, otp) => {
     const data = await res.json();
     if (!res.ok) return { success: false, error: data.error || "OTP verify nahi hua" };
     return { success: true, data };
+  } catch (err) { return { success: false, error: "Backend se connect nahi hua." }; }
+};
+
+export const sendRegisterOTP = async (email, name) => {
+  try {
+    const res = await fetch(`${BASE_URL}/api/auth/send-otp-register`, {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, name }),
+    });
+    const data = await res.json();
+    if (!res.ok) return { success: false, error: data.error || "OTP send nahi hua" };
+    return { success: true, message: data.message };
+  } catch (err) { return { success: false, error: "Backend se connect nahi hua." }; }
+};
+
+export const verifyRegisterOTP = async (email, otp) => {
+  try {
+    const res = await fetch(`${BASE_URL}/api/auth/verify-otp-register`, {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, otp }),
+    });
+    const data = await res.json();
+    if (!res.ok) return { success: false, error: data.error || "OTP verify nahi hua" };
+    return { success: true };
   } catch (err) { return { success: false, error: "Backend se connect nahi hua." }; }
 };

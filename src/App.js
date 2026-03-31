@@ -1,5 +1,5 @@
 /* eslint-disable */
-import { registerUser, loginUser, createOrder as apiCreateOrder, getSellerOrders, getBuyerOrders, getOrderById, createPaymentOrder, verifyPayment, confirmDelivery, raiseDispute, dispatchOrder, sendOTP, verifyOTP } from './api';
+import { registerUser, loginUser, createOrder as apiCreateOrder, getSellerOrders, getBuyerOrders, getOrderById, createPaymentOrder, verifyPayment, confirmDelivery, raiseDispute, dispatchOrder, sendOTP, verifyOTP, sendRegisterOTP, verifyRegisterOTP } from './api';
 import { useState, useEffect } from "react";
 import LOGO_SRC from "./escarapay-logo.jpg";
 
@@ -170,8 +170,8 @@ function getStyle(dark) {
   .tbl td{padding:12px 13px;font-size:13px;border-bottom:1px solid var(--border);}
   .tbl tr:hover td{background:var(--sf2);}
   .tbl tr:last-child td{border-bottom:none;}
-  .overlay{position:fixed;inset:0;background:rgba(0,0,0,.65);backdrop-filter:blur(4px);z-index:200;display:flex;align-items:center;justify-content:center;padding:14px;}
-  .modal{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:26px;width:100%;max-width:470px;animation:fadeUp .3s ease;max-height:92vh;overflow-y:auto;}
+  .overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);backdrop-filter:blur(4px);z-index:9999;display:flex;align-items:center;justify-content:center;padding:14px;}
+  .modal{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:26px;width:100%;max-width:470px;animation:fadeUp .3s ease;max-height:88vh;overflow-y:auto;position:relative;z-index:10000;}
   .tl{display:flex;gap:12px;padding-bottom:20px;position:relative;}
   .tl:not(:last-child)::before{content:'';position:absolute;left:14px;top:30px;bottom:0;width:2px;background:var(--border);}
   .tl-dot{width:30px;height:30px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:13px;}
@@ -783,6 +783,11 @@ function Auth({ type, onLogin, onBack, dark, onToggle }) {
   const [otp, setOtp] = useState("");
   const [otpTimer, setOtpTimer] = useState(0);
   const [otpMsg, setOtpMsg] = useState("");
+  // Register OTP states
+  const [regOtpSent, setRegOtpSent] = useState(false);
+  const [regOtpVerified, setRegOtpVerified] = useState(false);
+  const [regOtp, setRegOtp] = useState("");
+  const [regOtpMsg, setRegOtpMsg] = useState("");
 
   // OTP countdown timer
   useEffect(() => {
@@ -813,6 +818,11 @@ function Auth({ type, onLogin, onBack, dark, onToggle }) {
     const e = validate();
     setErrors(e);
     if (Object.keys(e).length > 0) return;
+    // Registration requires email verification
+    if (mode === "register" && !regOtpVerified) {
+      alert("❌ Pehle email verify karo! Neeche 'Email Verify Karo' button click karo.");
+      return;
+    }
     setLoading(true);
     const result = mode === "register"
       ? await registerUser(form.name,form.email,form.phone,type,form.password,form.shop||"",form.pan||"",form.gst||"")
@@ -822,6 +832,27 @@ function Auth({ type, onLogin, onBack, dark, onToggle }) {
       const u = result.data.user;
       onLogin(type, u.name, u.id, u.phone||form.phone||"");
     } else alert("❌ " + result.error);
+  };
+
+  // Send Register OTP
+  const handleSendRegisterOTP = async () => {
+    if (!validateEmail(form.email)) { setErrors({...errors, email:"Valid email daalo"}); return; }
+    if (!form.name.trim()) { setErrors({...errors, name:"Pehle naam daalo"}); return; }
+    setLoading(true); setRegOtpMsg("");
+    const r = await sendRegisterOTP(form.email, form.name);
+    setLoading(false);
+    if (r.success) { setRegOtpSent(true); setOtpTimer(60); setRegOtpMsg("✅ " + r.message); }
+    else setRegOtpMsg("❌ " + r.error);
+  };
+
+  // Verify Register OTP
+  const handleVerifyRegisterOTP = async () => {
+    if (!regOtp || regOtp.length !== 6) { setRegOtpMsg("❌ 6-digit OTP daalo"); return; }
+    setLoading(true); setRegOtpMsg("");
+    const r = await verifyRegisterOTP(form.email, regOtp);
+    setLoading(false);
+    if (r.success) { setRegOtpVerified(true); setRegOtpMsg("✅ Email verified! Ab account banao."); }
+    else setRegOtpMsg("❌ " + r.error);
   };
 
   // Send OTP
@@ -870,7 +901,7 @@ function Auth({ type, onLogin, onBack, dark, onToggle }) {
           {/* Login / Register tabs */}
           <div style={{display:"flex",gap:5,marginBottom:20,background:"var(--sf2)",padding:4,borderRadius:10}}>
             {["login","register"].map(m=>(
-              <button key={m} onClick={()=>{setMode(m);setErrors({});setOtpSent(false);setOtp("");setOtpMsg("");}}
+              <button key={m} onClick={()=>{setMode(m);setErrors({});setOtpSent(false);setOtp("");setOtpMsg("");setRegOtpSent(false);setRegOtp("");setRegOtpVerified(false);setRegOtpMsg("");}}
                 style={{flex:1,padding:"8px",border:"none",borderRadius:8,cursor:"pointer",
                   background:mode===m?"var(--gold)":"transparent",
                   color:mode===m?(dark?"#0a0a0f":"#fff"):"var(--muted)",
@@ -919,6 +950,41 @@ function Auth({ type, onLogin, onBack, dark, onToggle }) {
                 onChange={e=>setField("email",e.target.value)} />
               <FieldError msg={errors.email} />
             </div>
+
+            {/* Email Verification for Register */}
+            {mode==="register" && (
+              <div style={{background: regOtpVerified?"rgba(5,150,105,.08)":"rgba(14,165,233,.06)", border:`1px solid ${regOtpVerified?"rgba(5,150,105,.3)":"rgba(14,165,233,.2)"}`, borderRadius:10, padding:12}}>
+                <div style={{fontSize:12,fontWeight:600,marginBottom:8,color:regOtpVerified?"var(--green)":"var(--gold)"}}>
+                  {regOtpVerified ? "✅ Email Verified!" : "📧 Email Verify Karo (Zaroori)"}
+                </div>
+                {!regOtpVerified && (
+                  <>
+                    {!regOtpSent ? (
+                      <button className="btn-ghost" style={{width:"100%",fontSize:13,color:"var(--gold)",borderColor:"rgba(14,165,233,.3)"}}
+                        onClick={handleSendRegisterOTP} disabled={loading}>
+                        {loading?"⏳ OTP bhej raha hai...":"📧 Verification OTP Bhejo"}
+                      </button>
+                    ) : (
+                      <div style={{display:"flex",flexDirection:"column",gap:8}}>
+                        <input className="input" placeholder="6-digit OTP" maxLength={6} value={regOtp}
+                          onChange={e=>setRegOtp(e.target.value.replace(/\D/g,""))}
+                          style={{fontSize:20,letterSpacing:6,textAlign:"center",fontWeight:700}} />
+                        <button className="btn-ghost" style={{width:"100%",fontSize:13,color:"var(--green)",borderColor:"rgba(5,150,105,.3)"}}
+                          onClick={handleVerifyRegisterOTP} disabled={loading}>
+                          {loading?"⏳ Verify ho raha hai...":"✅ OTP Verify Karo"}
+                        </button>
+                        <div style={{textAlign:"center"}}>
+                          {otpTimer > 0
+                            ? <span style={{fontSize:11,color:"var(--muted)"}}>⏰ Resend in {otpTimer}s</span>
+                            : <button className="btn-ghost" style={{fontSize:11,padding:"3px 10px"}} onClick={handleSendRegisterOTP}>🔄 Resend</button>}
+                        </div>
+                      </div>
+                    )}
+                  </>
+                )}
+                {regOtpMsg && <div style={{fontSize:12,marginTop:6,color:regOtpMsg.startsWith("✅")?"var(--green)":"var(--red)"}}>{regOtpMsg}</div>}
+              </div>
+            )}
 
             {/* Phone — register only */}
             {mode==="register" && (
