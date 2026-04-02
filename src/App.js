@@ -1,3 +1,12 @@
+
+
+
+
+
+
+
+
+
 /* eslint-disable */
 import { registerUser, loginUser, createOrder as apiCreateOrder, getSellerOrders, getBuyerOrders, getOrderById, createPaymentOrder, verifyPayment, confirmDelivery, raiseDispute, dispatchOrder, sendOTP, verifyOTP, sendRegisterOTP, verifyRegisterOTP } from './api';
 import { useState, useEffect } from "react";
@@ -89,106 +98,188 @@ const T = {
 
 function getStyle(dark) {
   return `
-  @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=Outfit:wght@300;400;500;600;700&display=swap');
   *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
   :root {
     --bg:      ${dark ? "#0B0E14" : "#F8FAFC"};
     --surface: ${dark ? "#131620" : "#FFFFFF"};
     --sf2:     ${dark ? "#1C212D" : "#EBF4FA"};
     --border:  ${dark ? "rgba(255,255,255,0.08)" : "rgba(36,161,226,0.15)"};
-    --gold:    ${dark ? "#24A1E2" : "#24A1E2"}; /* Replaced gold with Logo's Cyan for a premium feel */
-    --gold2:   ${dark ? "#4BB3E9" : "#1A84C4"}; /* A slightly varied tone of cyan for hovers/gradients */
-    --green:   ${dark ? "#10B981" : "#059669"}; /* Softer, professional green for success/positive stats */
-    --red:     ${dark ? "#EF4444" : "#DC2626"};   /* Clean red for errors/negative stats */
+    --gold:    #24A1E2;
+    --gold2:   ${dark ? "#4BB3E9" : "#1A84C4"};
+    --green:   ${dark ? "#10B981" : "#059669"};
+    --red:     ${dark ? "#EF4444" : "#DC2626"};
     --blue:    ${dark ? "#38BDF8" : "#0284C7"};
-    --text:    ${dark ? "#F1F5F9" : "#1D1C59"}; /* Light mode text uses the deep Navy Blue from "Escaraa" */
+    --text:    ${dark ? "#F1F5F9" : "#1D1C59"};
     --muted:   ${dark ? "#94A3B8" : "#64748B"};
-    --accent:  ${dark ? "#8B5CF6" : "#4A1C81"}; /* Uses the rich Purple from your shield's gradient */; /* Uses the rich Purple from your shield's gradient */; /* Uses the rich Purple from your shield's gradient */
+    --accent:  ${dark ? "#8B5CF6" : "#4A1C81"};
   }
-  body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;}
+  body{background:var(--bg);color:var(--text);font-family:'Outfit',sans-serif;font-size:15px;line-height:1.6;}
   .syne{font-family:'Syne',sans-serif;}
   ::-webkit-scrollbar{width:4px;}
   ::-webkit-scrollbar-track{background:var(--bg);}
   ::-webkit-scrollbar-thumb{background:var(--gold);border-radius:2px;}
-  @keyframes fadeUp{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:translateY(0)}}
-  @keyframes shimmer{0%{background-position:-200% center}100%{background-position:200% center}}
+
+  /* ── Keyframes ── */
+  @keyframes fadeUp{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
+  @keyframes fadeIn{from{opacity:0}to{opacity:1}}
+  @keyframes slideLeft{from{opacity:0;transform:translateX(-20px)}to{opacity:1;transform:translateX(0)}}
+  @keyframes slideRight{from{opacity:0;transform:translateX(20px)}to{opacity:1;transform:translateX(0)}}
+  @keyframes shimmer{0%{background-position:-300% center}100%{background-position:300% center}}
   @keyframes spin{to{transform:rotate(360deg)}}
-  @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
-  @keyframes pulseGold{0%,100%{box-shadow:0 0 0 0 rgba(240,180,41,.4)}50%{box-shadow:0 0 0 14px rgba(240,180,41,0)}}
-  .fu{animation:fadeUp .55s ease forwards}
-  .fu2{animation:fadeUp .55s .13s ease both}
-  .fu3{animation:fadeUp .55s .26s ease both}
-  .float{animation:float 3s ease-in-out infinite}
-  .btn-gold{background:linear-gradient(135deg,var(--gold),var(--gold2));color:${dark?"#0a0a0f":"#fff"};border:none;padding:11px 26px;border-radius:10px;font-family:'Syne',sans-serif;font-weight:700;font-size:14px;cursor:pointer;transition:all .2s;white-space:nowrap;}
-  .btn-gold:hover{transform:translateY(-2px);box-shadow:0 8px 22px rgba(14,165,233,.35);}
-  .btn-gold.pulse{animation:pulseGold 2s infinite;}
-  .btn-green{background:linear-gradient(135deg,#22c55e,#16a34a);color:#fff;border:none;padding:11px 26px;border-radius:10px;font-family:'Syne',sans-serif;font-weight:700;font-size:14px;cursor:pointer;transition:all .2s;white-space:nowrap;}
-  .btn-green:hover{transform:translateY(-2px);}
-  .btn-red{background:linear-gradient(135deg,#ef4444,#dc2626);color:#fff;border:none;padding:11px 26px;border-radius:10px;font-family:'Syne',sans-serif;font-weight:700;font-size:14px;cursor:pointer;transition:all .2s;white-space:nowrap;}
-  .btn-outline{background:transparent;color:var(--gold);border:1.5px solid var(--gold);padding:10px 26px;border-radius:10px;font-family:'Syne',sans-serif;font-weight:600;font-size:14px;cursor:pointer;transition:all .2s;white-space:nowrap;}
-  .btn-outline:hover{background:rgba(14,165,233,.1);transform:translateY(-2px);}
-  .btn-ghost{background:var(--sf2);color:var(--text);border:1px solid var(--border);padding:9px 18px;border-radius:8px;font-family:'DM Sans',sans-serif;font-weight:500;font-size:13px;cursor:pointer;transition:all .2s;white-space:nowrap;}
-  .btn-ghost:hover{border-color:var(--gold);color:var(--gold);}
-  .btn-whatsapp{background:linear-gradient(135deg,#25D366,#128C7E);color:#fff;border:none;padding:11px 20px;border-radius:10px;font-family:'Syne',sans-serif;font-weight:700;font-size:14px;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:7px;white-space:nowrap;}
-  .btn-whatsapp:hover{transform:translateY(-2px);box-shadow:0 8px 22px rgba(37,211,102,.35);}
-  .card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:22px;transition:border-color .3s;}
-  .card:hover{border-color:rgba(14,165,233,.3);}
-  .input{width:100%;background:var(--sf2);border:1px solid var(--border);color:var(--text);padding:11px 14px;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:14px;outline:none;transition:border-color .2s;}
-  .input:focus{border-color:var(--gold);}
+  @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+  @keyframes pulseCyan{0%,100%{box-shadow:0 0 0 0 rgba(36,161,226,.45)}50%{box-shadow:0 0 0 16px rgba(36,161,226,0)}}
+  @keyframes glowCyan{0%,100%{box-shadow:0 4px 20px rgba(36,161,226,.25)}50%{box-shadow:0 8px 40px rgba(36,161,226,.5)}}
+  @keyframes breathe{0%,100%{transform:scale(1)}50%{transform:scale(1.03)}}
+  @keyframes borderGlow{0%,100%{border-color:rgba(36,161,226,.2)}50%{border-color:rgba(36,161,226,.6)}}
+  @keyframes dotPulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.6;transform:scale(.85)}}
+
+  /* ── Utility animation classes ── */
+  .fu {animation:fadeUp .6s cubic-bezier(.22,.68,0,1.2) forwards}
+  .fu2{animation:fadeUp .6s .14s cubic-bezier(.22,.68,0,1.2) both}
+  .fu3{animation:fadeUp .6s .28s cubic-bezier(.22,.68,0,1.2) both}
+  .fu4{animation:fadeUp .6s .42s cubic-bezier(.22,.68,0,1.2) both}
+  .float{animation:float 3.5s ease-in-out infinite}
+  .breathe{animation:breathe 4s ease-in-out infinite}
+
+  /* ── Buttons ── */
+  .btn-gold{
+    background:linear-gradient(135deg,var(--gold),var(--gold2));
+    color:#fff;border:none;padding:11px 26px;border-radius:10px;
+    font-family:'Syne',sans-serif;font-weight:700;font-size:14px;
+    cursor:pointer;transition:all .25s cubic-bezier(.4,0,.2,1);white-space:nowrap;
+    letter-spacing:.3px;position:relative;overflow:hidden;
+  }
+  .btn-gold::after{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,.15),transparent);opacity:0;transition:opacity .2s;}
+  .btn-gold:hover{transform:translateY(-2px);box-shadow:0 10px 28px rgba(36,161,226,.4);}
+  .btn-gold:hover::after{opacity:1;}
+  .btn-gold:active{transform:translateY(0);box-shadow:0 4px 12px rgba(36,161,226,.3);}
+  .btn-gold.pulse{animation:pulseCyan 2.2s infinite;}
+
+  .btn-green{background:linear-gradient(135deg,#10B981,#059669);color:#fff;border:none;padding:11px 26px;border-radius:10px;font-family:'Syne',sans-serif;font-weight:700;font-size:14px;cursor:pointer;transition:all .25s;white-space:nowrap;}
+  .btn-green:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(16,185,129,.35);}
+  .btn-red{background:linear-gradient(135deg,#EF4444,#DC2626);color:#fff;border:none;padding:11px 26px;border-radius:10px;font-family:'Syne',sans-serif;font-weight:700;font-size:14px;cursor:pointer;transition:all .25s;white-space:nowrap;}
+  .btn-red:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(239,68,68,.3);}
+  .btn-outline{
+    background:transparent;color:var(--gold);border:1.5px solid var(--gold);
+    padding:10px 26px;border-radius:10px;font-family:'Syne',sans-serif;
+    font-weight:600;font-size:14px;cursor:pointer;transition:all .25s;white-space:nowrap;
+  }
+  .btn-outline:hover{background:rgba(36,161,226,.1);transform:translateY(-2px);box-shadow:0 6px 20px rgba(36,161,226,.2);}
+  .btn-ghost{
+    background:var(--sf2);color:var(--text);border:1px solid var(--border);
+    padding:9px 18px;border-radius:8px;font-family:'Outfit',sans-serif;
+    font-weight:500;font-size:13px;cursor:pointer;transition:all .2s;white-space:nowrap;
+  }
+  .btn-ghost:hover{border-color:var(--gold);color:var(--gold);background:rgba(36,161,226,.06);}
+  .btn-whatsapp{background:linear-gradient(135deg,#25D366,#128C7E);color:#fff;border:none;padding:11px 20px;border-radius:10px;font-family:'Syne',sans-serif;font-weight:700;font-size:14px;cursor:pointer;transition:all .25s;display:flex;align-items:center;gap:7px;white-space:nowrap;}
+  .btn-whatsapp:hover{transform:translateY(-2px);box-shadow:0 10px 28px rgba(37,211,102,.35);}
+
+  /* ── Cards ── */
+  .card{
+    background:var(--surface);border:1px solid var(--border);
+    border-radius:16px;padding:22px;
+    transition:border-color .3s,box-shadow .3s,transform .25s;
+  }
+  .card:hover{border-color:rgba(36,161,226,.35);box-shadow:0 8px 32px rgba(36,161,226,.08);}
+
+  /* ── Inputs ── */
+  .input{width:100%;background:var(--sf2);border:1.5px solid var(--border);color:var(--text);padding:11px 14px;border-radius:10px;font-family:'Outfit',sans-serif;font-size:14px;outline:none;transition:all .2s;}
+  .input:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(36,161,226,.12);}
   .input::placeholder{color:var(--muted);}
-  .select{width:100%;background:var(--sf2);border:1px solid var(--border);color:var(--text);padding:11px 14px;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:14px;outline:none;cursor:pointer;}
-  .label{display:block;font-size:12px;color:var(--muted);margin-bottom:5px;font-weight:500;}
-  .badge{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:20px;font-size:12px;font-weight:600;}
-  .bg{background:rgba(5,150,105,.15);color:var(--green);}
-  .bo{background:rgba(14,165,233,.15);color:var(--gold);}
-  .br{background:rgba(220,38,38,.15);color:var(--red);}
-  .bb{background:rgba(2,132,199,.15);color:var(--blue);}
+  .select{width:100%;background:var(--sf2);border:1.5px solid var(--border);color:var(--text);padding:11px 14px;border-radius:10px;font-family:'Outfit',sans-serif;font-size:14px;outline:none;cursor:pointer;transition:border-color .2s;}
+  .select:focus{border-color:var(--gold);}
+  .label{display:block;font-size:12px;color:var(--muted);margin-bottom:5px;font-weight:500;letter-spacing:.3px;}
+
+  /* ── Badges ── */
+  .badge{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:20px;font-size:12px;font-weight:600;font-family:'Outfit',sans-serif;}
+  .bg{background:rgba(16,185,129,.15);color:var(--green);}
+  .bo{background:rgba(36,161,226,.15);color:var(--gold);}
+  .br{background:rgba(239,68,68,.15);color:var(--red);}
+  .bb{background:rgba(56,189,248,.15);color:var(--blue);}
   .bm{background:var(--sf2);color:var(--muted);}
-  .bpur{background:rgba(124,58,237,.15);color:#a78bfa;}
-  .borange{background:rgba(251,146,60,.15);color:#fb923c;}
-  .chip{display:inline-flex;align-items:center;gap:5px;padding:5px 12px;border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;border:1px solid var(--border);background:var(--sf2);color:var(--muted);transition:all .2s;}
+  .bpur{background:rgba(139,92,246,.15);color:#A78BFA;}
+  .borange{background:rgba(251,146,60,.15);color:#FB923C;}
+
+  /* ── Chips ── */
+  .chip{display:inline-flex;align-items:center;gap:5px;padding:5px 12px;border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;border:1px solid var(--border);background:var(--sf2);color:var(--muted);transition:all .2s;font-family:'Outfit',sans-serif;}
   .chip:hover{border-color:var(--gold);color:var(--gold);}
-  .chip.active{background:rgba(14,165,233,.15);border-color:var(--gold);color:var(--gold);}
-  .nav{position:sticky;top:0;z-index:100;background:${dark?"rgba(10,10,15,.9)":"rgba(240,247,255,.93)"};backdrop-filter:blur(22px);border-bottom:1px solid var(--border);padding:0 16px;height:62px;display:flex;align-items:center;justify-content:space-between;gap:8px;}
+  .chip.active{background:rgba(36,161,226,.12);border-color:var(--gold);color:var(--gold);}
+
+  /* ── Nav ── */
+  .nav{
+    position:sticky;top:0;z-index:100;
+    background:${dark ? "rgba(11,14,20,.92)" : "rgba(248,250,252,.94)"};
+    backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);
+    border-bottom:1px solid var(--border);
+    padding:0 20px;height:64px;
+    display:flex;align-items:center;justify-content:space-between;gap:8px;
+  }
   .logo-img{height:30px;width:auto;object-fit:contain;flex-shrink:0;}
-  .logo-wrap{display:flex;align-items:center;gap:6px;cursor:pointer;flex-shrink:0;}
-  .logo-name{font-family:'Syne',sans-serif;font-size:16px;font-weight:800;background:linear-gradient(135deg,var(--gold),var(--gold2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
-  .toggle-btn{display:flex;align-items:center;gap:6px;padding:6px 10px;border-radius:20px;border:1px solid var(--border);background:var(--sf2);cursor:pointer;font-size:12px;color:var(--muted);transition:all .2s;flex-shrink:0;}
-  .toggle-btn:hover{border-color:var(--gold);color:var(--gold);}
-  .sidebar{width:220px;background:var(--surface);border-right:1px solid var(--border);padding:18px 10px;position:fixed;top:62px;left:0;bottom:0;overflow-y:auto;display:flex;flex-direction:column;}
-  .si{display:flex;align-items:center;gap:9px;padding:9px 12px;border-radius:9px;cursor:pointer;font-size:14px;font-weight:500;color:var(--muted);transition:all .2s;margin-bottom:2px;}
+  .logo-wrap{display:flex;align-items:center;gap:7px;cursor:pointer;flex-shrink:0;}
+  .logo-name{
+    font-family:'Syne',sans-serif;font-size:17px;font-weight:800;
+    background:linear-gradient(135deg,var(--gold),var(--gold2));
+    -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+    letter-spacing:-.3px;
+  }
+  .toggle-btn{display:flex;align-items:center;gap:6px;padding:6px 11px;border-radius:20px;border:1px solid var(--border);background:var(--sf2);cursor:pointer;font-size:12px;color:var(--muted);transition:all .2s;flex-shrink:0;font-family:'Outfit',sans-serif;font-weight:500;}
+  .toggle-btn:hover{border-color:var(--gold);color:var(--gold);background:rgba(36,161,226,.06);}
+
+  /* ── Sidebar & Dashboard ── */
+  .sidebar{width:220px;background:var(--surface);border-right:1px solid var(--border);padding:18px 10px;position:fixed;top:64px;left:0;bottom:0;overflow-y:auto;display:flex;flex-direction:column;}
+  .si{display:flex;align-items:center;gap:9px;padding:9px 12px;border-radius:9px;cursor:pointer;font-size:14px;font-weight:500;color:var(--muted);transition:all .2s;margin-bottom:2px;font-family:'Outfit',sans-serif;}
   .si:hover{background:var(--sf2);color:var(--text);}
-  .si.active{background:rgba(14,165,233,.12);color:var(--gold);}
-  .main{margin-left:220px;padding:24px;min-height:calc(100vh - 62px);}
+  .si.active{background:rgba(36,161,226,.1);color:var(--gold);font-weight:600;}
+  .main{margin-left:220px;padding:24px;min-height:calc(100vh - 64px);}
   .step{display:flex;align-items:flex-start;gap:12px;padding:14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);}
   .step-num{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-weight:700;font-size:13px;flex-shrink:0;}
+
+  /* ── Grids ── */
   .g2{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
   .g3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;}
   .g4{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;}
+
+  /* ── Table ── */
   .tbl{width:100%;border-collapse:collapse;}
-  .tbl th{text-align:left;padding:11px 13px;font-size:11px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid var(--border);white-space:nowrap;}
-  .tbl td{padding:12px 13px;font-size:13px;border-bottom:1px solid var(--border);}
+  .tbl th{text-align:left;padding:11px 13px;font-size:11px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.6px;border-bottom:1px solid var(--border);white-space:nowrap;font-family:'Outfit',sans-serif;}
+  .tbl td{padding:12px 13px;font-size:13px;border-bottom:1px solid var(--border);font-family:'Outfit',sans-serif;}
   .tbl tr:hover td{background:var(--sf2);}
   .tbl tr:last-child td{border-bottom:none;}
-  .overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);backdrop-filter:blur(4px);z-index:9999;display:flex;align-items:center;justify-content:center;padding:14px;}
-  .modal{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:26px;width:100%;max-width:470px;animation:fadeUp .3s ease;max-height:88vh;overflow-y:auto;position:relative;z-index:10000;}
+
+  /* ── Overlays & Modals ── */
+  .overlay{position:fixed;inset:0;background:rgba(0,0,0,.72);backdrop-filter:blur(6px);z-index:9999;display:flex;align-items:center;justify-content:center;padding:14px;}
+  .modal{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:28px;width:100%;max-width:470px;animation:fadeUp .3s cubic-bezier(.22,.68,0,1.2);max-height:88vh;overflow-y:auto;position:relative;z-index:10000;box-shadow:0 24px 60px rgba(0,0,0,.25);}
+
+  /* ── Timeline ── */
   .tl{display:flex;gap:12px;padding-bottom:20px;position:relative;}
   .tl:not(:last-child)::before{content:'';position:absolute;left:14px;top:30px;bottom:0;width:2px;background:var(--border);}
   .tl-dot{width:30px;height:30px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:13px;}
-  .shimmer{background:linear-gradient(90deg,var(--gold),${dark?"#fff":"#0369a1"},var(--gold));background-size:200% auto;-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;animation:shimmer 3s linear infinite;}
-  .hero-glow{position:absolute;width:400px;height:400px;border-radius:50%;filter:blur(80px);pointer-events:none;}
+
+  /* ── Shimmer text ── */
+  .shimmer{
+    background:linear-gradient(90deg,var(--gold),${dark?"#93C5FD":"#4A1C81"},var(--gold2),var(--gold));
+    background-size:300% auto;
+    -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+    animation:shimmer 4s linear infinite;
+  }
+
+  /* ── Misc ── */
+  .hero-glow{position:absolute;width:400px;height:400px;border-radius:50%;filter:blur(90px);pointer-events:none;}
   .avatar{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--gold),var(--accent));display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-weight:700;font-size:13px;color:white;flex-shrink:0;}
   .ficon{width:44px;height:44px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:20px;margin-bottom:12px;}
   .stat-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:18px 20px;}
   .pbar{height:5px;background:var(--sf2);border-radius:3px;overflow:hidden;}
-  .pfill{height:100%;border-radius:3px;background:linear-gradient(90deg,var(--gold),var(--gold2));transition:width .5s;}
-  .tracking-box{background:rgba(2,132,199,.1);border:1px solid rgba(2,132,199,.3);border-radius:10px;padding:12px;display:flex;align-items:center;gap:10px;}
-  .hold-box{background:rgba(124,58,237,.1);border:1px solid rgba(124,58,237,.3);border-radius:10px;padding:12px;}
-  .copy-toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:var(--green);color:#fff;padding:10px 22px;border-radius:10px;font-size:13px;font-weight:600;z-index:999;animation:fadeUp .3s ease;}
-  .mobile-nav{display:none;position:fixed;bottom:0;left:0;right:0;background:${dark?"rgba(18,18,26,.97)":"rgba(255,255,255,.97)"};backdrop-filter:blur(20px);border-top:1px solid var(--border);z-index:100;padding:8px 0 max(8px,env(safe-area-inset-bottom));}
-  .mni{display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px 16px;cursor:pointer;border-radius:10px;transition:all .2s;color:var(--muted);font-size:10px;font-weight:500;min-width:60px;}
+  .pfill{height:100%;border-radius:3px;background:linear-gradient(90deg,var(--gold),var(--gold2));transition:width .6s cubic-bezier(.4,0,.2,1);}
+  .tracking-box{background:rgba(36,161,226,.08);border:1px solid rgba(36,161,226,.25);border-radius:10px;padding:12px;display:flex;align-items:center;gap:10px;}
+  .hold-box{background:rgba(139,92,246,.08);border:1px solid rgba(139,92,246,.25);border-radius:10px;padding:12px;}
+  .copy-toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:var(--green);color:#fff;padding:10px 22px;border-radius:10px;font-size:13px;font-weight:600;z-index:999;animation:fadeUp .3s ease;font-family:'Outfit',sans-serif;}
+  .mobile-nav{display:none;position:fixed;bottom:0;left:0;right:0;background:${dark?"rgba(19,22,32,.97)":"rgba(255,255,255,.97)"};backdrop-filter:blur(24px);border-top:1px solid var(--border);z-index:100;padding:8px 0 max(8px,env(safe-area-inset-bottom));}
+  .mni{display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px 16px;cursor:pointer;border-radius:10px;transition:all .2s;color:var(--muted);font-size:10px;font-weight:500;min-width:60px;font-family:'Outfit',sans-serif;}
   .mni.active{color:var(--gold);}
   .mni span:first-child{font-size:20px;}
+
+  /* ── Responsive ── */
   @media(max-width:1024px){.g4{grid-template-columns:1fr 1fr;}}
   @media(max-width:800px){.g3{grid-template-columns:1fr 1fr;}}
   @media(max-width:640px){
@@ -196,14 +287,16 @@ function getStyle(dark) {
     .mobile-nav{display:flex;justify-content:space-around;align-items:center;}
     .main{margin-left:0 !important;padding:14px;padding-bottom:90px;width:100%;max-width:100vw;overflow-x:hidden;}
     .g2,.g3,.g4{grid-template-columns:1fr;}
-    .nav{padding:0 10px;}
+    .nav{padding:0 12px;height:58px;}
     .hide-m{display:none;}
     body{overflow-x:hidden;}
-    .card{padding:14px;}
+    .card{padding:16px;}
     .tbl{font-size:11px;}
     .tbl th,.tbl td{padding:8px 6px;}
     .copy-toast{bottom:90px;}
   }
+  .hide-d{display:none;}
+  @media(max-width:640px){.hide-d{display:flex !important;}}
   *{box-sizing:border-box;}
   html,body{max-width:100vw;overflow-x:hidden;}
   `;
@@ -491,9 +584,71 @@ function OrderModal({ order, isSeller, onClose, onDispatch, onConfirmDelivery, o
   );
 }
 
+/* ══════════ STAT COUNT COMPONENT ══════════ */
+function StatCount({ target, suffix, label, started }) {
+  const val = useCountUp(target, 1800, started);
+  return (
+    <div style={{textAlign:"center"}}>
+      <div className="syne" style={{
+        fontSize:"clamp(32px,4vw,52px)",fontWeight:800,color:"#fff",lineHeight:1,marginBottom:6,
+        letterSpacing:"-1px"
+      }}>
+        {val.toLocaleString("en-IN")}{suffix}
+      </div>
+      <div style={{fontSize:13,color:"rgba(255,255,255,.65)",fontWeight:500}}>{label}</div>
+    </div>
+  );
+}
+
+/* ══════════ SCROLL ANIMATION HOOK ══════════ */
+function useScrollReveal() {
+  useEffect(() => {
+    const els = document.querySelectorAll(".reveal");
+    if (!els.length) return;
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach(e => {
+        if (e.isIntersecting) {
+          e.target.style.opacity = "1";
+          e.target.style.transform = "translateY(0)";
+          io.unobserve(e.target);
+        }
+      });
+    }, { threshold: 0.12 });
+    els.forEach(el => {
+      el.style.opacity = "0";
+      el.style.transform = "translateY(28px)";
+      el.style.transition = "opacity .6s ease, transform .6s ease";
+      io.observe(el);
+    });
+    return () => io.disconnect();
+  }, []);
+}
+
+/* ══════════ COUNT UP HOOK ══════════ */
+function useCountUp(target, duration = 1800, started = false) {
+  const [val, setVal] = useState(0);
+  useEffect(() => {
+    if (!started) return;
+    let start = null;
+    const step = (ts) => {
+      if (!start) start = ts;
+      const prog = Math.min((ts - start) / duration, 1);
+      const eased = 1 - Math.pow(1 - prog, 3);
+      setVal(Math.floor(eased * target));
+      if (prog < 1) requestAnimationFrame(step);
+    };
+    requestAnimationFrame(step);
+  }, [started, target, duration]);
+  return val;
+}
+
 /* ══════════ LANDING ══════════ */
 function Landing({ onEnter, dark, onToggle, lang, onLangToggle }) {
   const t = T[lang] || T.hl;
+  const [statsStarted, setStatsStarted] = useState(false);
+  const [openFaq, setOpenFaq] = useState(null);
+  const statsRef = useScrollReveal ? null : null;
+  useScrollReveal();
 
   const LT = {
     en: {
@@ -601,6 +756,61 @@ function Landing({ onEnter, dark, onToggle, lang, onLangToggle }) {
   };
 
   const lc = LT[lang] || LT.hl;
+
+  // ── Stats IntersectionObserver ──
+  useEffect(() => {
+    const el = document.getElementById("stats-section");
+    if (!el) return;
+    const io = new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting) { setStatsStarted(true); io.disconnect(); }
+    }, { threshold: 0.3 });
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
+
+  // ── Static content (no translation needed) ──
+  const STATS = [
+    { val:1200, suffix:"+", label: lang==="hi"?"ऑर्डर प्रोटेक्ट हुए": lang==="en"?"Orders Protected":"Orders Protected" },
+    { val:98,   suffix:"%", label: lang==="hi"?"सफल डिलीवरी":lang==="en"?"Successful Deliveries":"Successful Deliveries" },
+    { val:4,    suffix:" hr",label:lang==="hi"?"औसत विवाद समाधान":lang==="en"?"Avg Dispute Resolution":"Avg Dispute Resolution" },
+    { val:500,  suffix:"K+",label:lang==="hi"?"₹ सुरक्षित रखे":lang==="en"?"₹ Secured":"₹ Secured" },
+  ];
+
+  const COMPARE = {
+    head: lang==="hi"?["विकल्प","EscaraPay","Direct UPI","Cash on Delivery"]:["Option","EscaraPay","Direct UPI","Cash on Delivery"],
+    rows: [
+      { f: lang==="hi"?"फ्रॉड से सुरक्षा":lang==="en"?"Fraud Protection":"Fraud Protection",               a:"✅", b:"❌", c:"⚠️" },
+      { f: lang==="hi"?"RTO सुरक्षा":lang==="en"?"RTO Protection":"RTO Protection",                         a:"✅", b:"❌", c:"❌" },
+      { f: lang==="hi"?"टोकन होल्ड सिस्टम":lang==="en"?"Token Hold System":"Token Hold System",            a:"✅", b:"❌", c:"❌" },
+      { f: lang==="hi"?"विवाद समाधान":lang==="en"?"Dispute Resolution":"Dispute Resolution",                a:"✅", b:"❌", c:"⚠️" },
+      { f: lang==="hi"?"WhatsApp नेटिव":lang==="en"?"WhatsApp Native":"WhatsApp Native",                   a:"✅", b:"⚠️", c:"❌" },
+      { f: lang==="hi"?"2 मिनट सेटअप":lang==="en"?"2-Min Setup":"2-Min Setup",                             a:"✅", b:"✅", c:"❌" },
+      { f: lang==="hi"?"पेमेंट एनक्रिप्शन":lang==="en"?"Payment Encryption":"Payment Encryption",          a:"✅", b:"✅", c:"❌" },
+    ],
+  };
+
+  const FAQS = lang==="hi" ? [
+    { q:"EscaraPay पर न्यूनतम टोकन राशि क्या है?", a:"न्यूनतम टोकन ₹200 है। यह ऑर्डर वैल्यू का एक प्रतिशत होता है जो एस्क्रो में सुरक्षित रखा जाता है।" },
+    { q:"अगर सेलर ने आइटम नहीं भेजा तो क्या होगा?", a:"अगर सेलर निर्धारित समय में आइटम नहीं भेजता, तो टोकन पूरी तरह बायर को वापस कर दिया जाएगा।" },
+    { q:"टोकन का पैसा सेलर को कब मिलेगा?", a:"डिलीवरी की पुष्टि के बाद 7 दिनों में या जब बायर खुद कन्फर्म कर दे, तभी पैसा रिलीज होता है।" },
+    { q:"क्या EscaraPay RBI से approved है?", a:"EscaraPay Razorpay के ज़रिए पेमेंट प्रोसेस करता है जो RBI-compliant और PCI DSS certified है।" },
+    { q:"विवाद कैसे उठाएं?", a:"डिलीवरी के 7 दिनों के अंदर अपने डैशबोर्ड में जाकर 'Dispute Raise Karo' बटन दबाएं। हमारी टीम 24 घंटे में जवाब देगी।" },
+    { q:"क्या कोई hidden charges हैं?", a:"नहीं। केवल 2% Razorpay gateway fee है जो बायर को पेमेंट के समय दिखाई जाती है। कोई छुपी हुई फीस नहीं।" },
+  ] : lang==="en" ? [
+    { q:"What is the minimum token amount on EscaraPay?", a:"The minimum token is ₹200. It is a percentage of the order value that is held securely in escrow until delivery is confirmed." },
+    { q:"What if the seller doesn't ship the item?", a:"If the seller fails to ship within the agreed time, the full token amount is automatically refunded to the buyer." },
+    { q:"When does the seller receive the token payment?", a:"The payment is released to the seller within 7 days of delivery confirmation, or immediately when the buyer manually confirms receipt." },
+    { q:"Is EscaraPay approved by RBI?", a:"EscaraPay processes payments via Razorpay, which is fully RBI-compliant and PCI DSS Level 1 certified, ensuring maximum security." },
+    { q:"How do I raise a dispute?", a:"Within 7 days of delivery, go to your dashboard and click 'Raise Dispute'. Our team will investigate and respond within 24 hours." },
+    { q:"Are there any hidden charges?", a:"No hidden charges. Only a 2% Razorpay gateway fee is applied, which is shown transparently at the time of payment." },
+  ] : [
+    { q:"EscaraPay pe minimum token kitna hota hai?", a:"Minimum token ₹200 hai. Yeh order value ka ek percentage hota hai jo delivery confirm hone tak escrow mein safe rakha jaata hai." },
+    { q:"Agar seller ne item nahi bheja toh kya hoga?", a:"Agar seller decided time mein item nahi bhejta, toh poora token amount buyer ko automatically wapas kar diya jaata hai." },
+    { q:"Seller ko token payment kab milegi?", a:"Delivery confirmation ke 7 din ke andar, ya jab buyer khud confirm kare — tab payment seller ko release hoti hai." },
+    { q:"Kya EscaraPay RBI se approved hai?", a:"EscaraPay Razorpay ke zariye payments process karta hai jo RBI-compliant aur PCI DSS Level 1 certified hai." },
+    { q:"Dispute kaise raise karein?", a:"Delivery ke 7 din ke andar dashboard mein jaao aur 'Dispute Raise Karo' button dabao. Hamari team 24 ghante mein jawab degi." },
+    { q:"Koi hidden charges hain kya?", a:"Koi hidden charge nahi. Sirf 2% Razorpay gateway fee hai jo payment ke waqt clearly dikhti hai." },
+  ];
 
   return (
     <div style={{minHeight:"100vh"}}>
@@ -878,6 +1088,202 @@ function Landing({ onEnter, dark, onToggle, lang, onLangToggle }) {
         </div>
       </div>
 
+
+
+      {/* ── EARLY ACCESS SECTION (replaces testimonials - honest & professional) ── */}
+      <div className="reveal" style={{padding:"70px clamp(16px,5vw,40px)",background:"var(--sf2)"}}>
+        <div style={{maxWidth:860,margin:"0 auto"}}>
+          {/* Top label */}
+          <div style={{textAlign:"center",marginBottom:48}}>
+            <p style={{fontSize:12,fontWeight:700,color:"var(--gold)",letterSpacing:"2px",textTransform:"uppercase",marginBottom:10}}>EARLY ACCESS</p>
+            <h2 className="syne" style={{fontSize:"clamp(24px,3.5vw,40px)",fontWeight:800,marginBottom:14,letterSpacing:"-0.5px"}}>
+              {lang==="hi"?"पहले 100 में शामिल हों":lang==="en"?"Join Our First 100 Sellers":"Pehle 100 Sellers Mein Shaamil Ho"}
+            </h2>
+            <p style={{color:"var(--muted)",fontSize:15,maxWidth:500,margin:"0 auto",lineHeight:1.7}}>
+              {lang==="hi"?"EscaraPay अभी launch हो रहा है। पहले 100 sellers को lifetime benefits मिलेंगे।"
+               :lang==="en"?"EscaraPay is just launching. Our first 100 sellers get exclusive lifetime benefits."
+               :"EscaraPay abhi launch ho raha hai. Pehle 100 sellers ko exclusive lifetime benefits milenge."}
+            </p>
+          </div>
+
+          {/* Benefits grid */}
+          <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(240px,1fr))",gap:18,marginBottom:44}}>
+            {[
+              { icon:"🎯", color:"rgba(36,161,226,.15)", bdr:"rgba(36,161,226,.3)",
+                title: lang==="hi"?"ज़ीरो प्लेटफॉर्म फीस":lang==="en"?"Zero Platform Fee":"Zero Platform Fee",
+                desc: lang==="hi"?"पहले 100 sellers के लिए हमारी platform fee बिल्कुल माफ।":lang==="en"?"Our platform fee is completely waived for the first 100 sellers.":"Pehle 100 sellers ke liye hamaari platform fee bilkul maaf." },
+              { icon:"⚡", color:"rgba(74,28,129,.15)", bdr:"rgba(74,28,129,.3)",
+                title: lang==="hi"?"प्रायोरिटी सपोर्ट":lang==="en"?"Priority Support":"Priority Support",
+                desc: lang==="hi"?"Early sellers को 24/7 dedicated support मिलेगी — कोई भी समस्या तुरंत सुलझेगी।":lang==="en"?"Early sellers get dedicated 24/7 support — every issue resolved instantly.":"Early sellers ko 24/7 dedicated support milegi — koi bhi problem turant suljhegi." },
+              { icon:"🔒", color:"rgba(16,185,129,.15)", bdr:"rgba(16,185,129,.3)",
+                title: lang==="hi"?"Razorpay सिक्योर पेमेंट":lang==="en"?"Razorpay Secured":"Razorpay Secured",
+                desc: lang==="hi"?"हर पेमेंट RBI-compliant Razorpay से secure है — आपका और buyer का पैसा safe.":lang==="en"?"Every payment secured via RBI-compliant Razorpay — your money, always safe.":"Har payment RBI-compliant Razorpay se secure hai — aapka aur buyer ka paisa safe." },
+              { icon:"📊", color:"rgba(240,180,41,.12)", bdr:"rgba(240,180,41,.3)",
+                title: lang==="hi"?"फीडबैक से प्लेटफॉर्म शेप करें":lang==="en"?"Shape the Platform":"Platform Shape Karo",
+                desc: lang==="hi"?"Early users के suggestions से ही हम features बनाएंगे। आपकी आवाज़ सुनी जाएगी।":lang==="en"?"We build features based on early user feedback. Your voice matters here.":"Early users ke suggestions se hi hum features banayenge. Aapki awaaz suni jayegi." },
+            ].map((b,i)=>(
+              <div key={i} className="card reveal" style={{
+                background:b.color,borderColor:b.bdr,padding:"24px 22px",
+                transition:"transform .25s,box-shadow .25s",
+              }}
+                onMouseEnter={e=>{e.currentTarget.style.transform="translateY(-4px)";e.currentTarget.style.boxShadow="0 14px 36px rgba(0,0,0,.1)";}}
+                onMouseLeave={e=>{e.currentTarget.style.transform="translateY(0)";e.currentTarget.style.boxShadow="none";}}
+              >
+                <div style={{fontSize:28,marginBottom:12}}>{b.icon}</div>
+                <h3 className="syne" style={{fontWeight:700,fontSize:15,marginBottom:8}}>{b.title}</h3>
+                <p style={{fontSize:13,color:"var(--muted)",lineHeight:1.75,margin:0}}>{b.desc}</p>
+              </div>
+            ))}
+          </div>
+
+          {/* Slots counter */}
+          <div style={{
+            background: dark?"rgba(36,161,226,.07)":"rgba(36,161,226,.05)",
+            border:"1px solid rgba(36,161,226,.2)",
+            borderRadius:20,padding:"32px 28px",textAlign:"center"
+          }}>
+            <div style={{
+              display:"inline-flex",alignItems:"center",gap:8,
+              background:"rgba(36,161,226,.12)",border:"1px solid rgba(36,161,226,.25)",
+              borderRadius:100,padding:"6px 16px",marginBottom:18,
+              fontSize:12,fontWeight:700,color:"var(--gold)",letterSpacing:"1px",textTransform:"uppercase"
+            }}>
+              <span style={{width:7,height:7,borderRadius:"50%",background:"var(--green)",display:"inline-block",animation:"dotPulse 1.5s ease-in-out infinite"}}/>
+              {lang==="hi"?"अभी लाइव हो रहा है":lang==="en"?"Now Live":"Abhi Live Ho Raha Hai"}
+            </div>
+            <h3 className="syne" style={{fontWeight:800,fontSize:"clamp(20px,3vw,30px)",marginBottom:10,letterSpacing:"-0.5px"}}>
+              {lang==="hi"?"सीमित Early Access Slots":lang==="en"?"Limited Early Access Slots":"Limited Early Access Slots"}
+            </h3>
+            <p style={{color:"var(--muted)",fontSize:14,marginBottom:24,lineHeight:1.7,maxWidth:400,margin:"0 auto 24px"}}>
+              {lang==="hi"?"अभी register करें और India ke top escrow platform का हिस्सा बनें।"
+               :lang==="en"?"Register now and be part of India's most trusted escrow platform."
+               :"Abhi register karo aur India ke top escrow platform ka hissa bano."}
+            </p>
+            <div style={{display:"flex",gap:12,justifyContent:"center",flexWrap:"wrap"}}>
+              <button className="btn-gold pulse" style={{fontSize:15,padding:"13px 36px",borderRadius:12}} onClick={()=>onEnter("seller")}>
+                🏪 {lc.ctaSeller}
+              </button>
+              <button className="btn-outline" style={{fontSize:15,padding:"12px 36px",borderRadius:12}} onClick={()=>onEnter("buyer")}>
+                🛍️ {lc.ctaBuyer}
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* ── COMPARISON TABLE ── */}
+      <div className="reveal" style={{padding:"70px clamp(16px,5vw,40px)",background:"var(--surface)"}}>
+        <div style={{textAlign:"center",marginBottom:48}}>
+          <p style={{fontSize:12,fontWeight:700,color:"var(--gold)",letterSpacing:"2px",textTransform:"uppercase",marginBottom:10}}>COMPARISON</p>
+          <h2 className="syne" style={{fontSize:"clamp(24px,3.5vw,40px)",fontWeight:800,marginBottom:12,letterSpacing:"-0.5px"}}>
+            {lang==="hi"?"EscaraPay vs बाकी तरीके":lang==="en"?"EscaraPay vs Other Methods":"EscaraPay vs Baaki Tarike"}
+          </h2>
+          <p style={{color:"var(--muted)",fontSize:15,maxWidth:440,margin:"0 auto",lineHeight:1.6}}>
+            {lang==="hi"?"देखो क्यों EscaraPay सबसे आगे है":lang==="en"?"See why EscaraPay leads the way":"Dekho kyun EscaraPay sabse aage hai"}
+          </p>
+        </div>
+        <div style={{maxWidth:780,margin:"0 auto",overflowX:"auto"}}>
+          <table style={{width:"100%",borderCollapse:"separate",borderSpacing:0}}>
+            <thead>
+              <tr>
+                {COMPARE.head.map((h,i)=>(
+                  <th key={i} style={{
+                    padding:"14px 18px",
+                    textAlign: i===0?"left":"center",
+                    fontSize:13,fontFamily:"'Syne',sans-serif",fontWeight:700,
+                    background: i===1
+                      ? "linear-gradient(135deg,rgba(14,165,233,.2),rgba(56,189,248,.15))"
+                      : "var(--sf2)",
+                    color: i===1?"var(--gold)":"var(--muted)",
+                    borderBottom:"2px solid var(--border)",
+                    borderTop:"1px solid var(--border)",
+                    borderLeft: i===0?"1px solid var(--border)":"none",
+                    borderRight:"1px solid var(--border)",
+                    borderRadius: i===0?"12px 0 0 0":i===COMPARE.head.length-1?"0 12px 0 0":"0",
+                    position:"relative"
+                  }}>
+                    {i===1 && (
+                      <div style={{position:"absolute",top:-1,left:"50%",transform:"translateX(-50%)",background:"var(--gold)",color:dark?"#000":"#fff",fontSize:9,fontWeight:800,padding:"2px 10px",borderRadius:100,whiteSpace:"nowrap",letterSpacing:"1px"}}>
+                        ⭐ BEST
+                      </div>
+                    )}
+                    {h}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {COMPARE.rows.map((row,ri)=>(
+                <tr key={ri}>
+                  <td style={{padding:"13px 18px",fontSize:13,fontWeight:500,background:"var(--sf2)",borderBottom:"1px solid var(--border)",borderLeft:"1px solid var(--border)",borderRight:"1px solid var(--border)",color:"var(--text)"}}>{row.f}</td>
+                  <td style={{padding:"13px 18px",textAlign:"center",fontSize:16,background:dark?"rgba(14,165,233,.07)":"rgba(14,165,233,.04)",borderBottom:"1px solid rgba(14,165,233,.15)",borderRight:"1px solid var(--border)"}}>{row.a}</td>
+                  <td style={{padding:"13px 18px",textAlign:"center",fontSize:16,background:"var(--surface)",borderBottom:"1px solid var(--border)",borderRight:"1px solid var(--border)"}}>{row.b}</td>
+                  <td style={{padding:"13px 18px",textAlign:"center",fontSize:16,background:"var(--surface)",borderBottom:"1px solid var(--border)",borderRight:"1px solid var(--border)"}}>{row.c}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+          <div style={{marginTop:10,fontSize:11,color:"var(--muted)",textAlign:"center"}}>
+            ✅ = {lang==="hi"?"पूरी तरह":lang==="en"?"Fully Supported":"Fully Supported"} &nbsp;⚠️ = {lang==="hi"?"आंशिक":lang==="en"?"Partial":"Partial"} &nbsp;❌ = {lang==="hi"?"नहीं":lang==="en"?"Not Available":"Not Available"}
+          </div>
+        </div>
+      </div>
+
+      {/* ── FAQ ── */}
+      <div className="reveal" style={{padding:"70px clamp(16px,5vw,40px)",background:"var(--sf2)"}}>
+        <div style={{textAlign:"center",marginBottom:48}}>
+          <p style={{fontSize:12,fontWeight:700,color:"var(--gold)",letterSpacing:"2px",textTransform:"uppercase",marginBottom:10}}>FAQ</p>
+          <h2 className="syne" style={{fontSize:"clamp(24px,3.5vw,40px)",fontWeight:800,marginBottom:12,letterSpacing:"-0.5px"}}>
+            {lang==="hi"?"अक्सर पूछे जाने वाले सवाल":lang==="en"?"Frequently Asked Questions":"Aksar Puche Jaane Waale Sawaal"}
+          </h2>
+          <p style={{color:"var(--muted)",fontSize:15,maxWidth:420,margin:"0 auto",lineHeight:1.6}}>
+            {lang==="hi"?"कोई सवाल? हमारे पास जवाब है।":lang==="en"?"Any questions? We have the answers.":"Koi sawaal? Hamare paas jawab hai."}
+          </p>
+        </div>
+        <div style={{maxWidth:720,margin:"0 auto",display:"flex",flexDirection:"column",gap:10}}>
+          {FAQS.map((faq,i)=>(
+            <div key={i} className="card" style={{
+              padding:0,overflow:"hidden",
+              border: openFaq===i?"1px solid rgba(14,165,233,.4)":"1px solid var(--border)",
+              transition:"border-color .2s"
+            }}>
+              <button
+                onClick={()=>setOpenFaq(openFaq===i?null:i)}
+                style={{
+                  width:"100%",padding:"18px 20px",
+                  display:"flex",justifyContent:"space-between",alignItems:"center",
+                  background:"transparent",border:"none",cursor:"pointer",
+                  fontFamily:"'Syne',sans-serif",fontWeight:700,fontSize:14,
+                  color:"var(--text)",textAlign:"left",gap:12
+                }}
+              >
+                <span>{faq.q}</span>
+                <span style={{
+                  width:24,height:24,borderRadius:"50%",flexShrink:0,
+                  background: openFaq===i?"rgba(14,165,233,.2)":"var(--sf2)",
+                  display:"flex",alignItems:"center",justifyContent:"center",
+                  fontSize:14,color:"var(--gold)",transition:"all .2s",
+                  transform: openFaq===i?"rotate(45deg)":"rotate(0deg)"
+                }}>+</span>
+              </button>
+              {openFaq===i && (
+                <div style={{padding:"0 20px 18px",fontSize:13,color:"var(--muted)",lineHeight:1.8,borderTop:"1px solid var(--border)",paddingTop:14}}>
+                  {faq.a}
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+        <div style={{textAlign:"center",marginTop:32}}>
+          <span style={{fontSize:13,color:"var(--muted)"}}>
+            {lang==="hi"?"और सवाल हैं? ":lang==="en"?"More questions? ":"Aur sawaal hain? "}
+          </span>
+          <span style={{fontSize:13,color:"var(--gold)",fontWeight:600,cursor:"pointer",textDecoration:"underline"}} onClick={()=>window._goToPage("contact")}>
+            {lang==="hi"?"हमसे संपर्क करें →":lang==="en"?"Contact Us →":"Contact Karo →"}
+          </span>
+        </div>
+      </div>
+
       {/* ── TRUST BAR ── */}
       <div style={{
         background: dark?"rgba(14,165,233,.07)":"rgba(14,165,233,.06)",
@@ -948,11 +1354,26 @@ function Landing({ onEnter, dark, onToggle, lang, onLangToggle }) {
           </div>
         </div>
       </footer>
+      {/* ── MOBILE STICKY CTA ── */}
+      <div style={{
+        position:"fixed",bottom:0,left:0,right:0,zIndex:200,
+        background: dark?"rgba(12,12,22,.97)":"rgba(255,255,255,.97)",
+        backdropFilter:"blur(20px)",
+        borderTop:"1px solid var(--border)",
+        padding:"10px 16px max(10px, env(safe-area-inset-bottom))",
+        display:"flex",gap:10,alignItems:"center",
+        boxShadow:"0 -8px 30px rgba(0,0,0,.12)"
+      }} className="hide-d">
+        <button className="btn-outline" style={{flex:1,padding:"11px",fontSize:13,borderRadius:10}} onClick={()=>onEnter("buyer")}>
+          🛍️ {lc.ctaBuyer}
+        </button>
+        <button className="btn-gold" style={{flex:1,padding:"12px",fontSize:13,borderRadius:10}} onClick={()=>onEnter("seller")}>
+          🏪 {lc.ctaSeller}
+        </button>
+      </div>
     </div>
   );
 }
-
-/* ══════════ AUTH ══════════ */
 // ── Validation helpers ──
 const validateEmail = (e) => /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(e);
 const validatePhone = (p) => /^\d{10}$/.test(p);
