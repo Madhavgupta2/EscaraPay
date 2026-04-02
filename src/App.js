@@ -92,18 +92,18 @@ function getStyle(dark) {
   @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap');
   *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
   :root {
-    --bg:      ${dark?"#0a0a0f":"#f0f7ff"};
-    --surface: ${dark?"#12121a":"#ffffff"};
-    --sf2:     ${dark?"#1a1a26":"#e4f1fb"};
-    --border:  ${dark?"rgba(255,255,255,0.07)":"rgba(14,165,233,0.18)"};
-    --gold:    ${dark?"#f0b429":"#0ea5e9"};
-    --gold2:   ${dark?"#f7c948":"#38bdf8"};
-    --green:   ${dark?"#22c55e":"#059669"};
-    --red:     ${dark?"#ef4444":"#dc2626"};
-    --blue:    ${dark?"#60a5fa":"#0284c7"};
-    --text:    ${dark?"#f0f0f5":"#0c2340"};
-    --muted:   ${dark?"#8888a0":"#4a7fa5"};
-    --accent:  ${dark?"#7c3aed":"#0369a1"};
+    --bg:      ${dark ? "#0B0E14" : "#F8FAFC"};
+    --surface: ${dark ? "#131620" : "#FFFFFF"};
+    --sf2:     ${dark ? "#1C212D" : "#EBF4FA"};
+    --border:  ${dark ? "rgba(255,255,255,0.08)" : "rgba(36,161,226,0.15)"};
+    --gold:    ${dark ? "#24A1E2" : "#24A1E2"}; /* Replaced gold with Logo's Cyan for a premium feel */
+    --gold2:   ${dark ? "#4BB3E9" : "#1A84C4"}; /* A slightly varied tone of cyan for hovers/gradients */
+    --green:   ${dark ? "#10B981" : "#059669"}; /* Softer, professional green for success/positive stats */
+    --red:     ${dark ? "#EF4444" : "#DC2626"};   /* Clean red for errors/negative stats */
+    --blue:    ${dark ? "#38BDF8" : "#0284C7"};
+    --text:    ${dark ? "#F1F5F9" : "#1D1C59"}; /* Light mode text uses the deep Navy Blue from "Escaraa" */
+    --muted:   ${dark ? "#94A3B8" : "#64748B"};
+    --accent:  ${dark ? "#8B5CF6" : "#4A1C81"}; /* Uses the rich Purple from your shield's gradient */; /* Uses the rich Purple from your shield's gradient */; /* Uses the rich Purple from your shield's gradient */
   }
   body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;}
   .syne{font-family:'Syne',sans-serif;}
@@ -494,133 +494,397 @@ function OrderModal({ order, isSeller, onClose, onDispatch, onConfirmDelivery, o
 /* ══════════ LANDING ══════════ */
 function Landing({ onEnter, dark, onToggle, lang, onLangToggle }) {
   const t = T[lang] || T.hl;
-  const [tab, setTab] = useState("seller");
+
+  const LT = {
+    en: {
+      heroTag: "India's Trusted Escrow Platform",
+      heroH1a: "Escara Pay",
+      heroH1b: "Stop RTO Losses & Scale Your Business.",
+      heroDesc: "Escarapay.in: The trusted escrow platform for secure online transactions. We hold funds safely until your product is delivered and verified.",
+      ctaSeller: "Login as Seller",
+      ctaBuyer: "Login as Buyer",
+      howTitle: "How Escara Pay Works?",
+      whyTitle: "Why Choose Escara Pay?",
+      whySub: "Trade with Confidence & Grow Without Risk",
+      tokenTitle: "Token Hold System",
+      tokenSub: "Your money is safe. Always.",
+      steps: [
+        { num:"01", icon:"📝", title:"Register & Agree", desc:"Both parties sign up and agree on price and terms." },
+        { num:"02", icon:"🔗", title:"Generate Payment Link", desc:"The Seller creates a secure Escara Pay order link directly from their dashboard." },
+        { num:"03", icon:"💬", title:"Share via WhatsApp", desc:"The link is sent instantly to the Buyer via WhatsApp for quick and easy access." },
+        { num:"04", icon:"🔐", title:"Secure Deposit", desc:"The Buyer opens the link and pays the funds into Escara Pay's secure vault." },
+        { num:"05", icon:"🚚", title:"Ship & Track", desc:"The Seller delivers the goods and provides tracking details." },
+        { num:"06", icon:"✅", title:"Inspect & Release", desc:"Once the Buyer approves the delivery, Escara Pay releases the payment to the Seller." },
+      ],
+      benefits: [
+        { icon:"🛡️", title:"Zero Fraud Risk", desc:"Eliminate the fear of 'payment-not-received' or 'item-not-shipped' scams.", color:"rgba(14,165,233,.15)", bdr:"rgba(14,165,233,.35)" },
+        { icon:"📦", title:"Guaranteed RTO Protection", desc:"Escara Pay discourages casual or fake orders and protects your margins.", color:"rgba(5,150,105,.15)", bdr:"rgba(5,150,105,.35)" },
+        { icon:"⚡", title:"2-Minute Rapid Setup", desc:"Our streamlined onboarding process lets you create your first escrow link in just 2 minutes.", color:"rgba(240,180,41,.15)", bdr:"rgba(240,180,41,.35)" },
+        { icon:"💬", title:"WhatsApp-Native Experience", desc:"Create, share, and track your escrow orders directly within WhatsApp.", color:"rgba(37,211,102,.15)", bdr:"rgba(37,211,102,.35)" },
+        { icon:"🔒", title:"Razorpay-Powered Security", desc:"Razorpay's infrastructure ensures every payment is encrypted and 100% secure.", color:"rgba(124,58,237,.15)", bdr:"rgba(124,58,237,.35)" },
+        { icon:"⚖️", title:"Expert Dispute Resolution", desc:"Our mediators review the evidence and provide a fast, fair resolution.", color:"rgba(239,68,68,.15)", bdr:"rgba(239,68,68,.35)" },
+      ],
+      tokenCards: [
+        { icon:"🔒", title:"Funds Securely Held", desc:"All buyer payments are locked in EscaraPay's secure escrow vault — inaccessible to either party until conditions are met.", color:"rgba(14,165,233,.12)", bdr:"rgba(14,165,233,.3)" },
+        { icon:"✅", title:"Released After Approval", desc:"Payment is only released to the Seller after the Buyer confirms delivery and satisfaction. No disputes, no delays.", color:"rgba(5,150,105,.12)", bdr:"rgba(5,150,105,.3)" },
+        { icon:"⚠️", title:"Dispute Protection", desc:"Raise a dispute within 7 days. Our expert mediators review evidence and ensure a fair, fast resolution for both parties.", color:"rgba(240,180,41,.12)", bdr:"rgba(240,180,41,.3)" },
+      ],
+    },
+    hi: {
+      heroTag: "भारत का भरोसेमंद एस्क्रो प्लेटफॉर्म",
+      heroH1a: "एस्करा पे",
+      heroH1b: "RTO नुकसान रोकें और बिज़नेस बढ़ाएं।",
+      heroDesc: "Escarapay.in: सुरक्षित ऑनलाइन लेनदेन के लिए भरोसेमंद एस्क्रो प्लेटफॉर्म। हम आपके फंड तब तक सुरक्षित रखते हैं जब तक डिलीवरी वेरीफाई न हो।",
+      ctaSeller: "सेलर लॉगिन",
+      ctaBuyer: "बायर लॉगिन",
+      howTitle: "एस्करा पे कैसे काम करता है?",
+      whyTitle: "एस्करा पे क्यों चुनें?",
+      whySub: "विश्वास के साथ व्यापार करें और बिना जोखिम के बढ़ें",
+      tokenTitle: "टोकन होल्ड सिस्टम",
+      tokenSub: "आपका पैसा हमेशा सुरक्षित है।",
+      steps: [
+        { num:"01", icon:"📝", title:"रजिस्टर करें और सहमत हों", desc:"दोनों पक्ष साइन अप करते हैं और कीमत व शर्तों पर सहमत होते हैं।" },
+        { num:"02", icon:"🔗", title:"पेमेंट लिंक बनाएं", desc:"सेलर अपने डैशबोर्ड से सीधे एक सुरक्षित एस्करा पे ऑर्डर लिंक बनाता है।" },
+        { num:"03", icon:"💬", title:"व्हाट्सऐप पर शेयर करें", desc:"लिंक तुरंत व्हाट्सऐप के जरिए बायर को भेजा जाता है।" },
+        { num:"04", icon:"🔐", title:"सुरक्षित जमा", desc:"बायर लिंक खोलता है और फंड एस्करा पे के सुरक्षित वॉल्ट में जमा करता है।" },
+        { num:"05", icon:"🚚", title:"भेजें और ट्रैक करें", desc:"सेलर सामान डिलीवर करता है और ट्रैकिंग डिटेल्स देता है।" },
+        { num:"06", icon:"✅", title:"जांचें और रिलीज करें", desc:"बायर की मंजूरी के बाद एस्करा पे सेलर को पेमेंट रिलीज करता है।" },
+      ],
+      benefits: [
+        { icon:"🛡️", title:"ज़ीरो फ्रॉड रिस्क", desc:"'पेमेंट नहीं मिली' या 'आइटम नहीं भेजा' जैसे स्कैम का डर खत्म।", color:"rgba(14,165,233,.15)", bdr:"rgba(14,165,233,.35)" },
+        { icon:"📦", title:"RTO सुरक्षा गारंटी", desc:"एस्करा पे फर्जी ऑर्डर रोकता है और आपका मार्जिन बचाता है।", color:"rgba(5,150,105,.15)", bdr:"rgba(5,150,105,.35)" },
+        { icon:"⚡", title:"2 मिनट में सेटअप", desc:"हमारी स्ट्रीमलाइन्ड प्रक्रिया से सिर्फ 2 मिनट में पहला एस्क्रो लिंक बनाएं।", color:"rgba(240,180,41,.15)", bdr:"rgba(240,180,41,.35)" },
+        { icon:"💬", title:"व्हाट्सऐप नेटिव", desc:"व्हाट्सऐप में सीधे ऑर्डर बनाएं, शेयर करें और ट्रैक करें।", color:"rgba(37,211,102,.15)", bdr:"rgba(37,211,102,.35)" },
+        { icon:"🔒", title:"रेजरपे पावर्ड सिक्योरिटी", desc:"रेजरपे का इन्फ्रास्ट्रक्चर हर पेमेंट को एन्क्रिप्टेड और 100% सुरक्षित रखता है।", color:"rgba(124,58,237,.15)", bdr:"rgba(124,58,237,.35)" },
+        { icon:"⚖️", title:"विशेषज्ञ विवाद समाधान", desc:"हमारे मध्यस्थ सबूत देखकर तेज़ और निष्पक्ष निर्णय देते हैं।", color:"rgba(239,68,68,.15)", bdr:"rgba(239,68,68,.35)" },
+      ],
+      tokenCards: [
+        { icon:"🔒", title:"फंड सुरक्षित रखे जाते हैं", desc:"सभी बायर पेमेंट एस्करा पे के सुरक्षित एस्क्रो वॉल्ट में लॉक रहते हैं जब तक शर्तें पूरी न हों।", color:"rgba(14,165,233,.12)", bdr:"rgba(14,165,233,.3)" },
+        { icon:"✅", title:"मंजूरी के बाद रिलीज", desc:"बायर की पुष्टि के बाद ही सेलर को पेमेंट जाती है।", color:"rgba(5,150,105,.12)", bdr:"rgba(5,150,105,.3)" },
+        { icon:"⚠️", title:"विवाद सुरक्षा", desc:"7 दिनों में विवाद उठाएं। हमारे विशेषज्ञ तेज़ और निष्पक्ष समाधान देते हैं।", color:"rgba(240,180,41,.12)", bdr:"rgba(240,180,41,.3)" },
+      ],
+    },
+    hl: {
+      heroTag: "India Ka Trusted Escrow Platform",
+      heroH1a: "Escara Pay",
+      heroH1b: "RTO Losses Rokein & Business Badhao.",
+      heroDesc: "Escarapay.in: Secure online transactions ke liye trusted escrow platform. Hum funds tab tak safe rakhte hain jab tak product deliver aur verify na ho jaye.",
+      ctaSeller: "Login as Seller",
+      ctaBuyer: "Login as Buyer",
+      howTitle: "Escara Pay Kaise Kaam Karta Hai?",
+      whyTitle: "Escara Pay Kyun Choose Karein?",
+      whySub: "Confidence ke saath Trade Karo & Bina Risk Badhao",
+      tokenTitle: "Token Hold System",
+      tokenSub: "Aapka paisa hamesha safe hai.",
+      steps: [
+        { num:"01", icon:"📝", title:"Register & Agree Karo", desc:"Dono parties sign up karti hain aur price aur terms par agree karti hain." },
+        { num:"02", icon:"🔗", title:"Payment Link Generate Karo", desc:"Seller apne dashboard se seedha ek secure Escara Pay order link banata hai." },
+        { num:"03", icon:"💬", title:"WhatsApp pe Share Karo", desc:"Link turant WhatsApp ke zariye Buyer ko bheja jaata hai." },
+        { num:"04", icon:"🔐", title:"Secure Deposit", desc:"Buyer link kholkar funds Escara Pay ke secure vault mein pay karta hai." },
+        { num:"05", icon:"🚚", title:"Ship & Track Karo", desc:"Seller saamaan deliver karta hai aur tracking details deta hai." },
+        { num:"06", icon:"✅", title:"Inspect & Release Karo", desc:"Buyer ki approval ke baad Escara Pay Seller ko payment release karta hai." },
+      ],
+      benefits: [
+        { icon:"🛡️", title:"Zero Fraud Risk", desc:"'Payment nahi mili' ya 'item nahi bheja' jaisi scams ka darr khatam.", color:"rgba(14,165,233,.15)", bdr:"rgba(14,165,233,.35)" },
+        { icon:"📦", title:"Guaranteed RTO Protection", desc:"Escara Pay fake orders rokta hai aur aapka margin bachata hai.", color:"rgba(5,150,105,.15)", bdr:"rgba(5,150,105,.35)" },
+        { icon:"⚡", title:"2-Minute Rapid Setup", desc:"Hamare streamlined process se sirf 2 minute mein pehla escrow link banao.", color:"rgba(240,180,41,.15)", bdr:"rgba(240,180,41,.35)" },
+        { icon:"💬", title:"WhatsApp-Native Experience", desc:"WhatsApp mein seedha orders banao, share karo aur track karo.", color:"rgba(37,211,102,.15)", bdr:"rgba(37,211,102,.35)" },
+        { icon:"🔒", title:"Razorpay-Powered Security", desc:"Razorpay ka infrastructure har payment ko encrypted aur 100% secure rakhta hai.", color:"rgba(124,58,237,.15)", bdr:"rgba(124,58,237,.35)" },
+        { icon:"⚖️", title:"Expert Dispute Resolution", desc:"Hamare mediators evidence dekhkar fast aur fair resolution dete hain.", color:"rgba(239,68,68,.15)", bdr:"rgba(239,68,68,.35)" },
+      ],
+      tokenCards: [
+        { icon:"🔒", title:"Funds Securely Held", desc:"Saari buyer payments EscaraPay ke secure escrow vault mein lock rehti hain — tab tak jab tak conditions meet na ho.", color:"rgba(14,165,233,.12)", bdr:"rgba(14,165,233,.3)" },
+        { icon:"✅", title:"Buyer Approval ke Baad Release", desc:"Payment sirf tab Seller ko milti hai jab Buyer delivery confirm kare. Koi dispute, koi delay nahi.", color:"rgba(5,150,105,.12)", bdr:"rgba(5,150,105,.3)" },
+        { icon:"⚠️", title:"Dispute Protection", desc:"7 din mein dispute raise karo. Hamare expert mediators evidence review karke fair aur fast resolution dete hain.", color:"rgba(240,180,41,.12)", bdr:"rgba(240,180,41,.3)" },
+      ],
+    },
+  };
+
+  const lc = LT[lang] || LT.hl;
+
   return (
     <div style={{minHeight:"100vh"}}>
+      {/* ── NAV ── */}
       <nav className="nav">
         <Logo />
         <div style={{display:"flex",gap:6,alignItems:"center"}}>
           <LangToggle lang={lang} onToggle={onLangToggle} />
           <ThemeToggle dark={dark} onToggle={onToggle} />
-          <button className="btn-ghost" style={{padding:"7px 12px",fontSize:12}} onClick={()=>onEnter("buyer")}>Buyer</button>
-          <button className="btn-gold" style={{padding:"7px 12px",fontSize:12}} onClick={()=>onEnter("seller")}>Seller</button>
+          <button className="btn-ghost" style={{padding:"7px 14px",fontSize:12}} onClick={()=>onEnter("buyer")}>{lc.ctaBuyer}</button>
+          <button className="btn-gold" style={{padding:"7px 14px",fontSize:12}} onClick={()=>onEnter("seller")}>{lc.ctaSeller}</button>
         </div>
       </nav>
-      <div style={{position:"relative",overflow:"hidden",padding:"clamp(40px,8vw,80px) clamp(16px,5vw,40px) clamp(40px,6vw,68px)",textAlign:"center",width:"100%",boxSizing:"border-box"}}>
-        <div className="hero-glow" style={{background:dark?"rgba(240,180,41,.07)":"rgba(14,165,233,.09)",top:"-80px",left:"50%",transform:"translateX(-50%)"}} />
-        <div style={{marginBottom:14}} className="fu"><span className="badge bo" style={{fontSize:12}}>🛡️ {t.tagline}</span></div>
-        <h1 className="syne fu2" style={{fontSize:"clamp(28px,5.5vw,64px)",fontWeight:800,lineHeight:1.1,marginBottom:16}}>
-          WhatsApp Deal Ka<br /><span className="shimmer">Sabse Safe Tarika</span>
+
+      {/* ── HERO ── */}
+      <div style={{
+        position:"relative",overflow:"hidden",
+        background: dark
+          ? "linear-gradient(135deg,#06060e 0%,#0d1a2e 50%,#06060e 100%)"
+          : "linear-gradient(135deg,#e8f4fd 0%,#dbeffe 40%,#e0f2fe 100%)",
+        padding:"clamp(56px,10vw,100px) clamp(16px,5vw,40px) clamp(60px,9vw,90px)",
+        textAlign:"center"
+      }}>
+        {/* Decorative blobs */}
+        <div style={{position:"absolute",top:"-60px",left:"10%",width:320,height:320,borderRadius:"50%",background:"rgba(14,165,233,.07)",filter:"blur(70px)",pointerEvents:"none"}} />
+        <div style={{position:"absolute",bottom:"-40px",right:"8%",width:260,height:260,borderRadius:"50%",background:"rgba(56,189,248,.06)",filter:"blur(60px)",pointerEvents:"none"}} />
+        <div style={{position:"absolute",top:"30%",left:"50%",transform:"translateX(-50%)",width:500,height:200,borderRadius:"50%",background:"rgba(14,165,233,.04)",filter:"blur(50px)",pointerEvents:"none"}} />
+
+        {/* Pill badge */}
+        <div className="fu" style={{marginBottom:18}}>
+          <span style={{
+            display:"inline-flex",alignItems:"center",gap:7,
+            background: dark?"rgba(14,165,233,.12)":"rgba(14,165,233,.1)",
+            border:"1px solid rgba(14,165,233,.3)",
+            borderRadius:100,padding:"6px 16px",
+            fontSize:12,fontWeight:600,color:"var(--gold)",letterSpacing:".3px"
+          }}>
+            <span style={{width:7,height:7,borderRadius:"50%",background:"var(--gold)",display:"inline-block",boxShadow:"0 0 8px var(--gold)"}} />
+            {lc.heroTag}
+          </span>
+        </div>
+
+        {/* H1 */}
+        <h1 className="syne fu2" style={{
+          fontSize:"clamp(36px,6.5vw,76px)",fontWeight:800,lineHeight:1.08,marginBottom:12,letterSpacing:"-1.5px"
+        }}>
+          <span className="shimmer">{lc.heroH1a}</span>
         </h1>
-        <p className="fu3" style={{color:"var(--muted)",fontSize:"clamp(14px,2vw,17px)",maxWidth:520,margin:"0 auto 32px",lineHeight:1.7}}>{t.heroDesc}</p>
-        <div className="fu3" style={{display:"flex",gap:10,justifyContent:"center",flexWrap:"wrap"}}>
-          <button className="btn-gold pulse" style={{fontSize:15,padding:"13px 34px"}} onClick={()=>onEnter("seller")}>{t.sellerBtn}</button>
-          <button className="btn-outline" onClick={()=>onEnter("buyer")}>{t.buyerBtn}</button>
-        </div>
-      </div>
-      <div style={{padding:"52px 40px",background:"var(--surface)"}}>
-        <h2 className="syne" style={{textAlign:"center",fontSize:"clamp(22px,3vw,34px)",fontWeight:800,marginBottom:20}}>{t.howWorks}</h2>
-        <div style={{display:"flex",justifyContent:"center",gap:6,marginBottom:24}}>
-          {["seller","buyer"].map(tb=>(
-            <button key={tb} onClick={()=>setTab(tb)} style={{padding:"7px 22px",borderRadius:8,cursor:"pointer",fontFamily:"'Syne',sans-serif",fontWeight:600,fontSize:13,border:"1px solid var(--border)",background:tab===tb?"var(--gold)":"transparent",color:tab===tb?(dark?"#0a0a0f":"#fff"):"var(--muted)",transition:"all .2s"}}>{tb==="seller"?t.sellerView:t.buyerView}</button>
-          ))}
-        </div>
-        <div style={{maxWidth:640,margin:"0 auto",display:"flex",flexDirection:"column",gap:10}}>
-          {(tab==="seller"?[
-            ["1","var(--gold)", lang==="en"?"Create Order Link":lang==="hi"?"ऑर्डर लिंक बनाएं":"Order Link Banao", lang==="en"?"Add product — token auto calculated":lang==="hi"?"प्रोडक्ट जोड़ें — टोकन अपने आप":"Product add karo — token auto calculate hoga"],
-            ["2","var(--blue)", lang==="en"?"Share on WhatsApp":lang==="hi"?"व्हाट्सऐप पर भेजें":"WhatsApp pe Link Bhejo", lang==="en"?"Buyer clicks → direct payment → no login needed":lang==="hi"?"बायर क्लिक करे → सीधे पेमेंट":"Buyer click karega → seedha payment page"],
-            ["3","var(--green)", lang==="en"?"Dispatch Confidently":lang==="hi"?"निश्चिंत होकर भेजें":"Confidently Dispatch Karo", lang==="en"?"Token secured → dispatch with tracking ID":lang==="hi"?"टोकन सुरक्षित → ट्रैकिंग ID के साथ":"Token secured → tracking ID ke saath dispatch karo"],
-          ]:[
-            ["1","var(--gold)", lang==="en"?"Click Link or Create Deal":lang==="hi"?"लिंक क्लिक करें या डील बनाएं":"Link pe Click Karo — Ya Deal Banao", lang==="en"?"Got seller's link? Click it. Or create your own deal":lang==="hi"?"सेलर का लिंक मिला? क्लिक करें":"Seller ka link aaya → click karo. Ya khud deal banao"],
-            ["2","var(--blue)", lang==="en"?"Pay Token":lang==="hi"?"टोकन पेमेंट करें":"Token Pay Karo", lang==="en"?"UPI / Card / NetBanking — locked in escrow":lang==="hi"?"UPI / कार्ड — एस्क्रो में लॉक":"UPI / Card / NetBanking — escrow mein lock"],
-            ["3","var(--green)", lang==="en"?"Safe Delivery":lang==="hi"?"सुरक्षित डिलीवरी":"Safe Delivery", lang==="en"?"Got it? Confirm. Didn't get it? Raise dispute":lang==="hi"?"मिला? कन्फर्म करें। नहीं मिला? विवाद":"Order aaya → confirm. Nahi aaya → dispute raise karo."],
-          ]).map(([n,c,st,d])=>(
-            <div key={n} className="step">
-              <div className="step-num" style={{background:`${c}20`,color:c}}>{n}</div>
-              <div><div style={{fontWeight:600,marginBottom:3,fontSize:14}}>{st}</div><div style={{fontSize:13,color:"var(--muted)"}}>{d}</div></div>
-            </div>
-          ))}
-        </div>
-      </div>
-      {/* WHY ESCARAPAY */}
-      <div style={{padding:"52px clamp(16px,5vw,40px)",background:"var(--sf2)"}}>
-        <h2 className="syne" style={{textAlign:"center",fontSize:"clamp(22px,3vw,34px)",fontWeight:800,marginBottom:8}}>
-          {lang==="en"?"Why EscaraPay?":lang==="hi"?"एस्करापे क्यों?":"Why EscaraPay?"}
+        <h2 className="syne fu2" style={{
+          fontSize:"clamp(18px,3vw,34px)",fontWeight:700,lineHeight:1.25,marginBottom:22,
+          color: dark?"rgba(255,255,255,.85)":"rgba(12,35,64,.8)"
+        }}>
+          {lc.heroH1b}
         </h2>
-        <p style={{textAlign:"center",color:"var(--muted)",fontSize:14,marginBottom:32}}>
-          {lang==="en"?"The only escrow platform built for Indian social sellers":lang==="hi"?"भारतीय सोशल सेलर्स के लिए बना एकमात्र एस्क्रो प्लेटफॉर्म":"India ke social sellers ke liye banaya gaya pehla escrow platform"}
+
+        <p className="fu3" style={{
+          color:"var(--muted)",fontSize:"clamp(14px,1.7vw,17px)",
+          maxWidth:560,margin:"0 auto 36px",lineHeight:1.75
+        }}>
+          {lc.heroDesc}
         </p>
-        <div className="g3" style={{maxWidth:900,margin:"0 auto",gap:16}}>
+
+        {/* CTA Buttons */}
+        <div className="fu3" style={{display:"flex",gap:12,justifyContent:"center",flexWrap:"wrap",marginBottom:44}}>
+          <button
+            className="btn-gold pulse"
+            style={{fontSize:15,padding:"14px 38px",borderRadius:12,letterSpacing:".2px"}}
+            onClick={()=>onEnter("seller")}
+          >
+            🏪 {lc.ctaSeller}
+          </button>
+          <button
+            className="btn-outline"
+            style={{fontSize:15,padding:"13px 38px",borderRadius:12,letterSpacing:".2px"}}
+            onClick={()=>onEnter("buyer")}
+          >
+            🛍️ {lc.ctaBuyer}
+          </button>
+        </div>
+
+        {/* Trust chips */}
+        <div className="fu3" style={{display:"flex",gap:10,justifyContent:"center",flexWrap:"wrap"}}>
           {[
-            {icon:"🛡️",color:"rgba(14,165,233,.15)",bdr:"rgba(14,165,233,.3)",
-              en:"Zero Fraud Risk",     hi:"शून्य धोखाधड़ी जोखिम",   hl:"Zero Fraud Risk",
-              de:"Token locked in escrow — neither party can cheat", dh:"टोकन एस्क्रो में — कोई धोखा नहीं",dl:"Token escrow mein lock — koi cheating nahi"},
-            {icon:"💰",color:"rgba(5,150,105,.15)",bdr:"rgba(5,150,105,.3)",
-              en:"RTO Protection",      hi:"RTO सुरक्षा",             hl:"RTO Protection",
-              de:"Buyer cancels? Token still goes to seller", dh:"बायर कैंसिल करे? टोकन सेलर को",dl:"Buyer cancel kare? Token fir bhi seller ko"},
-            {icon:"⚡",color:"rgba(240,180,41,.15)",bdr:"rgba(240,180,41,.3)",
-              en:"2 Min Setup",         hi:"2 मिनट में शुरू",         hl:"2 Min Setup",
-              de:"Create order, share link, done. No app needed", dh:"ऑर्डर बनाएं, लिंक भेजें, बस",dl:"Order banao, link bhejo, ho gaya"},
-            {icon:"📱",color:"rgba(124,58,237,.15)",bdr:"rgba(124,58,237,.3)",
-              en:"WhatsApp Native",     hi:"व्हाट्सऐप नेटिव",        hl:"WhatsApp Native",
-              de:"Direct link sharing on WhatsApp & Instagram", dh:"व्हाट्सऐप और इंस्टाग्राम पर डायरेक्ट",dl:"WhatsApp & Instagram pe direct link share"},
-            {icon:"🔐",color:"rgba(14,165,233,.15)",bdr:"rgba(14,165,233,.3)",
-              en:"Razorpay Secured",    hi:"रेजरपे सुरक्षित",        hl:"Razorpay Secured",
-              de:"RBI-compliant payments, UPI/Card/NetBanking", dh:"RBI अनुपालन, UPI/कार्ड/नेटबैंकिंग",dl:"RBI-compliant, UPI/Card/NetBanking"},
-            {icon:"⚖️",color:"rgba(239,68,68,.15)",bdr:"rgba(239,68,68,.3)",
-              en:"Dispute Resolution",  hi:"विवाद समाधान",            hl:"Dispute Resolution",
-              de:"24-hour investigation. Fair decision, always", dh:"24 घंटे में जांच। हमेशा निष्पक्ष",dl:"24 ghante mein investigation. Fair decision"},
-          ].map(item=>(
-            <div key={item.en} className="card" style={{background:item.color,borderColor:item.bdr,textAlign:"center",padding:20}}>
-              <div style={{fontSize:32,marginBottom:10}}>{item.icon}</div>
-              <div className="syne" style={{fontWeight:700,fontSize:14,marginBottom:6}}>
-                {lang==="en"?item.en:lang==="hi"?item.hi:item.hl}
+            {icon:"🔒","text":"Razorpay Secured"},
+            {icon:"🛡️","text":"Escrow Protected"},
+            {icon:"⚡","text":"RBI Compliant"},
+            {icon:"✅","text":"2-Min Setup"},
+          ].map(chip=>(
+            <span key={chip.text} style={{
+              display:"inline-flex",alignItems:"center",gap:5,
+              background: dark?"rgba(255,255,255,.05)":"rgba(14,165,233,.07)",
+              border:"1px solid var(--border)",borderRadius:100,
+              padding:"5px 13px",fontSize:11,fontWeight:600,color:"var(--muted)"
+            }}>
+              {chip.icon} {chip.text}
+            </span>
+          ))}
+        </div>
+      </div>
+
+      {/* ── HOW IT WORKS ── */}
+      <div style={{padding:"70px clamp(16px,5vw,40px)",background:"var(--surface)"}}>
+        <div style={{textAlign:"center",marginBottom:48}}>
+          <p style={{fontSize:12,fontWeight:700,color:"var(--gold)",letterSpacing:"2px",textTransform:"uppercase",marginBottom:10}}>PROCESS</p>
+          <h2 className="syne" style={{fontSize:"clamp(24px,3.5vw,40px)",fontWeight:800,marginBottom:12,letterSpacing:"-0.5px"}}>
+            {lc.howTitle}
+          </h2>
+          <p style={{color:"var(--muted)",fontSize:15,maxWidth:480,margin:"0 auto",lineHeight:1.6}}>
+            {lang==="hi"?"सरल, सुरक्षित, और तेज़ — बस 6 स्टेप्स में।":"Simple, secure, and fast — in just 6 steps."}
+          </p>
+        </div>
+
+        <div style={{
+          display:"grid",
+          gridTemplateColumns:"repeat(auto-fit,minmax(280px,1fr))",
+          gap:20,maxWidth:980,margin:"0 auto"
+        }}>
+          {lc.steps.map((step,i)=>(
+            <div key={step.num} className="card" style={{
+              padding:"26px 22px",
+              background: dark?"var(--surface)":"#fff",
+              position:"relative",overflow:"hidden",
+              transition:"transform .25s,box-shadow .25s,border-color .25s",
+              cursor:"default"
+            }}
+              onMouseEnter={e=>{e.currentTarget.style.transform="translateY(-4px)";e.currentTarget.style.boxShadow="0 16px 40px rgba(14,165,233,.12)";e.currentTarget.style.borderColor="rgba(14,165,233,.35)";}}
+              onMouseLeave={e=>{e.currentTarget.style.transform="translateY(0)";e.currentTarget.style.boxShadow="none";e.currentTarget.style.borderColor="var(--border)";}}
+            >
+              {/* Step number accent */}
+              <div style={{
+                position:"absolute",top:14,right:16,
+                fontFamily:"'Syne',sans-serif",fontWeight:800,fontSize:32,
+                color: dark?"rgba(255,255,255,.04)":"rgba(14,165,233,.06)",
+                lineHeight:1,userSelect:"none"
+              }}>{step.num}</div>
+
+              <div style={{
+                width:46,height:46,borderRadius:12,marginBottom:16,
+                display:"flex",alignItems:"center",justifyContent:"center",fontSize:22,
+                background: i%2===0
+                  ? dark?"rgba(14,165,233,.15)":"rgba(14,165,233,.1)"
+                  : dark?"rgba(56,189,248,.12)":"rgba(56,189,248,.1)",
+                border:`1px solid ${i%2===0?"rgba(14,165,233,.25)":"rgba(56,189,248,.2)"}`,
+              }}>
+                {step.icon}
               </div>
-              <div style={{fontSize:12,color:"var(--muted)",lineHeight:1.6}}>
-                {lang==="en"?item.de:lang==="hi"?item.dh:item.dl}
-              </div>
+
+              <div style={{
+                display:"inline-block",
+                background:"rgba(14,165,233,.12)",border:"1px solid rgba(14,165,233,.25)",
+                borderRadius:100,padding:"2px 10px",fontSize:10,fontWeight:700,
+                color:"var(--gold)",letterSpacing:"1px",textTransform:"uppercase",marginBottom:10
+              }}>Step {step.num}</div>
+
+              <h3 className="syne" style={{fontWeight:700,fontSize:16,marginBottom:8,lineHeight:1.3}}>
+                {step.title}
+              </h3>
+              <p style={{fontSize:13,color:"var(--muted)",lineHeight:1.7,margin:0}}>
+                {step.desc}
+              </p>
             </div>
           ))}
         </div>
       </div>
 
-      {/* TOKEN RELEASE */}
-      <div style={{padding:"52px 40px"}}>
-        <h2 className="syne" style={{textAlign:"center",fontSize:"clamp(20px,3vw,32px)",fontWeight:800,marginBottom:30}}>
-          {lang==="en"?"When Does Token Get Released?":lang==="hi"?"टोकन कब और किसे मिलेगा?":"Token Kab Kiske Paas Jayega?"}
-        </h2>
-        <div className="g3" style={{maxWidth:820,margin:"0 auto"}}>
-          {[
-            {icon:"✅",bg:"rgba(5,150,105,.1)",bdr:"rgba(5,150,105,.22)",
-             en:"Order Delivered",  hi:"ऑर्डर डिलीवर हुआ",  hl:"Order Deliver Hua",
-             sub:"Token → Seller",
-             de:"Auto-release after 7 days",dh:"7 दिन बाद ऑटो-रिलीज",dl:"7 din baad auto-release"},
-            {icon:"❌",bg:"rgba(220,38,38,.1)",bdr:"rgba(220,38,38,.22)",
-             en:"Buyer Cancels",   hi:"बायर ने कैंसिल किया",hl:"Buyer ne Cancel Kiya",
-             sub:"Token → Seller",
-             de:"Seller's shipping cover",dh:"सेलर का शिपिंग कवर",dl:"Seller ka shipping cover"},
-            {icon:"🚫",bg:"rgba(14,165,233,.1)",bdr:"rgba(14,165,233,.22)",
-             en:"Seller Didn't Ship",hi:"सेलर ने नहीं भेजा", hl:"Seller ne Nahi Bheja",
-             sub:"Token → Buyer",
-             de:"Full token refunded",dh:"पूरा टोकन वापस",dl:"Poora token wapas"},
-          ].map(item=>(
-            <div key={item.hl} className="card" style={{background:item.bg,borderColor:item.bdr,textAlign:"center"}}>
-              <div style={{fontSize:30,marginBottom:10}}>{item.icon}</div>
-              <div className="syne" style={{fontWeight:700,marginBottom:4,fontSize:14}}>
-                {lang==="en"?item.en:lang==="hi"?item.hi:item.hl}
+      {/* ── WHY CHOOSE ── */}
+      <div style={{padding:"70px clamp(16px,5vw,40px)",background:"var(--sf2)"}}>
+        <div style={{textAlign:"center",marginBottom:48}}>
+          <p style={{fontSize:12,fontWeight:700,color:"var(--gold)",letterSpacing:"2px",textTransform:"uppercase",marginBottom:10}}>BENEFITS</p>
+          <h2 className="syne" style={{fontSize:"clamp(24px,3.5vw,40px)",fontWeight:800,marginBottom:12,letterSpacing:"-0.5px"}}>
+            {lc.whyTitle}
+          </h2>
+          <p style={{color:"var(--muted)",fontSize:15,maxWidth:460,margin:"0 auto",lineHeight:1.6}}>
+            {lc.whySub}
+          </p>
+        </div>
+
+        <div style={{
+          display:"grid",
+          gridTemplateColumns:"repeat(auto-fit,minmax(270px,1fr))",
+          gap:18,maxWidth:980,margin:"0 auto"
+        }}>
+          {lc.benefits.map(b=>(
+            <div key={b.title} className="card" style={{
+              background:b.color,borderColor:b.bdr,
+              padding:"26px 22px",
+              transition:"transform .25s,box-shadow .25s",cursor:"default"
+            }}
+              onMouseEnter={e=>{e.currentTarget.style.transform="translateY(-4px)";e.currentTarget.style.boxShadow="0 14px 36px rgba(0,0,0,.1)";}}
+              onMouseLeave={e=>{e.currentTarget.style.transform="translateY(0)";e.currentTarget.style.boxShadow="none";}}
+            >
+              <div style={{
+                width:48,height:48,borderRadius:14,marginBottom:16,
+                display:"flex",alignItems:"center",justifyContent:"center",fontSize:22,
+                background: dark?"rgba(0,0,0,.2)":"rgba(255,255,255,.6)",
+                border:`1px solid ${b.bdr}`,
+              }}>
+                {b.icon}
               </div>
-              <div style={{color:"var(--gold)",fontWeight:700,marginBottom:8,fontSize:13}}>{item.sub}</div>
-              <div style={{fontSize:13,color:"var(--muted)",lineHeight:1.6}}>
-                {lang==="en"?item.de:lang==="hi"?item.dh:item.dl}
-              </div>
+              <h3 className="syne" style={{fontWeight:700,fontSize:15,marginBottom:8,lineHeight:1.3}}>
+                {b.title}
+              </h3>
+              <p style={{fontSize:13,color:"var(--muted)",lineHeight:1.7,margin:0}}>
+                {b.desc}
+              </p>
             </div>
           ))}
         </div>
       </div>
 
-      {/* TRUST BAR */}
-      <div style={{background:dark?"rgba(14,165,233,.08)":"rgba(14,165,233,.06)",borderTop:"1px solid var(--border)",borderBottom:"1px solid var(--border)",padding:"14px 20px"}}>
-        <div style={{maxWidth:900,margin:"0 auto",display:"flex",justifyContent:"center",alignItems:"center",gap:"clamp(16px,4vw,48px)",flexWrap:"wrap"}}>
+      {/* ── TOKEN HOLD SYSTEM ── */}
+      <div style={{padding:"70px clamp(16px,5vw,40px)",background:"var(--surface)"}}>
+        <div style={{textAlign:"center",marginBottom:48}}>
+          <p style={{fontSize:12,fontWeight:700,color:"var(--gold)",letterSpacing:"2px",textTransform:"uppercase",marginBottom:10}}>SECURITY</p>
+          <h2 className="syne" style={{fontSize:"clamp(24px,3.5vw,40px)",fontWeight:800,marginBottom:12,letterSpacing:"-0.5px"}}>
+            {lc.tokenTitle}
+          </h2>
+          <p style={{color:"var(--muted)",fontSize:15,maxWidth:440,margin:"0 auto",lineHeight:1.6}}>
+            {lc.tokenSub}
+          </p>
+        </div>
+
+        <div style={{
+          display:"grid",
+          gridTemplateColumns:"repeat(auto-fit,minmax(270px,1fr))",
+          gap:20,maxWidth:900,margin:"0 auto 44px"
+        }}>
+          {lc.tokenCards.map(card=>(
+            <div key={card.title} className="card" style={{
+              background:card.color,borderColor:card.bdr,
+              padding:"30px 24px",textAlign:"center",
+              transition:"transform .25s,box-shadow .25s"
+            }}
+              onMouseEnter={e=>{e.currentTarget.style.transform="translateY(-4px)";e.currentTarget.style.boxShadow="0 14px 36px rgba(0,0,0,.1)";}}
+              onMouseLeave={e=>{e.currentTarget.style.transform="translateY(0)";e.currentTarget.style.boxShadow="none";}}
+            >
+              <div style={{
+                width:56,height:56,borderRadius:16,margin:"0 auto 18px",
+                display:"flex",alignItems:"center",justifyContent:"center",fontSize:26,
+                background: dark?"rgba(0,0,0,.2)":"rgba(255,255,255,.65)",
+                border:`1px solid ${card.bdr}`,
+              }}>
+                {card.icon}
+              </div>
+              <h3 className="syne" style={{fontWeight:700,fontSize:16,marginBottom:10,lineHeight:1.3}}>
+                {card.title}
+              </h3>
+              <p style={{fontSize:13,color:"var(--muted)",lineHeight:1.75,margin:0}}>
+                {card.desc}
+              </p>
+            </div>
+          ))}
+        </div>
+
+        {/* CTA Row inside token section */}
+        <div style={{textAlign:"center"}}>
+          <div style={{
+            display:"inline-flex",flexDirection:"column",alignItems:"center",gap:16,
+            background: dark?"rgba(14,165,233,.06)":"rgba(14,165,233,.05)",
+            border:"1px solid rgba(14,165,233,.2)",borderRadius:20,
+            padding:"32px 40px",maxWidth:480,width:"100%"
+          }}>
+            <div style={{fontSize:36}}>🚀</div>
+            <div className="syne" style={{fontWeight:800,fontSize:20,lineHeight:1.3}}>
+              {lang==="hi"?"आज ही शुरू करें!":lang==="en"?"Start for Free Today!":"Aaj Hi Shuru Karo!"}
+            </div>
+            <p style={{color:"var(--muted)",fontSize:13,lineHeight:1.6,margin:0}}>
+              {lang==="hi"?"EscaraPay के साथ हर डील सुरक्षित बनाएं।":lang==="en"?"Make every deal safe with EscaraPay.":"EscaraPay ke saath har deal safe banao."}
+            </p>
+            <div style={{display:"flex",gap:10,flexWrap:"wrap",justifyContent:"center"}}>
+              <button className="btn-gold pulse" style={{padding:"12px 28px",fontSize:14}} onClick={()=>onEnter("seller")}>🏪 {lc.ctaSeller}</button>
+              <button className="btn-outline" style={{padding:"11px 28px",fontSize:14}} onClick={()=>onEnter("buyer")}>🛍️ {lc.ctaBuyer}</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* ── TRUST BAR ── */}
+      <div style={{
+        background: dark?"rgba(14,165,233,.07)":"rgba(14,165,233,.06)",
+        borderTop:"1px solid var(--border)",borderBottom:"1px solid var(--border)",
+        padding:"16px 20px"
+      }}>
+        <div style={{maxWidth:900,margin:"0 auto",display:"flex",justifyContent:"center",alignItems:"center",gap:"clamp(18px,4vw,52px)",flexWrap:"wrap"}}>
           {[
             {icon:"🔒",text:"Secure Payments"},
             {icon:"🛡️",text:"Escrow Protection"},
@@ -634,47 +898,51 @@ function Landing({ onEnter, dark, onToggle, lang, onLangToggle }) {
         </div>
       </div>
 
-      {/* PROFESSIONAL FOOTER */}
-      <footer style={{background:dark?"#08080f":"#0c2340",padding:"40px 20px 24px",color:"#fff"}}>
+      {/* ── FOOTER ── */}
+      <footer style={{background:dark?"#08080f":"#0c2340",padding:"48px 20px 24px",color:"#fff"}}>
         <div style={{maxWidth:960,margin:"0 auto"}}>
-          <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(180px,1fr))",gap:32,marginBottom:32}}>
-            {/* Brand */}
+          <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(180px,1fr))",gap:32,marginBottom:36}}>
             <div>
-              <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:12}}>
+              <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:14}}>
                 <img src={LOGO_SRC} alt="EscaraPay" style={{height:28,objectFit:"contain"}} onError={e=>e.target.style.display="none"} />
                 <span style={{fontFamily:"'Syne',sans-serif",fontWeight:800,fontSize:16,color:"#fff"}}>EscaraPay</span>
               </div>
-              <p style={{fontSize:12,color:"rgba(255,255,255,.55)",lineHeight:1.8,marginBottom:12}}>India's trusted escrow payment platform for WhatsApp & Instagram sellers.</p>
-              <div style={{fontSize:11,color:"rgba(255,255,255,.4)"}}>CIN: Applied for Registration<br/>GST: Applied</div>
+              <p style={{fontSize:12,color:"rgba(255,255,255,.5)",lineHeight:1.85,marginBottom:12}}>India's trusted escrow payment platform for WhatsApp & Instagram sellers.</p>
+              <div style={{fontSize:11,color:"rgba(255,255,255,.35)"}}>CIN: Applied for Registration<br/>GST: Applied</div>
             </div>
-            {/* Company */}
             <div>
-              <div style={{fontSize:12,fontWeight:700,color:"rgba(255,255,255,.5)",textTransform:"uppercase",letterSpacing:1,marginBottom:12}}>Company</div>
+              <div style={{fontSize:11,fontWeight:700,color:"rgba(255,255,255,.4)",textTransform:"uppercase",letterSpacing:1.2,marginBottom:14}}>Company</div>
               {[["About Us","about"],["Contact Us","contact"],["How It Works","landing"]].map(([l,s])=>(
-                <div key={l} style={{fontSize:13,color:"rgba(255,255,255,.7)",marginBottom:8,cursor:"pointer"}} onClick={()=>window._goToPage(s)}>{l}</div>
+                <div key={l} style={{fontSize:13,color:"rgba(255,255,255,.65)",marginBottom:9,cursor:"pointer",transition:"color .2s"}}
+                  onMouseEnter={e=>e.target.style.color="#fff"}
+                  onMouseLeave={e=>e.target.style.color="rgba(255,255,255,.65)"}
+                  onClick={()=>window._goToPage(s)}>{l}</div>
               ))}
             </div>
-            {/* Legal */}
             <div>
-              <div style={{fontSize:12,fontWeight:700,color:"rgba(255,255,255,.5)",textTransform:"uppercase",letterSpacing:1,marginBottom:12}}>Legal</div>
+              <div style={{fontSize:11,fontWeight:700,color:"rgba(255,255,255,.4)",textTransform:"uppercase",letterSpacing:1.2,marginBottom:14}}>Legal</div>
               {[["Terms & Conditions","terms"],["Privacy Policy","privacy"],["Refund Policy","refund"],["Dispute Resolution","dispute"]].map(([l,s])=>(
-                <div key={l} style={{fontSize:13,color:"rgba(255,255,255,.7)",marginBottom:8,cursor:"pointer"}} onClick={()=>window._goToPage(s)}>{l}</div>
+                <div key={l} style={{fontSize:13,color:"rgba(255,255,255,.65)",marginBottom:9,cursor:"pointer",transition:"color .2s"}}
+                  onMouseEnter={e=>e.target.style.color="#fff"}
+                  onMouseLeave={e=>e.target.style.color="rgba(255,255,255,.65)"}
+                  onClick={()=>window._goToPage(s)}>{l}</div>
               ))}
             </div>
-            {/* Contact */}
             <div>
-              <div style={{fontSize:12,fontWeight:700,color:"rgba(255,255,255,.5)",textTransform:"uppercase",letterSpacing:1,marginBottom:12}}>Contact</div>
-              <div style={{fontSize:13,color:"rgba(255,255,255,.7)",marginBottom:6}}>📧 support@escarapay.in</div>
-              <div style={{fontSize:13,color:"rgba(255,255,255,.7)",marginBottom:6}}>⚖️ legal@escarapay.in</div>
-              <div style={{fontSize:12,color:"rgba(255,255,255,.4)",marginTop:12,lineHeight:1.7}}>Response time: 24 hours<br/>Mon–Sat, 10AM–6PM IST</div>
+              <div style={{fontSize:11,fontWeight:700,color:"rgba(255,255,255,.4)",textTransform:"uppercase",letterSpacing:1.2,marginBottom:14}}>Contact</div>
+              <div style={{fontSize:13,color:"rgba(255,255,255,.65)",marginBottom:7}}>📧 support@escarapay.in</div>
+              <div style={{fontSize:13,color:"rgba(255,255,255,.65)",marginBottom:7}}>⚖️ legal@escarapay.in</div>
+              <div style={{fontSize:12,color:"rgba(255,255,255,.35)",marginTop:14,lineHeight:1.8}}>Response time: 24 hours<br/>Mon–Sat, 10AM–6PM IST</div>
             </div>
           </div>
-          {/* Bottom bar */}
-          <div style={{borderTop:"1px solid rgba(255,255,255,.1)",paddingTop:20,display:"flex",justifyContent:"space-between",alignItems:"center",flexWrap:"wrap",gap:10}}>
-            <div style={{fontSize:11,color:"rgba(255,255,255,.4)"}}>© 2026 EscaraPay (India). All rights reserved. | Jurisdiction: Uttar Pradesh, India</div>
+          <div style={{borderTop:"1px solid rgba(255,255,255,.08)",paddingTop:20,display:"flex",justifyContent:"space-between",alignItems:"center",flexWrap:"wrap",gap:10}}>
+            <div style={{fontSize:11,color:"rgba(255,255,255,.35)"}}>© 2026 EscaraPay (India). All rights reserved. | Jurisdiction: Uttar Pradesh, India</div>
             <div style={{display:"flex",gap:16}}>
               {[["Terms","terms"],["Privacy","privacy"],["Refund","refund"],["Dispute","dispute"]].map(([l,s])=>(
-                <span key={l} style={{fontSize:11,color:"rgba(255,255,255,.4)",cursor:"pointer"}} onClick={()=>window._goToPage(s)}>{l}</span>
+                <span key={l} style={{fontSize:11,color:"rgba(255,255,255,.35)",cursor:"pointer",transition:"color .2s"}}
+                  onMouseEnter={e=>e.target.style.color="rgba(255,255,255,.7)"}
+                  onMouseLeave={e=>e.target.style.color="rgba(255,255,255,.35)"}
+                  onClick={()=>window._goToPage(s)}>{l}</span>
               ))}
             </div>
           </div>
