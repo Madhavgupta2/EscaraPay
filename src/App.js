@@ -1,16 +1,32 @@
-
-
-
-
-
-
-
-
-
 /* eslint-disable */
 import { registerUser, loginUser, createOrder as apiCreateOrder, getSellerOrders, getBuyerOrders, getOrderById, createPaymentOrder, verifyPayment, confirmDelivery, raiseDispute, dispatchOrder, sendOTP, verifyOTP, sendRegisterOTP, verifyRegisterOTP } from './api';
 import { useState, useEffect } from "react";
 import LOGO_SRC from "./escarapay-logo.jpg";
+
+// ── Inject Google Fonts once into <head> (avoids flash on re-render) ──
+(function injectFonts() {
+  if (document.getElementById("escara-gfonts")) return;
+
+  // Preconnect for faster load
+  const pc1 = document.createElement("link");
+  pc1.rel = "preconnect"; 
+  pc1.href = "https://fonts.googleapis.com";
+  document.head.appendChild(pc1);
+
+  const pc2 = document.createElement("link");
+  pc2.rel = "preconnect"; 
+  pc2.href = "https://fonts.gstatic.com"; 
+  pc2.crossOrigin = "anonymous";
+  document.head.appendChild(pc2);
+
+  // Gemini-style modern fonts (Inter and Outfit)
+  const link = document.createElement("link");
+  link.id = "escara-gfonts";
+  link.rel = "stylesheet";
+  // Inter: Professional text ke liye | Outfit: Bold headings ke liye
+  link.href = "https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;600;700;800&display=swap";
+  document.head.appendChild(link);
+})();
 
 const BACKEND_URL = "https://escarapay-backend-production.up.railway.app";
 
@@ -98,7 +114,6 @@ const T = {
 
 function getStyle(dark) {
   return `
-  @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=Outfit:wght@300;400;500;600;700&display=swap');
   *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
   :root {
     --bg:      ${dark ? "#0B0E14" : "#F8FAFC"};
@@ -114,7 +129,7 @@ function getStyle(dark) {
     --muted:   ${dark ? "#94A3B8" : "#64748B"};
     --accent:  ${dark ? "#8B5CF6" : "#4A1C81"};
   }
-  body{background:var(--bg);color:var(--text);font-family:'Outfit',sans-serif;font-size:15px;line-height:1.6;}
+  body{background:var(--bg);color:var(--text);font-family:Poppins,sans-serif;font-size:15px;line-height:1.6;}
   .syne{font-family:'Syne',sans-serif;}
   ::-webkit-scrollbar{width:4px;}
   ::-webkit-scrollbar-track{background:var(--bg);}
@@ -168,7 +183,7 @@ function getStyle(dark) {
   .btn-outline:hover{background:rgba(36,161,226,.1);transform:translateY(-2px);box-shadow:0 6px 20px rgba(36,161,226,.2);}
   .btn-ghost{
     background:var(--sf2);color:var(--text);border:1px solid var(--border);
-    padding:9px 18px;border-radius:8px;font-family:'Outfit',sans-serif;
+    padding:9px 18px;border-radius:8px;font-family:Poppins,sans-serif;
     font-weight:500;font-size:13px;cursor:pointer;transition:all .2s;white-space:nowrap;
   }
   .btn-ghost:hover{border-color:var(--gold);color:var(--gold);background:rgba(36,161,226,.06);}
@@ -184,15 +199,15 @@ function getStyle(dark) {
   .card:hover{border-color:rgba(36,161,226,.35);box-shadow:0 8px 32px rgba(36,161,226,.08);}
 
   /* ── Inputs ── */
-  .input{width:100%;background:var(--sf2);border:1.5px solid var(--border);color:var(--text);padding:11px 14px;border-radius:10px;font-family:'Outfit',sans-serif;font-size:14px;outline:none;transition:all .2s;}
+  .input{width:100%;background:var(--sf2);border:1.5px solid var(--border);color:var(--text);padding:11px 14px;border-radius:10px;font-family:Poppins,sans-serif;font-size:14px;outline:none;transition:all .2s;}
   .input:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(36,161,226,.12);}
   .input::placeholder{color:var(--muted);}
-  .select{width:100%;background:var(--sf2);border:1.5px solid var(--border);color:var(--text);padding:11px 14px;border-radius:10px;font-family:'Outfit',sans-serif;font-size:14px;outline:none;cursor:pointer;transition:border-color .2s;}
+  .select{width:100%;background:var(--sf2);border:1.5px solid var(--border);color:var(--text);padding:11px 14px;border-radius:10px;font-family:Poppins,sans-serif;font-size:14px;outline:none;cursor:pointer;transition:border-color .2s;}
   .select:focus{border-color:var(--gold);}
   .label{display:block;font-size:12px;color:var(--muted);margin-bottom:5px;font-weight:500;letter-spacing:.3px;}
 
   /* ── Badges ── */
-  .badge{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:20px;font-size:12px;font-weight:600;font-family:'Outfit',sans-serif;}
+  .badge{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:20px;font-size:12px;font-weight:600;font-family:Poppins,sans-serif;}
   .bg{background:rgba(16,185,129,.15);color:var(--green);}
   .bo{background:rgba(36,161,226,.15);color:var(--gold);}
   .br{background:rgba(239,68,68,.15);color:var(--red);}
@@ -202,7 +217,7 @@ function getStyle(dark) {
   .borange{background:rgba(251,146,60,.15);color:#FB923C;}
 
   /* ── Chips ── */
-  .chip{display:inline-flex;align-items:center;gap:5px;padding:5px 12px;border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;border:1px solid var(--border);background:var(--sf2);color:var(--muted);transition:all .2s;font-family:'Outfit',sans-serif;}
+  .chip{display:inline-flex;align-items:center;gap:5px;padding:5px 12px;border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;border:1px solid var(--border);background:var(--sf2);color:var(--muted);transition:all .2s;font-family:Poppins,sans-serif;}
   .chip:hover{border-color:var(--gold);color:var(--gold);}
   .chip.active{background:rgba(36,161,226,.12);border-color:var(--gold);color:var(--gold);}
 
@@ -223,12 +238,12 @@ function getStyle(dark) {
     -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
     letter-spacing:-.3px;
   }
-  .toggle-btn{display:flex;align-items:center;gap:6px;padding:6px 11px;border-radius:20px;border:1px solid var(--border);background:var(--sf2);cursor:pointer;font-size:12px;color:var(--muted);transition:all .2s;flex-shrink:0;font-family:'Outfit',sans-serif;font-weight:500;}
+  .toggle-btn{display:flex;align-items:center;gap:6px;padding:6px 11px;border-radius:20px;border:1px solid var(--border);background:var(--sf2);cursor:pointer;font-size:12px;color:var(--muted);transition:all .2s;flex-shrink:0;font-family:Poppins,sans-serif;font-weight:500;}
   .toggle-btn:hover{border-color:var(--gold);color:var(--gold);background:rgba(36,161,226,.06);}
 
   /* ── Sidebar & Dashboard ── */
   .sidebar{width:220px;background:var(--surface);border-right:1px solid var(--border);padding:18px 10px;position:fixed;top:64px;left:0;bottom:0;overflow-y:auto;display:flex;flex-direction:column;}
-  .si{display:flex;align-items:center;gap:9px;padding:9px 12px;border-radius:9px;cursor:pointer;font-size:14px;font-weight:500;color:var(--muted);transition:all .2s;margin-bottom:2px;font-family:'Outfit',sans-serif;}
+  .si{display:flex;align-items:center;gap:9px;padding:9px 12px;border-radius:9px;cursor:pointer;font-size:14px;font-weight:500;color:var(--muted);transition:all .2s;margin-bottom:2px;font-family:Poppins,sans-serif;}
   .si:hover{background:var(--sf2);color:var(--text);}
   .si.active{background:rgba(36,161,226,.1);color:var(--gold);font-weight:600;}
   .main{margin-left:220px;padding:24px;min-height:calc(100vh - 64px);}
@@ -242,8 +257,8 @@ function getStyle(dark) {
 
   /* ── Table ── */
   .tbl{width:100%;border-collapse:collapse;}
-  .tbl th{text-align:left;padding:11px 13px;font-size:11px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.6px;border-bottom:1px solid var(--border);white-space:nowrap;font-family:'Outfit',sans-serif;}
-  .tbl td{padding:12px 13px;font-size:13px;border-bottom:1px solid var(--border);font-family:'Outfit',sans-serif;}
+  .tbl th{text-align:left;padding:11px 13px;font-size:11px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.6px;border-bottom:1px solid var(--border);white-space:nowrap;font-family:Poppins,sans-serif;}
+  .tbl td{padding:12px 13px;font-size:13px;border-bottom:1px solid var(--border);font-family:Poppins,sans-serif;}
   .tbl tr:hover td{background:var(--sf2);}
   .tbl tr:last-child td{border-bottom:none;}
 
@@ -273,9 +288,9 @@ function getStyle(dark) {
   .pfill{height:100%;border-radius:3px;background:linear-gradient(90deg,var(--gold),var(--gold2));transition:width .6s cubic-bezier(.4,0,.2,1);}
   .tracking-box{background:rgba(36,161,226,.08);border:1px solid rgba(36,161,226,.25);border-radius:10px;padding:12px;display:flex;align-items:center;gap:10px;}
   .hold-box{background:rgba(139,92,246,.08);border:1px solid rgba(139,92,246,.25);border-radius:10px;padding:12px;}
-  .copy-toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:var(--green);color:#fff;padding:10px 22px;border-radius:10px;font-size:13px;font-weight:600;z-index:999;animation:fadeUp .3s ease;font-family:'Outfit',sans-serif;}
+  .copy-toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:var(--green);color:#fff;padding:10px 22px;border-radius:10px;font-size:13px;font-weight:600;z-index:999;animation:fadeUp .3s ease;font-family:Poppins,sans-serif;}
   .mobile-nav{display:none;position:fixed;bottom:0;left:0;right:0;background:${dark?"rgba(19,22,32,.97)":"rgba(255,255,255,.97)"};backdrop-filter:blur(24px);border-top:1px solid var(--border);z-index:100;padding:8px 0 max(8px,env(safe-area-inset-bottom));}
-  .mni{display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px 16px;cursor:pointer;border-radius:10px;transition:all .2s;color:var(--muted);font-size:10px;font-weight:500;min-width:60px;font-family:'Outfit',sans-serif;}
+  .mni{display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px 16px;cursor:pointer;border-radius:10px;transition:all .2s;color:var(--muted);font-size:10px;font-weight:500;min-width:60px;font-family:Poppins,sans-serif;}
   .mni.active{color:var(--gold);}
   .mni span:first-child{font-size:20px;}
 
@@ -287,13 +302,19 @@ function getStyle(dark) {
     .mobile-nav{display:flex;justify-content:space-around;align-items:center;}
     .main{margin-left:0 !important;padding:14px;padding-bottom:90px;width:100%;max-width:100vw;overflow-x:hidden;}
     .g2,.g3,.g4{grid-template-columns:1fr;}
-    .nav{padding:0 12px;height:58px;}
-    .hide-m{display:none;}
+    .nav{padding:0 10px;height:56px;}
+    .hide-m{display:none !important;}
     body{overflow-x:hidden;}
-    .card{padding:16px;}
+    .card{padding:14px;}
     .tbl{font-size:11px;}
     .tbl th,.tbl td{padding:8px 6px;}
     .copy-toast{bottom:90px;}
+    .btn-gold,.btn-outline,.btn-ghost{font-size:12px !important;padding:7px 8px !important;}
+    .logo-name{font-size:14px;}
+  }
+  @media(max-width:380px){
+    .nav{padding:0 6px;}
+    .toggle-btn{padding:5px 7px;font-size:11px;}
   }
   .hide-d{display:none;}
   @media(max-width:640px){.hide-d{display:flex !important;}}
@@ -817,11 +838,15 @@ function Landing({ onEnter, dark, onToggle, lang, onLangToggle }) {
       {/* ── NAV ── */}
       <nav className="nav">
         <Logo />
-        <div style={{display:"flex",gap:6,alignItems:"center"}}>
+        <div style={{display:"flex",gap:5,alignItems:"center",flexShrink:0}}>
           <LangToggle lang={lang} onToggle={onLangToggle} />
           <ThemeToggle dark={dark} onToggle={onToggle} />
-          <button className="btn-ghost" style={{padding:"7px 14px",fontSize:12}} onClick={()=>onEnter("buyer")}>{lc.ctaBuyer}</button>
-          <button className="btn-gold" style={{padding:"7px 14px",fontSize:12}} onClick={()=>onEnter("seller")}>{lc.ctaSeller}</button>
+          <button className="btn-ghost" style={{padding:"7px 10px",fontSize:12,whiteSpace:"nowrap"}} onClick={()=>onEnter("buyer")}>
+            <span className="hide-m">🛍️ </span>{lc.ctaBuyer}
+          </button>
+          <button className="btn-gold" style={{padding:"7px 10px",fontSize:12,whiteSpace:"nowrap"}} onClick={()=>onEnter("seller")}>
+            <span className="hide-m">🏪 </span>{lc.ctaSeller}
+          </button>
         </div>
       </nav>
 
@@ -1088,9 +1113,209 @@ function Landing({ onEnter, dark, onToggle, lang, onLangToggle }) {
         </div>
       </div>
 
+      {/* ══ TOKEN RELEASE — 3 CONDITIONS ══ */}
+      <div className="reveal" style={{padding:"80px clamp(16px,5vw,40px)",background:"var(--sf2)"}}>
+        <div style={{maxWidth:960,margin:"0 auto"}}>
+          {/* Header */}
+          <div style={{textAlign:"center",marginBottom:56}}>
+            <p style={{fontSize:11,fontWeight:700,color:"var(--gold)",letterSpacing:"2.5px",textTransform:"uppercase",marginBottom:12}}>
+              {lang==="hi"?"टोकन रिलीज सिस्टम":lang==="en"?"TOKEN RELEASE SYSTEM":"TOKEN RELEASE SYSTEM"}
+            </p>
+            <h2 className="syne" style={{fontSize:"clamp(26px,3.8vw,44px)",fontWeight:800,marginBottom:14,letterSpacing:"-0.8px",lineHeight:1.15}}>
+              {lang==="hi"?"टोकन कब किसे मिलेगा?":lang==="en"?"When & Who Gets the Token?":"Token Kab Kisko Milega?"}
+            </h2>
+            <p style={{color:"var(--muted)",fontSize:15,maxWidth:480,margin:"0 auto",lineHeight:1.7}}>
+              {lang==="hi"?"हर scenario में EscaraPay सही फैसला करता है — ऑटोमेटिक और फेयर।"
+               :lang==="en"?"In every scenario, EscaraPay makes the right call — automatic and fair."
+               :"Har scenario mein EscaraPay sahi faisla karta hai — automatic aur fair."}
+            </p>
+          </div>
 
+          {/* 3 Condition Cards */}
+          <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(280px,1fr))",gap:24,marginBottom:48}}>
 
-      {/* ── EARLY ACCESS SECTION (replaces testimonials - honest & professional) ── */}
+            {/* Card 1 — Successful Delivery → Seller */}
+            <div className="reveal" style={{
+              borderRadius:20,overflow:"hidden",
+              border:`2px solid rgba(16,185,129,.35)`,
+              background: dark?"rgba(16,185,129,.06)":"rgba(16,185,129,.05)",
+              transition:"transform .3s,box-shadow .3s",cursor:"default"
+            }}
+              onMouseEnter={e=>{e.currentTarget.style.transform="translateY(-6px)";e.currentTarget.style.boxShadow="0 24px 60px rgba(16,185,129,.15)";}}
+              onMouseLeave={e=>{e.currentTarget.style.transform="translateY(0)";e.currentTarget.style.boxShadow="none";}}
+            >
+              {/* Top accent bar */}
+              <div style={{height:4,background:"linear-gradient(90deg,#10B981,#34D399)"}} />
+              <div style={{padding:"28px 26px"}}>
+                {/* Icon */}
+                <div style={{
+                  width:60,height:60,borderRadius:18,marginBottom:20,
+                  display:"flex",alignItems:"center",justifyContent:"center",fontSize:28,
+                  background:"rgba(16,185,129,.15)",border:"1px solid rgba(16,185,129,.3)"
+                }}>✅</div>
+                {/* Condition label */}
+                <div style={{
+                  display:"inline-block",background:"rgba(16,185,129,.15)",
+                  border:"1px solid rgba(16,185,129,.3)",borderRadius:100,
+                  padding:"3px 12px",fontSize:11,fontWeight:700,color:"var(--green)",
+                  letterSpacing:"1px",textTransform:"uppercase",marginBottom:14
+                }}>
+                  {lang==="hi"?"स्थिति 1":lang==="en"?"Condition 1":"Condition 1"}
+                </div>
+                <h3 className="syne" style={{fontWeight:800,fontSize:18,marginBottom:10,lineHeight:1.25,color:"var(--text)"}}>
+                  {lang==="hi"?"डिलीवरी सफल रही":lang==="en"?"Successful Delivery":"Delivery Successful Hui"}
+                </h3>
+                <p style={{fontSize:13,color:"var(--muted)",lineHeight:1.8,marginBottom:20}}>
+                  {lang==="hi"?"बायर ने डिलीवरी कन्फर्म कर दी या 7 दिन बिना विवाद के बीत गए।"
+                   :lang==="en"?"Buyer confirms delivery, or 7 days pass without a dispute."
+                   :"Buyer ne delivery confirm kar di ya 7 din bina dispute ke beet gaye."}
+                </p>
+                {/* Result arrow */}
+                <div style={{
+                  display:"flex",alignItems:"center",gap:12,
+                  background:"rgba(16,185,129,.1)",border:"1px solid rgba(16,185,129,.25)",
+                  borderRadius:12,padding:"14px 16px"
+                }}>
+                  <div style={{fontSize:20}}>🏪</div>
+                  <div>
+                    <div style={{fontSize:11,color:"var(--muted)",fontWeight:600,letterSpacing:"0.5px",textTransform:"uppercase",marginBottom:2}}>
+                      {lang==="hi"?"टोकन जाता है":lang==="en"?"Token Goes To":"Token Jaata Hai"}
+                    </div>
+                    <div className="syne" style={{fontWeight:800,fontSize:16,color:"var(--green)"}}>
+                      {lang==="hi"?"→ सेलर को ✓":lang==="en"?"→ Seller ✓":"→ Seller ko ✓"}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Card 2 — Fraud Seller / Not Shipped → Buyer */}
+            <div className="reveal" style={{
+              borderRadius:20,overflow:"hidden",
+              border:`2px solid rgba(239,68,68,.35)`,
+              background: dark?"rgba(239,68,68,.05)":"rgba(239,68,68,.04)",
+              transition:"transform .3s,box-shadow .3s",cursor:"default"
+            }}
+              onMouseEnter={e=>{e.currentTarget.style.transform="translateY(-6px)";e.currentTarget.style.boxShadow="0 24px 60px rgba(239,68,68,.12)";}}
+              onMouseLeave={e=>{e.currentTarget.style.transform="translateY(0)";e.currentTarget.style.boxShadow="none";}}
+            >
+              <div style={{height:4,background:"linear-gradient(90deg,#EF4444,#F87171)"}} />
+              <div style={{padding:"28px 26px"}}>
+                <div style={{
+                  width:60,height:60,borderRadius:18,marginBottom:20,
+                  display:"flex",alignItems:"center",justifyContent:"center",fontSize:28,
+                  background:"rgba(239,68,68,.15)",border:"1px solid rgba(239,68,68,.3)"
+                }}>🚨</div>
+                <div style={{
+                  display:"inline-block",background:"rgba(239,68,68,.12)",
+                  border:"1px solid rgba(239,68,68,.3)",borderRadius:100,
+                  padding:"3px 12px",fontSize:11,fontWeight:700,color:"var(--red)",
+                  letterSpacing:"1px",textTransform:"uppercase",marginBottom:14
+                }}>
+                  {lang==="hi"?"स्थिति 2":lang==="en"?"Condition 2":"Condition 2"}
+                </div>
+                <h3 className="syne" style={{fontWeight:800,fontSize:18,marginBottom:10,lineHeight:1.25,color:"var(--text)"}}>
+                  {lang==="hi"?"सेलर ने डिलीवर नहीं किया":lang==="en"?"Seller Didn't Deliver":"Seller Ne Deliver Nahi Kiya"}
+                </h3>
+                <p style={{fontSize:13,color:"var(--muted)",lineHeight:1.8,marginBottom:20}}>
+                  {lang==="hi"?"सेलर ने आइटम नहीं भेजा, या फ्रॉड सेलर निकला — बायर ने dispute raise किया।"
+                   :lang==="en"?"Seller failed to ship, or turned out to be fraudulent — buyer raised a dispute."
+                   :"Seller ne item nahi bheja, ya fraud seller nikla — buyer ne dispute raise kiya."}
+                </p>
+                <div style={{
+                  display:"flex",alignItems:"center",gap:12,
+                  background:"rgba(239,68,68,.08)",border:"1px solid rgba(239,68,68,.2)",
+                  borderRadius:12,padding:"14px 16px"
+                }}>
+                  <div style={{fontSize:20}}>🛍️</div>
+                  <div>
+                    <div style={{fontSize:11,color:"var(--muted)",fontWeight:600,letterSpacing:"0.5px",textTransform:"uppercase",marginBottom:2}}>
+                      {lang==="hi"?"टोकन जाता है":lang==="en"?"Token Goes To":"Token Jaata Hai"}
+                    </div>
+                    <div className="syne" style={{fontWeight:800,fontSize:16,color:"var(--red)"}}>
+                      {lang==="hi"?"→ बायर को (Refund) ✓":lang==="en"?"→ Buyer (Full Refund) ✓":"→ Buyer ko (Refund) ✓"}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Card 3 — Buyer Cancels After Dispatch → Seller (RTO) */}
+            <div className="reveal" style={{
+              borderRadius:20,overflow:"hidden",
+              border:`2px solid rgba(36,161,226,.35)`,
+              background: dark?"rgba(36,161,226,.06)":"rgba(36,161,226,.05)",
+              transition:"transform .3s,box-shadow .3s",cursor:"default"
+            }}
+              onMouseEnter={e=>{e.currentTarget.style.transform="translateY(-6px)";e.currentTarget.style.boxShadow="0 24px 60px rgba(36,161,226,.12)";}}
+              onMouseLeave={e=>{e.currentTarget.style.transform="translateY(0)";e.currentTarget.style.boxShadow="none";}}
+            >
+              <div style={{height:4,background:"linear-gradient(90deg,#24A1E2,#4BB3E9)"}} />
+              <div style={{padding:"28px 26px"}}>
+                <div style={{
+                  width:60,height:60,borderRadius:18,marginBottom:20,
+                  display:"flex",alignItems:"center",justifyContent:"center",fontSize:28,
+                  background:"rgba(36,161,226,.15)",border:"1px solid rgba(36,161,226,.3)"
+                }}>📦</div>
+                <div style={{
+                  display:"inline-block",background:"rgba(36,161,226,.12)",
+                  border:"1px solid rgba(36,161,226,.3)",borderRadius:100,
+                  padding:"3px 12px",fontSize:11,fontWeight:700,color:"var(--gold)",
+                  letterSpacing:"1px",textTransform:"uppercase",marginBottom:14
+                }}>
+                  {lang==="hi"?"स्थिति 3":lang==="en"?"Condition 3":"Condition 3"}
+                </div>
+                <h3 className="syne" style={{fontWeight:800,fontSize:18,marginBottom:10,lineHeight:1.25,color:"var(--text)"}}>
+                  {lang==="hi"?"बायर ने Dispatch के बाद Cancel किया":lang==="en"?"Buyer Cancels After Dispatch":"Buyer Ne Dispatch Ke Baad Cancel Kiya"}
+                </h3>
+                <p style={{fontSize:13,color:"var(--muted)",lineHeight:1.8,marginBottom:20}}>
+                  {lang==="hi"?"सेलर ने माल भेज दिया, लेकिन बायर ने बीच में cancel कर दिया (RTO)।"
+                   :lang==="en"?"Seller already shipped the item, but buyer cancelled mid-way causing an RTO."
+                   :"Seller ne maal bhej diya, lekin buyer ne beech mein cancel kar diya — RTO hua."}
+                </p>
+                <div style={{
+                  display:"flex",alignItems:"center",gap:12,
+                  background:"rgba(36,161,226,.1)",border:"1px solid rgba(36,161,226,.2)",
+                  borderRadius:12,padding:"14px 16px"
+                }}>
+                  <div style={{fontSize:20}}>🏪</div>
+                  <div>
+                    <div style={{fontSize:11,color:"var(--muted)",fontWeight:600,letterSpacing:"0.5px",textTransform:"uppercase",marginBottom:2}}>
+                      {lang==="hi"?"टोकन जाता है":lang==="en"?"Token Goes To":"Token Jaata Hai"}
+                    </div>
+                    <div className="syne" style={{fontWeight:800,fontSize:16,color:"var(--gold)"}}>
+                      {lang==="hi"?"→ सेलर को (RTO Cover) ✓":lang==="en"?"→ Seller (RTO Cover) ✓":"→ Seller ko (RTO Cover) ✓"}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Bottom guarantee strip */}
+          <div style={{
+            background: dark
+              ? "linear-gradient(135deg,rgba(36,161,226,.1),rgba(74,28,129,.1))"
+              : "linear-gradient(135deg,rgba(36,161,226,.07),rgba(74,28,129,.06))",
+            border:"1px solid rgba(36,161,226,.2)",borderRadius:16,
+            padding:"22px 28px",
+            display:"flex",alignItems:"center",gap:16,flexWrap:"wrap",justifyContent:"center",
+            textAlign:"center"
+          }}>
+            <span style={{fontSize:28}}>🛡️</span>
+            <div>
+              <div className="syne" style={{fontWeight:700,fontSize:15,marginBottom:4}}>
+                {lang==="hi"?"EscaraPay Guarantee":lang==="en"?"EscaraPay Guarantee":"EscaraPay Guarantee"}
+              </div>
+              <div style={{fontSize:13,color:"var(--muted)",lineHeight:1.6}}>
+                {lang==="hi"?"हमारी टीम हर dispute को 24 घंटे में review करती है और सबूत के आधार पर fair decision देती है।"
+                 :lang==="en"?"Our team reviews every dispute within 24 hours and delivers a fair, evidence-based decision."
+                 :"Hamari team har dispute ko 24 ghante mein review karti hai aur fair decision deti hai."}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
       <div className="reveal" style={{padding:"70px clamp(16px,5vw,40px)",background:"var(--sf2)"}}>
         <div style={{maxWidth:860,margin:"0 auto"}}>
           {/* Top label */}
