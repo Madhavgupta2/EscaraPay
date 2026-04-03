@@ -6,24 +6,18 @@ import LOGO_SRC from "./escarapay-logo.jpg";
 // ── Inject Google Fonts once into <head> (avoids flash on re-render) ──
 (function injectFonts() {
   if (document.getElementById("escara-gfonts")) return;
-
-  // Preconnect for faster load
   const pc1 = document.createElement("link");
-  pc1.rel = "preconnect"; 
+  pc1.rel = "preconnect";
   pc1.href = "https://fonts.googleapis.com";
   document.head.appendChild(pc1);
-
   const pc2 = document.createElement("link");
-  pc2.rel = "preconnect"; 
-  pc2.href = "https://fonts.gstatic.com"; 
+  pc2.rel = "preconnect";
+  pc2.href = "https://fonts.gstatic.com";
   pc2.crossOrigin = "anonymous";
   document.head.appendChild(pc2);
-
-  // Gemini-style modern fonts (Inter and Outfit)
   const link = document.createElement("link");
   link.id = "escara-gfonts";
   link.rel = "stylesheet";
-  // Inter: Professional text ke liye | Outfit: Bold headings ke liye
   link.href = "https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;600;700;800&display=swap";
   document.head.appendChild(link);
 })();
@@ -33,7 +27,7 @@ const BACKEND_URL = "https://escarapay-backend-production.up.railway.app";
 // Language translations
 const T = {
   en: {
-    tagline: "India's Trusted Escrow Platform",
+    tagline: "India's Trusted Payment Protection Platform",
     hero1: "WhatsApp Deal Ka",
     hero2: "Safest Way",
     heroDesc: "Seller's RTO loss eliminated. Buyer's fraud fear eliminated. Minimum ₹200 token for 100% protection.",
@@ -59,7 +53,7 @@ const T = {
     loading: "Loading...",
   },
   hi: {
-    tagline: "भारत का भरोसेमंद एस्क्रो प्लेटफॉर्म",
+    tagline: "भारत का भरोसेमंद पेमेंट प्रोटेक्शन प्लेटफॉर्म",
     hero1: "व्हाट्सऐप डील का",
     hero2: "सबसे सुरक्षित तरीका",
     heroDesc: "सेलर का RTO नुकसान खत्म। बायर का फ्रॉड का डर खत्म। न्यूनतम ₹200 टोकन से 100% सुरक्षा।",
@@ -85,7 +79,7 @@ const T = {
     loading: "लोड हो रहा है...",
   },
   hl: {
-    tagline: "India Ka Trusted Escrow Platform",
+    tagline: "India Ka Trusted Payment Protection Platform",
     hero1: "WhatsApp Deal Ka",
     hero2: "Sabse Safe Tarika",
     heroDesc: "Seller ka RTO loss khatam. Buyer ka fraud ka darr khatam. Minimum ₹200 token se dono ko 100% protection.",
@@ -129,8 +123,8 @@ function getStyle(dark) {
     --muted:   ${dark ? "#94A3B8" : "#64748B"};
     --accent:  ${dark ? "#8B5CF6" : "#4A1C81"};
   }
-  body{background:var(--bg);color:var(--text);font-family:Poppins,sans-serif;font-size:15px;line-height:1.6;}
-  .syne{font-family:'Syne',sans-serif;}
+  body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;font-size:15px;line-height:1.6;}
+  .syne{font-family:'Outfit',sans-serif;}
   ::-webkit-scrollbar{width:4px;}
   ::-webkit-scrollbar-track{background:var(--bg);}
   ::-webkit-scrollbar-thumb{background:var(--gold);border-radius:2px;}
@@ -161,7 +155,7 @@ function getStyle(dark) {
   .btn-gold{
     background:linear-gradient(135deg,var(--gold),var(--gold2));
     color:#fff;border:none;padding:11px 26px;border-radius:10px;
-    font-family:'Syne',sans-serif;font-weight:700;font-size:14px;
+    font-family:'Outfit',sans-serif;font-weight:700;font-size:14px;
     cursor:pointer;transition:all .25s cubic-bezier(.4,0,.2,1);white-space:nowrap;
     letter-spacing:.3px;position:relative;overflow:hidden;
   }
@@ -171,23 +165,23 @@ function getStyle(dark) {
   .btn-gold:active{transform:translateY(0);box-shadow:0 4px 12px rgba(36,161,226,.3);}
   .btn-gold.pulse{animation:pulseCyan 2.2s infinite;}
 
-  .btn-green{background:linear-gradient(135deg,#10B981,#059669);color:#fff;border:none;padding:11px 26px;border-radius:10px;font-family:'Syne',sans-serif;font-weight:700;font-size:14px;cursor:pointer;transition:all .25s;white-space:nowrap;}
+  .btn-green{background:linear-gradient(135deg,#10B981,#059669);color:#fff;border:none;padding:11px 26px;border-radius:10px;font-family:'Outfit',sans-serif;font-weight:700;font-size:14px;cursor:pointer;transition:all .25s;white-space:nowrap;}
   .btn-green:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(16,185,129,.35);}
-  .btn-red{background:linear-gradient(135deg,#EF4444,#DC2626);color:#fff;border:none;padding:11px 26px;border-radius:10px;font-family:'Syne',sans-serif;font-weight:700;font-size:14px;cursor:pointer;transition:all .25s;white-space:nowrap;}
+  .btn-red{background:linear-gradient(135deg,#EF4444,#DC2626);color:#fff;border:none;padding:11px 26px;border-radius:10px;font-family:'Outfit',sans-serif;font-weight:700;font-size:14px;cursor:pointer;transition:all .25s;white-space:nowrap;}
   .btn-red:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(239,68,68,.3);}
   .btn-outline{
     background:transparent;color:var(--gold);border:1.5px solid var(--gold);
-    padding:10px 26px;border-radius:10px;font-family:'Syne',sans-serif;
+    padding:10px 26px;border-radius:10px;font-family:'Outfit',sans-serif;
     font-weight:600;font-size:14px;cursor:pointer;transition:all .25s;white-space:nowrap;
   }
   .btn-outline:hover{background:rgba(36,161,226,.1);transform:translateY(-2px);box-shadow:0 6px 20px rgba(36,161,226,.2);}
   .btn-ghost{
     background:var(--sf2);color:var(--text);border:1px solid var(--border);
-    padding:9px 18px;border-radius:8px;font-family:Poppins,sans-serif;
+    padding:9px 18px;border-radius:8px;font-family:'Inter',sans-serif;
     font-weight:500;font-size:13px;cursor:pointer;transition:all .2s;white-space:nowrap;
   }
   .btn-ghost:hover{border-color:var(--gold);color:var(--gold);background:rgba(36,161,226,.06);}
-  .btn-whatsapp{background:linear-gradient(135deg,#25D366,#128C7E);color:#fff;border:none;padding:11px 20px;border-radius:10px;font-family:'Syne',sans-serif;font-weight:700;font-size:14px;cursor:pointer;transition:all .25s;display:flex;align-items:center;gap:7px;white-space:nowrap;}
+  .btn-whatsapp{background:linear-gradient(135deg,#25D366,#128C7E);color:#fff;border:none;padding:11px 20px;border-radius:10px;font-family:'Outfit',sans-serif;font-weight:700;font-size:14px;cursor:pointer;transition:all .25s;display:flex;align-items:center;gap:7px;white-space:nowrap;}
   .btn-whatsapp:hover{transform:translateY(-2px);box-shadow:0 10px 28px rgba(37,211,102,.35);}
 
   /* ── Cards ── */
@@ -199,15 +193,15 @@ function getStyle(dark) {
   .card:hover{border-color:rgba(36,161,226,.35);box-shadow:0 8px 32px rgba(36,161,226,.08);}
 
   /* ── Inputs ── */
-  .input{width:100%;background:var(--sf2);border:1.5px solid var(--border);color:var(--text);padding:11px 14px;border-radius:10px;font-family:Poppins,sans-serif;font-size:14px;outline:none;transition:all .2s;}
+  .input{width:100%;background:var(--sf2);border:1.5px solid var(--border);color:var(--text);padding:11px 14px;border-radius:10px;font-family:'Inter',sans-serif;font-size:14px;outline:none;transition:all .2s;}
   .input:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(36,161,226,.12);}
   .input::placeholder{color:var(--muted);}
-  .select{width:100%;background:var(--sf2);border:1.5px solid var(--border);color:var(--text);padding:11px 14px;border-radius:10px;font-family:Poppins,sans-serif;font-size:14px;outline:none;cursor:pointer;transition:border-color .2s;}
+  .select{width:100%;background:var(--sf2);border:1.5px solid var(--border);color:var(--text);padding:11px 14px;border-radius:10px;font-family:'Inter',sans-serif;font-size:14px;outline:none;cursor:pointer;transition:border-color .2s;}
   .select:focus{border-color:var(--gold);}
   .label{display:block;font-size:12px;color:var(--muted);margin-bottom:5px;font-weight:500;letter-spacing:.3px;}
 
   /* ── Badges ── */
-  .badge{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:20px;font-size:12px;font-weight:600;font-family:Poppins,sans-serif;}
+  .badge{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:20px;font-size:12px;font-weight:600;font-family:'Inter',sans-serif;}
   .bg{background:rgba(16,185,129,.15);color:var(--green);}
   .bo{background:rgba(36,161,226,.15);color:var(--gold);}
   .br{background:rgba(239,68,68,.15);color:var(--red);}
@@ -217,7 +211,7 @@ function getStyle(dark) {
   .borange{background:rgba(251,146,60,.15);color:#FB923C;}
 
   /* ── Chips ── */
-  .chip{display:inline-flex;align-items:center;gap:5px;padding:5px 12px;border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;border:1px solid var(--border);background:var(--sf2);color:var(--muted);transition:all .2s;font-family:Poppins,sans-serif;}
+  .chip{display:inline-flex;align-items:center;gap:5px;padding:5px 12px;border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;border:1px solid var(--border);background:var(--sf2);color:var(--muted);transition:all .2s;font-family:'Inter',sans-serif;}
   .chip:hover{border-color:var(--gold);color:var(--gold);}
   .chip.active{background:rgba(36,161,226,.12);border-color:var(--gold);color:var(--gold);}
 
@@ -233,22 +227,22 @@ function getStyle(dark) {
   .logo-img{height:30px;width:auto;object-fit:contain;flex-shrink:0;}
   .logo-wrap{display:flex;align-items:center;gap:7px;cursor:pointer;flex-shrink:0;}
   .logo-name{
-    font-family:'Syne',sans-serif;font-size:17px;font-weight:800;
+    font-family:'Outfit',sans-serif;font-size:17px;font-weight:800;
     background:linear-gradient(135deg,var(--gold),var(--gold2));
     -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
     letter-spacing:-.3px;
   }
-  .toggle-btn{display:flex;align-items:center;gap:6px;padding:6px 11px;border-radius:20px;border:1px solid var(--border);background:var(--sf2);cursor:pointer;font-size:12px;color:var(--muted);transition:all .2s;flex-shrink:0;font-family:Poppins,sans-serif;font-weight:500;}
+  .toggle-btn{display:flex;align-items:center;gap:6px;padding:6px 11px;border-radius:20px;border:1px solid var(--border);background:var(--sf2);cursor:pointer;font-size:12px;color:var(--muted);transition:all .2s;flex-shrink:0;font-family:'Inter',sans-serif;font-weight:500;}
   .toggle-btn:hover{border-color:var(--gold);color:var(--gold);background:rgba(36,161,226,.06);}
 
   /* ── Sidebar & Dashboard ── */
   .sidebar{width:220px;background:var(--surface);border-right:1px solid var(--border);padding:18px 10px;position:fixed;top:64px;left:0;bottom:0;overflow-y:auto;display:flex;flex-direction:column;}
-  .si{display:flex;align-items:center;gap:9px;padding:9px 12px;border-radius:9px;cursor:pointer;font-size:14px;font-weight:500;color:var(--muted);transition:all .2s;margin-bottom:2px;font-family:Poppins,sans-serif;}
+  .si{display:flex;align-items:center;gap:9px;padding:9px 12px;border-radius:9px;cursor:pointer;font-size:14px;font-weight:500;color:var(--muted);transition:all .2s;margin-bottom:2px;font-family:'Inter',sans-serif;}
   .si:hover{background:var(--sf2);color:var(--text);}
   .si.active{background:rgba(36,161,226,.1);color:var(--gold);font-weight:600;}
   .main{margin-left:220px;padding:24px;min-height:calc(100vh - 64px);}
   .step{display:flex;align-items:flex-start;gap:12px;padding:14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);}
-  .step-num{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-weight:700;font-size:13px;flex-shrink:0;}
+  .step-num{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Outfit',sans-serif;font-weight:700;font-size:13px;flex-shrink:0;}
 
   /* ── Grids ── */
   .g2{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
@@ -257,8 +251,8 @@ function getStyle(dark) {
 
   /* ── Table ── */
   .tbl{width:100%;border-collapse:collapse;}
-  .tbl th{text-align:left;padding:11px 13px;font-size:11px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.6px;border-bottom:1px solid var(--border);white-space:nowrap;font-family:Poppins,sans-serif;}
-  .tbl td{padding:12px 13px;font-size:13px;border-bottom:1px solid var(--border);font-family:Poppins,sans-serif;}
+  .tbl th{text-align:left;padding:11px 13px;font-size:11px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.6px;border-bottom:1px solid var(--border);white-space:nowrap;font-family:'Inter',sans-serif;}
+  .tbl td{padding:12px 13px;font-size:13px;border-bottom:1px solid var(--border);font-family:'Inter',sans-serif;}
   .tbl tr:hover td{background:var(--sf2);}
   .tbl tr:last-child td{border-bottom:none;}
 
@@ -281,16 +275,16 @@ function getStyle(dark) {
 
   /* ── Misc ── */
   .hero-glow{position:absolute;width:400px;height:400px;border-radius:50%;filter:blur(90px);pointer-events:none;}
-  .avatar{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--gold),var(--accent));display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-weight:700;font-size:13px;color:white;flex-shrink:0;}
+  .avatar{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--gold),var(--accent));display:flex;align-items:center;justify-content:center;font-family:'Outfit',sans-serif;font-weight:700;font-size:13px;color:white;flex-shrink:0;}
   .ficon{width:44px;height:44px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:20px;margin-bottom:12px;}
   .stat-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:18px 20px;}
   .pbar{height:5px;background:var(--sf2);border-radius:3px;overflow:hidden;}
   .pfill{height:100%;border-radius:3px;background:linear-gradient(90deg,var(--gold),var(--gold2));transition:width .6s cubic-bezier(.4,0,.2,1);}
   .tracking-box{background:rgba(36,161,226,.08);border:1px solid rgba(36,161,226,.25);border-radius:10px;padding:12px;display:flex;align-items:center;gap:10px;}
   .hold-box{background:rgba(139,92,246,.08);border:1px solid rgba(139,92,246,.25);border-radius:10px;padding:12px;}
-  .copy-toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:var(--green);color:#fff;padding:10px 22px;border-radius:10px;font-size:13px;font-weight:600;z-index:999;animation:fadeUp .3s ease;font-family:Poppins,sans-serif;}
+  .copy-toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:var(--green);color:#fff;padding:10px 22px;border-radius:10px;font-size:13px;font-weight:600;z-index:999;animation:fadeUp .3s ease;font-family:'Inter',sans-serif;}
   .mobile-nav{display:none;position:fixed;bottom:0;left:0;right:0;background:${dark?"rgba(19,22,32,.97)":"rgba(255,255,255,.97)"};backdrop-filter:blur(24px);border-top:1px solid var(--border);z-index:100;padding:8px 0 max(8px,env(safe-area-inset-bottom));}
-  .mni{display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px 16px;cursor:pointer;border-radius:10px;transition:all .2s;color:var(--muted);font-size:10px;font-weight:500;min-width:60px;font-family:Poppins,sans-serif;}
+  .mni{display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px 16px;cursor:pointer;border-radius:10px;transition:all .2s;color:var(--muted);font-size:10px;font-weight:500;min-width:60px;font-family:'Inter',sans-serif;}
   .mni.active{color:var(--gold);}
   .mni span:first-child{font-size:20px;}
 
@@ -363,7 +357,7 @@ function Logo({ onClick }) {
   return (
     <div className="logo-wrap" onClick={onClick}>
       <img src={LOGO_SRC} alt="EscaraPay" className="logo-img" onError={e=>{ e.target.style.display="none"; e.target.nextSibling.style.display="flex"; }} />
-      <div style={{display:"none",width:32,height:32,borderRadius:8,background:"linear-gradient(135deg,#0ea5e9,#38bdf8)",alignItems:"center",justifyContent:"center",fontSize:14,fontWeight:900,color:"#fff",fontFamily:"'Syne',sans-serif"}}>E₹</div>
+      <div style={{display:"none",width:32,height:32,borderRadius:8,background:"linear-gradient(135deg,#0ea5e9,#38bdf8)",alignItems:"center",justifyContent:"center",fontSize:14,fontWeight:900,color:"#fff",fontFamily:"'Outfit',sans-serif"}}>E₹</div>
       <span className="logo-name">EscaraPay</span>
     </div>
   );
@@ -452,7 +446,7 @@ function PayPage({ orderId, dark, onToggle, onGoHome }) {
         <div style={{width:"100%",maxWidth:460}}>
           {loading && <div className="card" style={{textAlign:"center",padding:50}}><div style={{width:44,height:44,border:"3px solid var(--gold)",borderTopColor:"transparent",borderRadius:"50%",animation:"spin .8s linear infinite",margin:"0 auto 16px"}} /><div style={{color:"var(--muted)"}}>Order load ho raha hai...</div></div>}
           {error && <div className="card" style={{textAlign:"center",padding:40}}><div style={{fontSize:40,marginBottom:12}}>❌</div><div className="syne" style={{fontWeight:800,fontSize:18,marginBottom:8}}>Order Nahi Mila</div><div style={{color:"var(--muted)",fontSize:13,marginBottom:20}}>{error}</div><button className="btn-ghost" onClick={onGoHome}>← Home</button></div>}
-          {payStep===3 && <div className="card fu" style={{textAlign:"center",padding:40}}><div style={{fontSize:60,marginBottom:16}}>🎉</div><div className="syne" style={{fontWeight:800,fontSize:24,color:"var(--green)",marginBottom:8}}>Token Secured!</div><div style={{color:"var(--muted)",fontSize:14,marginBottom:20}}>₹{order?.token_amount} escrow mein lock ho gaya</div><div style={{background:"rgba(14,165,233,.1)",border:"1px solid rgba(14,165,233,.2)",borderRadius:12,padding:14,marginBottom:16}}><div style={{fontSize:11,color:"var(--muted)",marginBottom:4}}>Order ID save karo:</div><div style={{fontFamily:"monospace",fontWeight:700,color:"var(--gold)",fontSize:16}}>{order?.id}</div></div><button className="btn-ghost" onClick={onGoHome}>← Home pe Jao</button></div>}
+          {payStep===3 && <div className="card fu" style={{textAlign:"center",padding:40}}><div style={{fontSize:60,marginBottom:16}}>🎉</div><div className="syne" style={{fontWeight:800,fontSize:24,color:"var(--green)",marginBottom:8}}>Token Secured!</div><div style={{color:"var(--muted)",fontSize:14,marginBottom:20}}>₹{order?.token_amount} protection vault mein secure ho gaya</div><div style={{background:"rgba(14,165,233,.1)",border:"1px solid rgba(14,165,233,.2)",borderRadius:12,padding:14,marginBottom:16}}><div style={{fontSize:11,color:"var(--muted)",marginBottom:4}}>Order ID save karo:</div><div style={{fontFamily:"monospace",fontWeight:700,color:"var(--gold)",fontSize:16}}>{order?.id}</div></div><button className="btn-ghost" onClick={onGoHome}>← Home pe Jao</button></div>}
           {payStep===2 && <div className="card" style={{textAlign:"center",padding:50}}><div style={{width:44,height:44,border:"3px solid var(--green)",borderTopColor:"transparent",borderRadius:"50%",animation:"spin .8s linear infinite",margin:"0 auto 16px"}} /><div className="syne" style={{fontWeight:700,fontSize:16}}>Payment Verify ho rahi hai...</div></div>}
           {payStep===1 && <div className="card" style={{textAlign:"center",padding:50}}><div style={{width:44,height:44,border:"3px solid var(--gold)",borderTopColor:"transparent",borderRadius:"50%",animation:"spin .8s linear infinite",margin:"0 auto 16px"}} /><div className="syne" style={{fontWeight:700,fontSize:16}}>Payment Gateway Load ho raha hai...</div></div>}
           {order && !loading && payStep===0 && (
@@ -468,7 +462,7 @@ function PayPage({ orderId, dark, onToggle, onGoHome }) {
               <div className="fu">
                 <div style={{textAlign:"center",marginBottom:20}}>
                   <img src={LOGO_SRC} alt="EscaraPay" style={{height:44,objectFit:"contain",marginBottom:12}} onError={e=>e.target.style.display="none"} />
-                  <div style={{fontSize:12,color:"var(--muted)",marginBottom:4}}>🛡️ Secured by EscaraPay Escrow</div>
+                  <div style={{fontSize:12,color:"var(--muted)",marginBottom:4}}>🛡️ Secured by EscaraPay</div>
                   <h2 className="syne" style={{fontWeight:800,fontSize:22}}>Secure Token Payment</h2>
                 </div>
                 <div className="card" style={{marginBottom:14,background:"rgba(14,165,233,.05)",borderColor:"rgba(14,165,233,.25)"}}>
@@ -483,7 +477,7 @@ function PayPage({ orderId, dark, onToggle, onGoHome }) {
                   </div>
                   <div style={{background:"var(--sf2)",borderRadius:10,padding:12,fontSize:12,marginBottom:14}}>
                     <div style={{fontWeight:600,marginBottom:8,color:"var(--muted)"}}>💰 Breakdown</div>
-                    <div style={{display:"flex",justifyContent:"space-between",marginBottom:5}}><span style={{color:"var(--muted)"}}>Token (Escrow)</span><span>₹{order.token_amount}</span></div>
+                    <div style={{display:"flex",justifyContent:"space-between",marginBottom:5}}><span style={{color:"var(--muted)"}}>Token (Protected)</span><span>₹{order.token_amount}</span></div>
                     <div style={{display:"flex",justifyContent:"space-between",marginBottom:5}}><span style={{color:"var(--muted)"}}>Gateway Fee (2%)</span><span style={{color:"var(--muted)"}}>₹{order.gateway_fee}</span></div>
                     <div style={{height:1,background:"var(--border)",margin:"6px 0"}}></div>
                     <div style={{display:"flex",justifyContent:"space-between",fontWeight:700}}><span>Total</span><span style={{color:"var(--gold)"}}>₹{order.buyer_pays||order.token_amount}</span></div>
@@ -548,7 +542,7 @@ function OrderModal({ order, isSeller, onClose, onDispatch, onConfirmDelivery, o
         </div>
         <div className="g2" style={{marginBottom:16}}>
           <div style={{background:"var(--sf2)",borderRadius:10,padding:12}}><div style={{fontSize:11,color:"var(--muted)",marginBottom:2}}>Order Amount</div><div className="syne" style={{fontWeight:800,fontSize:20}}>₹{order.order_amount}</div></div>
-          <div style={{background:"rgba(14,165,233,.1)",borderRadius:10,padding:12,border:"1px solid rgba(14,165,233,.2)"}}><div style={{fontSize:11,color:"var(--muted)",marginBottom:2}}>Token (Escrow)</div><div className="syne" style={{fontWeight:800,fontSize:20,color:"var(--gold)"}}>₹{order.token_amount}</div></div>
+          <div style={{background:"rgba(14,165,233,.1)",borderRadius:10,padding:12,border:"1px solid rgba(14,165,233,.2)"}}><div style={{fontSize:11,color:"var(--muted)",marginBottom:2}}>Token (Protected)</div><div className="syne" style={{fontWeight:800,fontSize:20,color:"var(--gold)"}}>₹{order.token_amount}</div></div>
         </div>
         {isSeller && (
           <div style={{background:"rgba(14,165,233,.08)",border:"1px solid rgba(14,165,233,.2)",borderRadius:10,padding:12,marginBottom:14}}>
@@ -673,10 +667,10 @@ function Landing({ onEnter, dark, onToggle, lang, onLangToggle }) {
 
   const LT = {
     en: {
-      heroTag: "India's Trusted Escrow Platform",
+      heroTag: "India's Trusted Payment Protection Platform",
       heroH1a: "Escara Pay",
-      heroH1b: "Stop RTO Losses & Scale Your Business.",
-      heroDesc: "Escarapay.in: The trusted escrow platform for secure online transactions. We hold funds safely until your product is delivered and verified.",
+      heroH1b: "Stop RTO Losses & Scale Your Business with Escara Pay.",
+      heroDesc: "Escara Pay ensures secure online transactions by protecting both buyers and sellers. We safeguard payments until the product is delivered, reducing fraud and building trust.",
       ctaSeller: "Login as Seller",
       ctaBuyer: "Login as Buyer",
       howTitle: "How Escara Pay Works?",
@@ -688,29 +682,29 @@ function Landing({ onEnter, dark, onToggle, lang, onLangToggle }) {
         { num:"01", icon:"📝", title:"Register & Agree", desc:"Both parties sign up and agree on price and terms." },
         { num:"02", icon:"🔗", title:"Generate Payment Link", desc:"The Seller creates a secure Escara Pay order link directly from their dashboard." },
         { num:"03", icon:"💬", title:"Share via WhatsApp", desc:"The link is sent instantly to the Buyer via WhatsApp for quick and easy access." },
-        { num:"04", icon:"🔐", title:"Secure Deposit", desc:"The Buyer opens the link and pays the funds into Escara Pay's secure vault." },
+        { num:"04", icon:"🔐", title:"Secure Deposit", desc:"The Buyer opens the link and pays the funds into Escara Pay's secure protected vault." },
         { num:"05", icon:"🚚", title:"Ship & Track", desc:"The Seller delivers the goods and provides tracking details." },
         { num:"06", icon:"✅", title:"Inspect & Release", desc:"Once the Buyer approves the delivery, Escara Pay releases the payment to the Seller." },
       ],
       benefits: [
         { icon:"🛡️", title:"Zero Fraud Risk", desc:"Eliminate the fear of 'payment-not-received' or 'item-not-shipped' scams.", color:"rgba(14,165,233,.15)", bdr:"rgba(14,165,233,.35)" },
         { icon:"📦", title:"Guaranteed RTO Protection", desc:"Escara Pay discourages casual or fake orders and protects your margins.", color:"rgba(5,150,105,.15)", bdr:"rgba(5,150,105,.35)" },
-        { icon:"⚡", title:"2-Minute Rapid Setup", desc:"Our streamlined onboarding process lets you create your first escrow link in just 2 minutes.", color:"rgba(240,180,41,.15)", bdr:"rgba(240,180,41,.35)" },
-        { icon:"💬", title:"WhatsApp-Native Experience", desc:"Create, share, and track your escrow orders directly within WhatsApp.", color:"rgba(37,211,102,.15)", bdr:"rgba(37,211,102,.35)" },
+        { icon:"⚡", title:"2-Minute Rapid Setup", desc:"Our streamlined onboarding process lets you create your first secure payment link in just 2 minutes.", color:"rgba(240,180,41,.15)", bdr:"rgba(240,180,41,.35)" },
+        { icon:"💬", title:"WhatsApp-Native Experience", desc:"Create, share, and track your protected orders directly within WhatsApp.", color:"rgba(37,211,102,.15)", bdr:"rgba(37,211,102,.35)" },
         { icon:"🔒", title:"Razorpay-Powered Security", desc:"Razorpay's infrastructure ensures every payment is encrypted and 100% secure.", color:"rgba(124,58,237,.15)", bdr:"rgba(124,58,237,.35)" },
         { icon:"⚖️", title:"Expert Dispute Resolution", desc:"Our mediators review the evidence and provide a fast, fair resolution.", color:"rgba(239,68,68,.15)", bdr:"rgba(239,68,68,.35)" },
       ],
       tokenCards: [
-        { icon:"🔒", title:"Funds Securely Held", desc:"All buyer payments are locked in EscaraPay's secure escrow vault — inaccessible to either party until conditions are met.", color:"rgba(14,165,233,.12)", bdr:"rgba(14,165,233,.3)" },
+        { icon:"🔒", title:"Funds Securely Held", desc:"All buyer payments are locked in EscaraPay's secure protected vault — inaccessible to either party until conditions are met.", color:"rgba(14,165,233,.12)", bdr:"rgba(14,165,233,.3)" },
         { icon:"✅", title:"Released After Approval", desc:"Payment is only released to the Seller after the Buyer confirms delivery and satisfaction. No disputes, no delays.", color:"rgba(5,150,105,.12)", bdr:"rgba(5,150,105,.3)" },
         { icon:"⚠️", title:"Dispute Protection", desc:"Raise a dispute within 7 days. Our expert mediators review evidence and ensure a fair, fast resolution for both parties.", color:"rgba(240,180,41,.12)", bdr:"rgba(240,180,41,.3)" },
       ],
     },
     hi: {
-      heroTag: "भारत का भरोसेमंद एस्क्रो प्लेटफॉर्म",
+      heroTag: "भारत का भरोसेमंद पेमेंट प्रोटेक्शन प्लेटफॉर्म",
       heroH1a: "एस्करा पे",
       heroH1b: "RTO नुकसान रोकें और बिज़नेस बढ़ाएं।",
-      heroDesc: "Escarapay.in: सुरक्षित ऑनलाइन लेनदेन के लिए भरोसेमंद एस्क्रो प्लेटफॉर्म। हम आपके फंड तब तक सुरक्षित रखते हैं जब तक डिलीवरी वेरीफाई न हो।",
+      heroDesc: "Escara Pay आपके हर ऑनलाइन लेनदेन को सुरक्षित बनाता है। हम buyer और seller दोनों के payments तब तक सुरक्षित रखते हैं जब तक delivery verify न हो — fraud मुक्त, भरोसेमंद।",
       ctaSeller: "सेलर लॉगिन",
       ctaBuyer: "बायर लॉगिन",
       howTitle: "एस्करा पे कैसे काम करता है?",
@@ -722,29 +716,29 @@ function Landing({ onEnter, dark, onToggle, lang, onLangToggle }) {
         { num:"01", icon:"📝", title:"रजिस्टर करें और सहमत हों", desc:"दोनों पक्ष साइन अप करते हैं और कीमत व शर्तों पर सहमत होते हैं।" },
         { num:"02", icon:"🔗", title:"पेमेंट लिंक बनाएं", desc:"सेलर अपने डैशबोर्ड से सीधे एक सुरक्षित एस्करा पे ऑर्डर लिंक बनाता है।" },
         { num:"03", icon:"💬", title:"व्हाट्सऐप पर शेयर करें", desc:"लिंक तुरंत व्हाट्सऐप के जरिए बायर को भेजा जाता है।" },
-        { num:"04", icon:"🔐", title:"सुरक्षित जमा", desc:"बायर लिंक खोलता है और फंड एस्करा पे के सुरक्षित वॉल्ट में जमा करता है।" },
+        { num:"04", icon:"🔐", title:"सुरक्षित जमा", desc:"बायर लिंक खोलता है और फंड एस्करा पे के सुरक्षित vault में जमा करता है।" },
         { num:"05", icon:"🚚", title:"भेजें और ट्रैक करें", desc:"सेलर सामान डिलीवर करता है और ट्रैकिंग डिटेल्स देता है।" },
         { num:"06", icon:"✅", title:"जांचें और रिलीज करें", desc:"बायर की मंजूरी के बाद एस्करा पे सेलर को पेमेंट रिलीज करता है।" },
       ],
       benefits: [
         { icon:"🛡️", title:"ज़ीरो फ्रॉड रिस्क", desc:"'पेमेंट नहीं मिली' या 'आइटम नहीं भेजा' जैसे स्कैम का डर खत्म।", color:"rgba(14,165,233,.15)", bdr:"rgba(14,165,233,.35)" },
         { icon:"📦", title:"RTO सुरक्षा गारंटी", desc:"एस्करा पे फर्जी ऑर्डर रोकता है और आपका मार्जिन बचाता है।", color:"rgba(5,150,105,.15)", bdr:"rgba(5,150,105,.35)" },
-        { icon:"⚡", title:"2 मिनट में सेटअप", desc:"हमारी स्ट्रीमलाइन्ड प्रक्रिया से सिर्फ 2 मिनट में पहला एस्क्रो लिंक बनाएं।", color:"rgba(240,180,41,.15)", bdr:"rgba(240,180,41,.35)" },
+        { icon:"⚡", title:"2 मिनट में सेटअप", desc:"हमारी streamlined process से सिर्फ 2 मिनट में पहला secure payment link बनाएं।", color:"rgba(240,180,41,.15)", bdr:"rgba(240,180,41,.35)" },
         { icon:"💬", title:"व्हाट्सऐप नेटिव", desc:"व्हाट्सऐप में सीधे ऑर्डर बनाएं, शेयर करें और ट्रैक करें।", color:"rgba(37,211,102,.15)", bdr:"rgba(37,211,102,.35)" },
         { icon:"🔒", title:"रेजरपे पावर्ड सिक्योरिटी", desc:"रेजरपे का इन्फ्रास्ट्रक्चर हर पेमेंट को एन्क्रिप्टेड और 100% सुरक्षित रखता है।", color:"rgba(124,58,237,.15)", bdr:"rgba(124,58,237,.35)" },
         { icon:"⚖️", title:"विशेषज्ञ विवाद समाधान", desc:"हमारे मध्यस्थ सबूत देखकर तेज़ और निष्पक्ष निर्णय देते हैं।", color:"rgba(239,68,68,.15)", bdr:"rgba(239,68,68,.35)" },
       ],
       tokenCards: [
-        { icon:"🔒", title:"फंड सुरक्षित रखे जाते हैं", desc:"सभी बायर पेमेंट एस्करा पे के सुरक्षित एस्क्रो वॉल्ट में लॉक रहते हैं जब तक शर्तें पूरी न हों।", color:"rgba(14,165,233,.12)", bdr:"rgba(14,165,233,.3)" },
+        { icon:"🔒", title:"फंड सुरक्षित रखे जाते हैं", desc:"सभी बायर पेमेंट एस्करा पे के secure vault में lock रहते हैं जब तक शर्तें पूरी न हों।", color:"rgba(14,165,233,.12)", bdr:"rgba(14,165,233,.3)" },
         { icon:"✅", title:"मंजूरी के बाद रिलीज", desc:"बायर की पुष्टि के बाद ही सेलर को पेमेंट जाती है।", color:"rgba(5,150,105,.12)", bdr:"rgba(5,150,105,.3)" },
         { icon:"⚠️", title:"विवाद सुरक्षा", desc:"7 दिनों में विवाद उठाएं। हमारे विशेषज्ञ तेज़ और निष्पक्ष समाधान देते हैं।", color:"rgba(240,180,41,.12)", bdr:"rgba(240,180,41,.3)" },
       ],
     },
     hl: {
-      heroTag: "India Ka Trusted Escrow Platform",
+      heroTag: "India Ka Trusted Payment Protection Platform",
       heroH1a: "Escara Pay",
       heroH1b: "RTO Losses Rokein & Business Badhao.",
-      heroDesc: "Escarapay.in: Secure online transactions ke liye trusted escrow platform. Hum funds tab tak safe rakhte hain jab tak product deliver aur verify na ho jaye.",
+      heroDesc: "Escara Pay aapke har online transaction ko secure banata hai. Hum buyer aur seller dono ke payments tab tak safe rakhte hain jab tak delivery verify na ho — fraud-free, trustworthy.",
       ctaSeller: "Login as Seller",
       ctaBuyer: "Login as Buyer",
       howTitle: "Escara Pay Kaise Kaam Karta Hai?",
@@ -763,13 +757,13 @@ function Landing({ onEnter, dark, onToggle, lang, onLangToggle }) {
       benefits: [
         { icon:"🛡️", title:"Zero Fraud Risk", desc:"'Payment nahi mili' ya 'item nahi bheja' jaisi scams ka darr khatam.", color:"rgba(14,165,233,.15)", bdr:"rgba(14,165,233,.35)" },
         { icon:"📦", title:"Guaranteed RTO Protection", desc:"Escara Pay fake orders rokta hai aur aapka margin bachata hai.", color:"rgba(5,150,105,.15)", bdr:"rgba(5,150,105,.35)" },
-        { icon:"⚡", title:"2-Minute Rapid Setup", desc:"Hamare streamlined process se sirf 2 minute mein pehla escrow link banao.", color:"rgba(240,180,41,.15)", bdr:"rgba(240,180,41,.35)" },
+        { icon:"⚡", title:"2-Minute Rapid Setup", desc:"Hamare streamlined process se sirf 2 minute mein pehla secure payment link banao.", color:"rgba(240,180,41,.15)", bdr:"rgba(240,180,41,.35)" },
         { icon:"💬", title:"WhatsApp-Native Experience", desc:"WhatsApp mein seedha orders banao, share karo aur track karo.", color:"rgba(37,211,102,.15)", bdr:"rgba(37,211,102,.35)" },
         { icon:"🔒", title:"Razorpay-Powered Security", desc:"Razorpay ka infrastructure har payment ko encrypted aur 100% secure rakhta hai.", color:"rgba(124,58,237,.15)", bdr:"rgba(124,58,237,.35)" },
         { icon:"⚖️", title:"Expert Dispute Resolution", desc:"Hamare mediators evidence dekhkar fast aur fair resolution dete hain.", color:"rgba(239,68,68,.15)", bdr:"rgba(239,68,68,.35)" },
       ],
       tokenCards: [
-        { icon:"🔒", title:"Funds Securely Held", desc:"Saari buyer payments EscaraPay ke secure escrow vault mein lock rehti hain — tab tak jab tak conditions meet na ho.", color:"rgba(14,165,233,.12)", bdr:"rgba(14,165,233,.3)" },
+        { icon:"🔒", title:"Funds Securely Held", desc:"Saari buyer payments EscaraPay ke secure protected vault mein lock rehti hain — tab tak jab tak conditions meet na ho.", color:"rgba(14,165,233,.12)", bdr:"rgba(14,165,233,.3)" },
         { icon:"✅", title:"Buyer Approval ke Baad Release", desc:"Payment sirf tab Seller ko milti hai jab Buyer delivery confirm kare. Koi dispute, koi delay nahi.", color:"rgba(5,150,105,.12)", bdr:"rgba(5,150,105,.3)" },
         { icon:"⚠️", title:"Dispute Protection", desc:"7 din mein dispute raise karo. Hamare expert mediators evidence review karke fair aur fast resolution dete hain.", color:"rgba(240,180,41,.12)", bdr:"rgba(240,180,41,.3)" },
       ],
@@ -818,14 +812,14 @@ function Landing({ onEnter, dark, onToggle, lang, onLangToggle }) {
     { q:"विवाद कैसे उठाएं?", a:"डिलीवरी के 7 दिनों के अंदर अपने डैशबोर्ड में जाकर 'Dispute Raise Karo' बटन दबाएं। हमारी टीम 24 घंटे में जवाब देगी।" },
     { q:"क्या कोई hidden charges हैं?", a:"नहीं। केवल 2% Razorpay gateway fee है जो बायर को पेमेंट के समय दिखाई जाती है। कोई छुपी हुई फीस नहीं।" },
   ] : lang==="en" ? [
-    { q:"What is the minimum token amount on EscaraPay?", a:"The minimum token is ₹200. It is a percentage of the order value that is held securely in escrow until delivery is confirmed." },
+    { q:"What is the minimum token amount on EscaraPay?", a:"The minimum token is ₹200. It is a percentage of the order value that is held securely in our protected vault until delivery is confirmed." },
     { q:"What if the seller doesn't ship the item?", a:"If the seller fails to ship within the agreed time, the full token amount is automatically refunded to the buyer." },
     { q:"When does the seller receive the token payment?", a:"The payment is released to the seller within 7 days of delivery confirmation, or immediately when the buyer manually confirms receipt." },
     { q:"Is EscaraPay approved by RBI?", a:"EscaraPay processes payments via Razorpay, which is fully RBI-compliant and PCI DSS Level 1 certified, ensuring maximum security." },
     { q:"How do I raise a dispute?", a:"Within 7 days of delivery, go to your dashboard and click 'Raise Dispute'. Our team will investigate and respond within 24 hours." },
     { q:"Are there any hidden charges?", a:"No hidden charges. Only a 2% Razorpay gateway fee is applied, which is shown transparently at the time of payment." },
   ] : [
-    { q:"EscaraPay pe minimum token kitna hota hai?", a:"Minimum token ₹200 hai. Yeh order value ka ek percentage hota hai jo delivery confirm hone tak escrow mein safe rakha jaata hai." },
+    { q:"EscaraPay pe minimum token kitna hota hai?", a:"Minimum token ₹200 hai. Yeh order value ka ek percentage hota hai jo delivery confirm hone tak protected vault mein safe rakha jaata hai." },
     { q:"Agar seller ne item nahi bheja toh kya hoga?", a:"Agar seller decided time mein item nahi bhejta, toh poora token amount buyer ko automatically wapas kar diya jaata hai." },
     { q:"Seller ko token payment kab milegi?", a:"Delivery confirmation ke 7 din ke andar, ya jab buyer khud confirm kare — tab payment seller ko release hoti hai." },
     { q:"Kya EscaraPay RBI se approved hai?", a:"EscaraPay Razorpay ke zariye payments process karta hai jo RBI-compliant aur PCI DSS Level 1 certified hai." },
@@ -920,7 +914,7 @@ function Landing({ onEnter, dark, onToggle, lang, onLangToggle }) {
         <div className="fu3" style={{display:"flex",gap:10,justifyContent:"center",flexWrap:"wrap"}}>
           {[
             {icon:"🔒","text":"Razorpay Secured"},
-            {icon:"🛡️","text":"Escrow Protected"},
+            {icon:"🛡️","text":"Payment Protected"},
             {icon:"⚡","text":"RBI Compliant"},
             {icon:"✅","text":"2-Min Setup"},
           ].map(chip=>(
@@ -967,7 +961,7 @@ function Landing({ onEnter, dark, onToggle, lang, onLangToggle }) {
               {/* Step number accent */}
               <div style={{
                 position:"absolute",top:14,right:16,
-                fontFamily:"'Syne',sans-serif",fontWeight:800,fontSize:32,
+                fontFamily:"'Outfit',sans-serif",fontWeight:800,fontSize:32,
                 color: dark?"rgba(255,255,255,.04)":"rgba(14,165,233,.06)",
                 lineHeight:1,userSelect:"none"
               }}>{step.num}</div>
@@ -1380,9 +1374,9 @@ function Landing({ onEnter, dark, onToggle, lang, onLangToggle }) {
               {lang==="hi"?"सीमित Early Access Slots":lang==="en"?"Limited Early Access Slots":"Limited Early Access Slots"}
             </h3>
             <p style={{color:"var(--muted)",fontSize:14,marginBottom:24,lineHeight:1.7,maxWidth:400,margin:"0 auto 24px"}}>
-              {lang==="hi"?"अभी register करें और India ke top escrow platform का हिस्सा बनें।"
-               :lang==="en"?"Register now and be part of India's most trusted escrow platform."
-               :"Abhi register karo aur India ke top escrow platform ka hissa bano."}
+              {lang==="hi"?"अभी register करें और India ke top payment protection platform का हिस्सा बनें।"
+               :lang==="en"?"Register now and be part of India's most trusted payment protection platform."
+               :"Abhi register karo aur India ke top payment protection platform ka hissa bano."}
             </p>
             <div style={{display:"flex",gap:12,justifyContent:"center",flexWrap:"wrap"}}>
               <button className="btn-gold pulse" style={{fontSize:15,padding:"13px 36px",borderRadius:12}} onClick={()=>onEnter("seller")}>
@@ -1415,7 +1409,7 @@ function Landing({ onEnter, dark, onToggle, lang, onLangToggle }) {
                   <th key={i} style={{
                     padding:"14px 18px",
                     textAlign: i===0?"left":"center",
-                    fontSize:13,fontFamily:"'Syne',sans-serif",fontWeight:700,
+                    fontSize:13,fontFamily:"'Outfit',sans-serif",fontWeight:700,
                     background: i===1
                       ? "linear-gradient(135deg,rgba(14,165,233,.2),rgba(56,189,248,.15))"
                       : "var(--sf2)",
@@ -1478,7 +1472,7 @@ function Landing({ onEnter, dark, onToggle, lang, onLangToggle }) {
                   width:"100%",padding:"18px 20px",
                   display:"flex",justifyContent:"space-between",alignItems:"center",
                   background:"transparent",border:"none",cursor:"pointer",
-                  fontFamily:"'Syne',sans-serif",fontWeight:700,fontSize:14,
+                  fontFamily:"'Outfit',sans-serif",fontWeight:700,fontSize:14,
                   color:"var(--text)",textAlign:"left",gap:12
                 }}
               >
@@ -1518,7 +1512,7 @@ function Landing({ onEnter, dark, onToggle, lang, onLangToggle }) {
         <div style={{maxWidth:900,margin:"0 auto",display:"flex",justifyContent:"center",alignItems:"center",gap:"clamp(18px,4vw,52px)",flexWrap:"wrap"}}>
           {[
             {icon:"🔒",text:"Secure Payments"},
-            {icon:"🛡️",text:"Escrow Protection"},
+            {icon:"🛡️",text:"Payment Protection"},
             {icon:"⚡",text:"Fast & Safe"},
             {icon:"✅",text:"Powered by Razorpay (RBI Compliant)"},
           ].map(b=>(
@@ -1536,9 +1530,9 @@ function Landing({ onEnter, dark, onToggle, lang, onLangToggle }) {
             <div>
               <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:14}}>
                 <img src={LOGO_SRC} alt="EscaraPay" style={{height:28,objectFit:"contain"}} onError={e=>e.target.style.display="none"} />
-                <span style={{fontFamily:"'Syne',sans-serif",fontWeight:800,fontSize:16,color:"#fff"}}>EscaraPay</span>
+                <span style={{fontFamily:"'Outfit',sans-serif",fontWeight:800,fontSize:16,color:"#fff"}}>EscaraPay</span>
               </div>
-              <p style={{fontSize:12,color:"rgba(255,255,255,.5)",lineHeight:1.85,marginBottom:12}}>India's trusted escrow payment platform for WhatsApp & Instagram sellers.</p>
+              <p style={{fontSize:12,color:"rgba(255,255,255,.5)",lineHeight:1.85,marginBottom:12}}>India's trusted payment protection platform for WhatsApp & Instagram sellers.</p>
               <div style={{fontSize:11,color:"rgba(255,255,255,.35)"}}>CIN: Applied for Registration<br/>GST: Applied</div>
             </div>
             <div>
@@ -1819,7 +1813,7 @@ function Auth({ type, onLogin, onBack, dark, onToggle }) {
                 style={{flex:1,padding:"8px",border:"none",borderRadius:8,cursor:"pointer",
                   background:mode===m?"var(--gold)":"transparent",
                   color:mode===m?(dark?"#0a0a0f":"#fff"):"var(--muted)",
-                  fontFamily:"'Syne',sans-serif",fontWeight:600,fontSize:13,transition:"all .2s"}}>
+                  fontFamily:"'Outfit',sans-serif",fontWeight:600,fontSize:13,transition:"all .2s"}}>
                 {m==="login"?"Login":"Register"}
               </button>
             ))}
@@ -2086,7 +2080,7 @@ function SellerDB({ user, userId, onLogout, dark, onToggle }) {
               <button className="btn-gold" style={{fontSize:13,padding:"9px 16px"}} onClick={()=>setShowCreate(true)}>+ New Order</button>
             </div>
             <div className="g4" style={{marginBottom:18}}>
-              {[{label:"Total Orders",value:stats.total,icon:"📦",color:"var(--gold)"},{label:"Active Escrows",value:stats.active,icon:"🔐",color:"var(--blue)"},{label:"Token Earned",value:`₹${stats.earned}`,icon:"💰",color:"var(--green)"},{label:"RTO Saved",value:`₹${stats.saved}`,icon:"🛡️",color:"var(--accent)"}].map(s=>(
+              {[{label:"Total Orders",value:stats.total,icon:"📦",color:"var(--gold)"},{label:"Active Orders",value:stats.active,icon:"🔐",color:"var(--blue)"},{label:"Token Earned",value:`₹${stats.earned}`,icon:"💰",color:"var(--green)"},{label:"RTO Saved",value:`₹${stats.saved}`,icon:"🛡️",color:"var(--accent)"}].map(s=>(
                 <div key={s.label} className="stat-card">
                   <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start"}}>
                     <div><div style={{fontSize:11,color:"var(--muted)",marginBottom:6}}>{s.label}</div><div className="syne" style={{fontSize:22,fontWeight:800,color:s.color}}>{s.value}</div></div>
@@ -2189,7 +2183,7 @@ function SellerDB({ user, userId, onLogout, dark, onToggle }) {
               {[
                 {label:"Total Token Collected",value:`₹${orders.filter(o=>o.status!=="pending").reduce((a,o)=>a+(o.token_amount||0),0).toLocaleString()}`,icon:"💰",color:"var(--gold)"},
                 {label:"Earnings Released",value:`₹${orders.filter(o=>o.status==="delivered").reduce((a,o)=>a+(o.seller_receives||0),0).toLocaleString()}`,icon:"✅",color:"var(--green)"},
-                {label:"In Escrow (Hold)",value:`₹${orders.filter(o=>["token_paid","dispatched"].includes(o.status)).reduce((a,o)=>a+(o.seller_receives||0),0).toLocaleString()}`,icon:"🔐",color:"var(--blue)"},
+                {label:"In Hold",value:`₹${orders.filter(o=>["token_paid","dispatched"].includes(o.status)).reduce((a,o)=>a+(o.seller_receives||0),0).toLocaleString()}`,icon:"🔐",color:"var(--blue)"},
               ].map(s=>(
                 <div key={s.label} className="stat-card">
                   <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start"}}>
@@ -2281,7 +2275,7 @@ function SellerDB({ user, userId, onLogout, dark, onToggle }) {
           <div className="modal" onClick={e=>e.stopPropagation()}>
             {!createdLink ? (
               <>
-                <h3 className="syne" style={{fontWeight:800,fontSize:20,marginBottom:4}}>New Escrow Order</h3>
+                <h3 className="syne" style={{fontWeight:800,fontSize:20,marginBottom:4}}>New Protected Order</h3>
                 <p style={{color:"var(--muted)",fontSize:13,marginBottom:20}}>Buyer ke liye secure payment link banao</p>
                 <div style={{display:"flex",flexDirection:"column",gap:12}}>
                   <div><label className="label">Product Name *</label><input className="input" placeholder="Handmade Bag" value={newOrder.product} onChange={e=>setNewOrder({...newOrder,product:e.target.value})} /></div>
@@ -2497,7 +2491,7 @@ function BuyerDB({ user, userId, userPhone, onLogout, dark, onToggle }) {
                 </div>
                 <div className="g2" style={{marginBottom:14}}>
                   <div style={{background:"var(--sf2)",borderRadius:10,padding:12,textAlign:"center"}}><div style={{fontSize:11,color:"var(--muted)",marginBottom:2}}>Order Amount</div><div className="syne" style={{fontWeight:800,fontSize:20}}>₹{linkOrder.order_amount}</div></div>
-                  <div style={{background:"rgba(14,165,233,.15)",borderRadius:10,padding:12,textAlign:"center",border:"1px solid rgba(14,165,233,.3)"}}><div style={{fontSize:11,color:"var(--muted)",marginBottom:2}}>Token (Escrow)</div><div className="syne" style={{fontWeight:800,fontSize:20,color:"var(--gold)"}}>₹{linkOrder.token_amount}</div></div>
+                  <div style={{background:"rgba(14,165,233,.15)",borderRadius:10,padding:12,textAlign:"center",border:"1px solid rgba(14,165,233,.3)"}}><div style={{fontSize:11,color:"var(--muted)",marginBottom:2}}>Token (Protected)</div><div className="syne" style={{fontWeight:800,fontSize:20,color:"var(--gold)"}}>₹{linkOrder.token_amount}</div></div>
                 </div>
                 {linkOrder.status==="pending" ? (
                   <button className="btn-gold pulse" style={{width:"100%",padding:13,fontSize:15}} onClick={()=>handlePay(linkOrder)}>💳 Pay ₹{linkOrder.buyer_pays||linkOrder.token_amount} Token</button>
@@ -2545,7 +2539,7 @@ function BuyerDB({ user, userId, userPhone, onLogout, dark, onToggle }) {
           <div className="fu" style={{maxWidth:560}}>
             <h1 className="syne" style={{fontSize:"clamp(18px,3vw,24px)",fontWeight:800,marginBottom:22}}>Help & Safety</h1>
             {[
-              {q:"Create Deal aur Pay via Link mein kya fark hai?",a:"Pay via Link: Seller ne order banaya. Create Deal: Tum order banao, seller confirm kare. Dono mein escrow protection same!"},
+              {q:"Create Deal aur Pay via Link mein kya fark hai?",a:"Pay via Link: Seller ne order banaya. Create Deal: Tum order banao, seller confirm kare. Dono mein payment protection same!"},
               {q:"Token kab release hoga seller ko?",a:"Delivery confirm ke baad 7 din hold. Dispute nahi → auto-release."},
               {q:"Order nahi aaya?",a:"'View Details' → 'Dispute Raise Karo'. 24 ghante mein team investigate karegi."},
               {q:"Tracking kaise kare?",a:"Order card mein 'Track →' button click karo."},
@@ -2716,7 +2710,7 @@ function UserDetailModal({ user, adminKey, onClose, onUpdate }) {
         {/* Tabs */}
         <div style={{display:"flex",gap:4,marginBottom:16,background:"var(--sf2)",padding:4,borderRadius:10}}>
           {[["details","👤 Details"],["orders","📦 Orders"],["actions","⚙️ Actions"]].map(([id,label])=>(
-            <button key={id} onClick={()=>setTab(id)} style={{flex:1,padding:"7px",border:"none",borderRadius:8,cursor:"pointer",background:tab===id?"var(--gold)":"transparent",color:tab===id?"#fff":"var(--muted)",fontFamily:"'Syne',sans-serif",fontWeight:600,fontSize:12,transition:"all .2s"}}>{label}</button>
+            <button key={id} onClick={()=>setTab(id)} style={{flex:1,padding:"7px",border:"none",borderRadius:8,cursor:"pointer",background:tab===id?"var(--gold)":"transparent",color:tab===id?"#fff":"var(--muted)",fontFamily:"'Outfit',sans-serif",fontWeight:600,fontSize:12,transition:"all .2s"}}>{label}</button>
           ))}
         </div>
 
@@ -3030,7 +3024,7 @@ function AboutPage({ onBack, dark, onToggle, lang, onLangToggle }) {
           <img src={LOGO_SRC} alt="EscaraPay" style={{height:64,marginBottom:16,objectFit:"contain"}} onError={e=>e.target.style.display="none"} />
           <h1 className="syne" style={{fontWeight:800,fontSize:"clamp(28px,4vw,42px)",marginBottom:12}}>About <span className="shimmer">EscaraPay</span></h1>
           <p style={{color:"var(--muted)",fontSize:16,maxWidth:560,margin:"0 auto",lineHeight:1.8}}>
-            {L("India's first escrow payment platform specifically designed for WhatsApp & Instagram sellers","भारत का पहला एस्क्रो पेमेंट प्लेटफॉर्म, खासतौर पर व्हाट्सऐप और इंस्टाग्राम सेलर्स के लिए","India ka pehla escrow payment platform specifically designed for WhatsApp & Instagram sellers")}
+            {L("India's first payment protection platform specifically designed for WhatsApp & Instagram sellers","भारत का पहला पेमेंट प्रोटेक्शन प्लेटफॉर्म, खासतौर पर व्हाट्सऐप और इंस्टाग्राम सेलर्स के लिए","India ka pehla payment protection platform specifically designed for WhatsApp & Instagram sellers")}
           </p>
         </div>
 
@@ -3039,9 +3033,9 @@ function AboutPage({ onBack, dark, onToggle, lang, onLangToggle }) {
           <h2 className="syne" style={{fontWeight:800,fontSize:20,marginBottom:12}}>🎯 {L("Our Mission","हमारा मिशन","Hamara Mission")}</h2>
           <p style={{fontSize:14,color:"var(--muted)",lineHeight:1.9}}>
             {L(
-              "Millions of sellers do business on WhatsApp and Instagram in India — but they fear RTO losses and buyers fear fraud. EscaraPay solved this with a simple escrow system: token is locked first, released after delivery.",
+              "Millions of sellers do business on WhatsApp and Instagram in India — but they fear RTO losses and buyers fear fraud. EscaraPay solved this with a simple payment protection system: token is locked first, released after delivery.",
               "भारत में लाखों सेलर व्हाट्सऐप और इंस्टाग्राम पर बिजनेस करते हैं — लेकिन उन्हें RTO का डर रहता है और बायर को फ्रॉड का। एस्करापे ने यह समस्या एक सरल एस्क्रो सिस्टम से हल की।",
-              "India mein lakho sellers WhatsApp aur Instagram pe business karte hain — lekin unhe RTO ka darr rehta hai aur buyers ko fraud ka. EscaraPay ne yeh problem solve ki ek simple escrow system se: token pehle lock hota hai, delivery ke baad release hota hai."
+              "India mein lakho sellers WhatsApp aur Instagram pe business karte hain — lekin unhe RTO ka darr rehta hai aur buyers ko fraud ka. EscaraPay ne yeh problem solve ki ek simple payment protection system se: token pehle lock hota hai, delivery ke baad release hota hai."
             )}
           </p>
         </div>
@@ -3062,7 +3056,7 @@ function AboutPage({ onBack, dark, onToggle, lang, onLangToggle }) {
             <div style={{fontSize:28,marginBottom:10}}>✅</div>
             <h3 className="syne" style={{fontWeight:700,fontSize:15,marginBottom:8,color:"var(--green)"}}>{L("With EscaraPay","एस्करापे के साथ","EscaraPay ke Saath")}</h3>
             <div style={{fontSize:13,color:"var(--muted)",lineHeight:1.8}}>
-              ✅ {L("Token locked in escrow — neither party can cheat","टोकन एस्क्रो में — कोई धोखा नहीं","Token escrow mein lock — kisi ko nahi milta jab tak deal complete na ho")}<br/>
+              ✅ {L("Token safely held — neither party can cheat","टोकन एस्क्रो में — कोई धोखा नहीं","Token safely held — kisi ko nahi milta jab tak deal complete na ho")}<br/>
               ✅ {L("Buyer cancels? Token still goes to seller (RTO cover)","बायर कैंसिल करे? टोकन सेलर को (RTO कवर)","Seller cancel kare bhi toh token seller ko milta hai")}<br/>
               ✅ {L("Seller doesn't ship? Full refund to buyer","सेलर न भेजे? बायर को पूरा रिफंड","Seller ship na kare toh buyer ko full refund")}<br/>
               ✅ {L("Dispute system — 24 hour resolution","विवाद सिस्टम — 24 घंटे में समाधान","Dispute system — 24 ghante mein resolution")}
@@ -3080,9 +3074,9 @@ function AboutPage({ onBack, dark, onToggle, lang, onLangToggle }) {
                dh:"प्रोडक्ट नाम, राशि और टोकन प्रतिशत सेट करता है। न्यूनतम ₹200 टोकन।",
                dl:"Product name, amount aur token percentage set karta hai. Minimum ₹200 token auto calculate."},
               {n:"2",c:"var(--blue)", en:"Buyer Pays Token", hi:"बायर टोकन पेमेंट करता है", hl:"Buyer Token Pay Karta Hai",
-               de:"Pays via UPI/Card/NetBanking. Token locked in EscaraPay escrow.",
+               de:"Pays via UPI/Card/NetBanking. Token locked in EscaraPay protected vault.",
                dh:"UPI/कार्ड से भुगतान करता है। टोकन एस्क्रो में लॉक।",
-               dl:"Razorpay ke through UPI/Card/NetBanking se pay. Token EscaraPay escrow mein lock."},
+               dl:"Razorpay ke through UPI/Card/NetBanking se pay. Token EscaraPay protected vault mein lock."},
               {n:"3",c:"var(--accent)", en:"Seller Dispatches", hi:"सेलर भेजता है", hl:"Seller Dispatch Karta Hai",
                de:"Token secured → seller ships confidently with tracking ID.",
                dh:"टोकन सुरक्षित → सेलर निश्चिंत होकर ट्रैकिंग ID के साथ भेजता है।",
@@ -3107,7 +3101,7 @@ function AboutPage({ onBack, dark, onToggle, lang, onLangToggle }) {
         <div className="g3" style={{marginBottom:16}}>
           {[
             {icon:"🚀",en:"Startup Stage",hi:"स्टार्टअप स्टेज",hl:"Startup Stage",de:"Actively building & growing",dh:"सक्रिय रूप से बना रहे हैं",dl:"Actively building & growing"},
-            {icon:"🛡️",en:"Escrow Protected",hi:"एस्क्रो सुरक्षित",hl:"Escrow Protected",de:"100% secure token system",dh:"100% सुरक्षित टोकन सिस्टम",dl:"100% secure token system"},
+            {icon:"🛡️",en:"Payment Protected",hi:"पेमेंट प्रोटेक्टेड",hl:"Payment Protected",de:"100% secure token system",dh:"100% सुरक्षित टोकन सिस्टम",dl:"100% secure token system"},
             {icon:"⚡",en:"Instant Setup",hi:"तुरंत शुरू",hl:"Instant Setup",de:"Ready in 5 minutes",dh:"5 मिनट में तैयार",dl:"5 minute mein start karo"},
           ].map(s=>(
             <div key={s.en} className="card" style={{textAlign:"center"}}>
@@ -3225,7 +3219,7 @@ function RefundPage({ onBack, dark, onToggle }) {
 
         <div style={{background:"rgba(5,150,105,.08)",border:"1px solid rgba(5,150,105,.3)",borderRadius:14,padding:20,marginBottom:24}}>
           <div style={{fontWeight:700,fontSize:15,color:"var(--green)",marginBottom:8}}>✅ Our Refund Promise</div>
-          <p style={{fontSize:13,color:"var(--muted)",lineHeight:1.8}}>EscaraPay is an escrow-based platform. We hold payments in trust and release them only when delivery is confirmed. If delivery does not happen, your money comes back. Simple.</p>
+          <p style={{fontSize:13,color:"var(--muted)",lineHeight:1.8}}>EscaraPay is a payment protection platform. We hold your payment securely and release it only after delivery is confirmed. If delivery does not happen, your money comes back. Simple.</p>
         </div>
 
         {[
@@ -3252,7 +3246,7 @@ function RefundPage({ onBack, dark, onToggle }) {
             {head:"Step 4 — Contact Support",body:"For any refund queries: support@escarapay.in | Response time: within 24 hours."},
           ]},
           {t:"5. EscaraPay's Role",icon:"🛡️",color:"var(--muted)",sections:[
-            {head:"Facilitator Only",body:"EscaraPay is a payment escrow facilitator. We do not manufacture, sell, or ship any products. We are responsible only for holding and releasing the escrow amount as per our policy."},
+            {head:"Facilitator Only",body:"EscaraPay is a payment protection facilitator. We do not manufacture, sell, or ship any products. We are responsible only for holding and releasing the protected token amount as per our policy."},
             {head:"Payments via Razorpay",body:"All payments are processed through Razorpay, an RBI-authorized payment aggregator. EscaraPay does not directly hold or process payment card data."},
           ]},
         ].map(section=>(
@@ -3303,7 +3297,7 @@ function DisputePage({ onBack, dark, onToggle }) {
           <h2 className="syne" style={{fontWeight:700,fontSize:16,marginBottom:16}}>📋 Dispute Process Step by Step</h2>
           {[
             {n:"1",c:"var(--gold)",   t:"Raise Dispute",       d:"Open your order → Click 'Dispute Raise Karo' → Select reason → Add any evidence (photos, screenshots). Must be raised within 48 hours of expected delivery."},
-            {n:"2",c:"var(--blue)",   t:"Notification",         d:"Both buyer and seller are notified immediately. The escrow token is frozen — no one can access it during investigation."},
+            {n:"2",c:"var(--blue)",   t:"Notification",         d:"Both buyer and seller are notified immediately. The protected token is frozen — no one can access it during investigation."},
             {n:"3",c:"var(--accent)", t:"Evidence Collection",  d:"Both parties must submit evidence within 24 hours: photos of item received, tracking screenshots, chat screenshots, any proof of delivery or non-delivery."},
             {n:"4",c:"var(--red)",    t:"Investigation",        d:"EscaraPay's dispute team reviews all evidence. We may contact courier partners for tracking verification. Investigation completes within 24 business hours."},
             {n:"5",c:"var(--green)",  t:"Decision & Release",   d:"EscaraPay makes a final, binding decision. Token is released to the winning party within 2 business days. Both parties are notified via email."},
@@ -3319,7 +3313,7 @@ function DisputePage({ onBack, dark, onToggle }) {
           {t:"1. Eligibility to Raise Dispute",icon:"⏰",color:"var(--gold)",c:"A dispute can only be raised within 48 hours of the expected delivery date. After 48 hours, the token automatically releases to the seller. Disputes raised after this window will not be considered. Emergency cases (e.g., seller fraud) may be escalated to legal@escarapay.in."},
           {t:"2. Valid Grounds for Dispute",icon:"📋",color:"var(--blue)",c:"Valid reasons include: Item not received despite tracking showing delivered, Wrong item received (different from description), Item received in damaged condition, Counterfeit or fake product received, Seller has not dispatched within agreed time. Invalid reasons: Change of mind, Item meets description but buyer doesn't like it, Buyer provided wrong delivery address."},
           {t:"3. Evidence Requirements",icon:"📸",color:"var(--accent)",c:"Buyers must provide: Photos/video of the item received (or proof of non-receipt), Screenshot of tracking showing non-delivery or wrong delivery, Original order confirmation from EscaraPay. Sellers must provide: Proof of dispatch (courier receipt, tracking ID), Photos of item packed and shipped, Any communication with buyer confirming order details."},
-          {t:"4. EscaraPay's Decision — Final & Binding",icon:"⚖️",color:"var(--red)",c:"EscaraPay's dispute team makes the final decision based on evidence. This decision is binding on both parties and cannot be appealed within the platform. Possible outcomes: (a) Full refund to buyer, (b) Full token release to seller, (c) Partial resolution at EscaraPay's discretion. EscaraPay acts as a neutral facilitator — we are not liable for product quality, authenticity, or any loss beyond the escrowed token amount."},
+          {t:"4. EscaraPay's Decision — Final & Binding",icon:"⚖️",color:"var(--red)",c:"EscaraPay's dispute team makes the final decision based on evidence. This decision is binding on both parties and cannot be appealed within the platform. Possible outcomes: (a) Full refund to buyer, (b) Full token release to seller, (c) Partial resolution at EscaraPay's discretion. EscaraPay acts as a neutral facilitator — we are not liable for product quality, authenticity, or any loss beyond the protected token amount."},
           {t:"5. Escalation",icon:"📞",color:"var(--muted)",c:"If you believe the decision was unfair due to procedural error, you may escalate within 7 days by emailing legal@escarapay.in with: Your Order ID, Evidence not previously submitted, Reason for escalation. Escalated cases are reviewed by senior team within 7 business days. EscaraPay's escalation decision is final."},
           {t:"6. Anti-Abuse Policy",icon:"🚫",color:"var(--red)",c:"Repeated false disputes, submission of fake evidence, or attempts to manipulate the dispute process will result in: Immediate account suspension, Permanent ban from the platform, Reporting to relevant law enforcement under IPC Section 420 (Cheating) and IT Act 2000. EscaraPay reserves the right to charge a dispute processing fee of ₹99 for disputes found to be frivolous."},
           {t:"7. Governing Law",icon:"🇮🇳",color:"var(--green)",c:"All disputes and their resolution are subject to Indian law. In case of legal proceedings, jurisdiction lies exclusively with courts in Uttar Pradesh, India. Users agree to resolve disputes through EscaraPay's internal process before approaching courts."},
@@ -3355,8 +3349,8 @@ function PrivacyPage({ onBack, dark, onToggle }) {
         </div>
         {[
           {t:"1. Information We Collect", c:"EscaraPay collects the following when you register or transact: Full name, email address, phone number (10 digits), PAN card or GST number (sellers only, for KYC), UPI ID (optional, for payouts), transaction history and order details, device information and IP address for security and fraud prevention."},
-          {t:"2. How We Use Your Information", c:"Your data is used strictly to: process and manage escrow transactions securely, verify identity to prevent fraud and unauthorized access, send transaction notifications, alerts, and OTPs, resolve disputes between buyers and sellers, comply with Indian financial regulations (IT Act 2000, PMLA 2002, RBI guidelines), improve platform performance and user experience."},
-          {t:"3. Payment Data & Razorpay", c:"EscaraPay uses Razorpay as our payment gateway — an RBI-authorized and PCI-DSS Level 1 certified payment aggregator. EscaraPay does NOT store card numbers, CVV, or banking credentials. Token amounts are held in trust/escrow accounts. All transactions are encrypted using 256-bit SSL/TLS."},
+          {t:"2. How We Use Your Information", c:"Your data is used strictly to: process and manage protected payment transactions securely, verify identity to prevent fraud and unauthorized access, send transaction notifications, alerts, and OTPs, resolve disputes between buyers and sellers, comply with Indian financial regulations (IT Act 2000, PMLA 2002, RBI guidelines), improve platform performance and user experience."},
+          {t:"3. Payment Data & Razorpay", c:"EscaraPay uses Razorpay as our payment gateway — an RBI-authorized and PCI-DSS Level 1 certified payment aggregator. EscaraPay does NOT store card numbers, CVV, or banking credentials. Token amounts are held in secure trust accounts. All transactions are encrypted using 256-bit SSL/TLS."},
           {t:"4. KYC & Seller Data", c:"Sellers must provide PAN Card or GST Number for KYC as required by Indian financial laws. This data is encrypted at rest (AES-256), accessible only by authorized compliance personnel, never shared for marketing, and retained for 7 years as per PMLA 2002 requirements."},
           {t:"5. Data Sharing", c:"We do NOT sell, rent, or trade your personal data. Data is shared only with: Razorpay (payment processing), law enforcement agencies when legally required by Indian courts or regulators, dispute resolution partners during fraud investigations. We notify you where legally permissible before sharing."},
           {t:"6. Data Security", c:"Our security measures include: SSL/TLS encryption in transit, AES-256 encryption at rest, strict role-based access controls, regular third-party security audits, industry-standard password hashing (bcrypt). However, no method of internet transmission is 100% secure."},
@@ -3424,7 +3418,7 @@ function TermsPage({ onBack, dark, onToggle }) {
           {t:"6. Prohibited Activities", c:"Users may not use EscaraPay for: sale of illegal, counterfeit, or prohibited goods, fraudulent transactions or identity theft, money laundering or financial fraud, creating multiple accounts to abuse the platform, harassment or threatening other users. Violations result in immediate account suspension, fund freeze, and may be reported to law enforcement under IT Act 2000 and IPC."},
           {t:"7. Seller Responsibilities", c:"Sellers must: accurately describe products and their condition, ship within the timeframe mentioned during order creation, provide valid tracking information after dispatch, respond to buyer queries within 24 hours, honor the deal terms agreed upon during order creation. Failure to meet these responsibilities may result in token refund to buyer and account suspension."},
           {t:"8. Buyer Responsibilities", c:"Buyers must: provide accurate delivery address and contact information, respond to delivery confirmation requests within 48 hours, raise disputes only for genuine reasons with evidence, not attempt chargebacks through their bank while EscaraPay dispute is active. False chargeback attempts will result in immediate account suspension."},
-          {t:"9. Limitation of Liability", c:"EscaraPay's liability is strictly limited to the token amount held in escrow for that specific transaction. We are not liable for: quality, safety, or legality of products exchanged, indirect or consequential damages, losses due to network failures or payment gateway downtime, disputes arising from incorrect information provided by either party."},
+          {t:"9. Limitation of Liability", c:"EscaraPay's liability is strictly limited to the token amount held in safe pay protection for that specific transaction. We are not liable for: quality, safety, or legality of products exchanged, indirect or consequential damages, losses due to network failures or payment gateway downtime, disputes arising from incorrect information provided by either party."},
           {t:"10. Governing Law & Jurisdiction", c:"These Terms are governed by the laws of India. All disputes arising from use of EscaraPay are subject to the exclusive jurisdiction of courts in Uttar Pradesh, India. EscaraPay (India) is a facilitator only — not a party to any transaction between buyers and sellers. These terms comply with: Information Technology Act 2000, Payment and Settlement Systems Act 2007, Prevention of Money Laundering Act 2002, Consumer Protection Act 2019, and applicable RBI guidelines on payment aggregators."},
           {t:"11. Contact for Legal Matters", c:"Legal queries: legal@escarapay.in | Dispute escalation: disputes@escarapay.in | General support: support@escarapay.in"},
         ].map(s=>(
@@ -3521,6 +3515,10 @@ export default function App() {
   const [adminKey, setAdminKey] = useState(()=> localStorage.getItem("adminKey") || "");
 
   useEffect(()=>{ window._goToPage=(s)=>setScreen(s); },[]);
+  useEffect(()=>{
+    // SEO: Update page title
+    document.title = "Escara Pay | India's Trusted Payment Protection Platform";
+  },[]);
   useEffect(()=>{
     const path=window.location.pathname;
     const pm=path.match(/^\/pay\/([A-Z0-9]+)$/); if(pm){setPayOrderId(pm[1]);setScreen("pay");return;}
