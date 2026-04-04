@@ -319,11 +319,11 @@ function getStyle(dark) {
 
 const MIN_TOKEN = 200;
 const calcToken = (amount, pct) => Math.max(MIN_TOKEN, Math.round(Number(amount)*Number(pct)/100));
-const BASE_URL = process.env.REACT_APP_FRONTEND_URL || "https://escara-pay.vercel.app";
+const BASE_URL = process.env.REACT_APP_FRONTEND_URL || "https://escarapay.in";
 
 const STATUS_META = {
   pending:                { label:"Awaiting Token",       cls:"bm",     icon:"⏳" },
-  pending_seller_confirm: { label:"Seller Confirm Karo",  cls:"borange", icon:"🤝" },
+  pending_seller_confirm: { label:"Awaiting Seller Confirm",  cls:"borange", icon:"🤝" },
   token_paid:             { label:"Token Paid",           cls:"bo",     icon:"🔐" },
   dispatched:             { label:"Dispatched",           cls:"bb",     icon:"📦" },
   delivered:              { label:"Delivered",            cls:"bg",     icon:"✅" },
@@ -445,7 +445,7 @@ function PayPage({ orderId, dark, onToggle, onGoHome }) {
       <div style={{display:"flex",alignItems:"center",justifyContent:"center",minHeight:"calc(100vh - 62px)",padding:20}}>
         <div style={{width:"100%",maxWidth:460}}>
           {loading && <div className="card" style={{textAlign:"center",padding:50}}><div style={{width:44,height:44,border:"3px solid var(--gold)",borderTopColor:"transparent",borderRadius:"50%",animation:"spin .8s linear infinite",margin:"0 auto 16px"}} /><div style={{color:"var(--muted)"}}>Order load ho raha hai...</div></div>}
-          {error && <div className="card" style={{textAlign:"center",padding:40}}><div style={{fontSize:40,marginBottom:12}}>❌</div><div className="syne" style={{fontWeight:800,fontSize:18,marginBottom:8}}>Order Nahi Mila</div><div style={{color:"var(--muted)",fontSize:13,marginBottom:20}}>{error}</div><button className="btn-ghost" onClick={onGoHome}>← Home</button></div>}
+          {error && <div className="card" style={{textAlign:"center",padding:40}}><div style={{fontSize:40,marginBottom:12}}>❌</div><div className="syne" style={{fontWeight:800,fontSize:18,marginBottom:8}}>No Order Found</div><div style={{color:"var(--muted)",fontSize:13,marginBottom:20}}>{error}</div><button className="btn-ghost" onClick={onGoHome}>← Home</button></div>}
           {payStep===3 && <div className="card fu" style={{textAlign:"center",padding:40}}><div style={{fontSize:60,marginBottom:16}}>🎉</div><div className="syne" style={{fontWeight:800,fontSize:24,color:"var(--green)",marginBottom:8}}>Token Secured!</div><div style={{color:"var(--muted)",fontSize:14,marginBottom:20}}>₹{order?.token_amount} protection vault mein secure ho gaya</div><div style={{background:"rgba(14,165,233,.1)",border:"1px solid rgba(14,165,233,.2)",borderRadius:12,padding:14,marginBottom:16}}><div style={{fontSize:11,color:"var(--muted)",marginBottom:4}}>Order ID save karo:</div><div style={{fontFamily:"monospace",fontWeight:700,color:"var(--gold)",fontSize:16}}>{order?.id}</div></div><button className="btn-ghost" onClick={onGoHome}>← Home pe Jao</button></div>}
           {payStep===2 && <div className="card" style={{textAlign:"center",padding:50}}><div style={{width:44,height:44,border:"3px solid var(--green)",borderTopColor:"transparent",borderRadius:"50%",animation:"spin .8s linear infinite",margin:"0 auto 16px"}} /><div className="syne" style={{fontWeight:700,fontSize:16}}>Payment Verify ho rahi hai...</div></div>}
           {payStep===1 && <div className="card" style={{textAlign:"center",padding:50}}><div style={{width:44,height:44,border:"3px solid var(--gold)",borderTopColor:"transparent",borderRadius:"50%",animation:"spin .8s linear infinite",margin:"0 auto 16px"}} /><div className="syne" style={{fontWeight:700,fontSize:16}}>Payment Gateway Load ho raha hai...</div></div>}
@@ -497,7 +497,7 @@ function PayPage({ orderId, dark, onToggle, onGoHome }) {
                 </div>
                 {payError && <div style={{background:"rgba(239,68,68,.1)",border:"1px solid rgba(239,68,68,.3)",borderRadius:10,padding:12,marginBottom:12,fontSize:13,color:"var(--red)"}}>❌ {payError}</div>}
                 <button className="btn-gold pulse" style={{width:"100%",padding:"16px",fontSize:16,borderRadius:12,marginBottom:12}} onClick={handlePay}>
-                  💳 ₹{order.buyer_pays||order.token_amount} Token Pay Karo
+                  💳 Pay ₹{order.buyer_pays||order.token_amount} Token
                 </button>
                 <div style={{textAlign:"center",fontSize:12,color:"var(--muted)"}}>🔒 Secured by Razorpay • UPI, Cards, NetBanking</div>
               </div>
@@ -570,19 +570,19 @@ function OrderModal({ order, isSeller, onClose, onDispatch, onConfirmDelivery, o
           <div style={{marginBottom:12}}>
             <label className="label">Courier Tracking Number *</label>
             <input className="input" placeholder="DTDC123456 / BLUEDART789" value={tracking} onChange={e=>setTracking(e.target.value)} style={{marginBottom:8}} />
-            <button className="btn-gold" style={{width:"100%"}} onClick={async()=>{ if(!tracking){setMsg("❌ Tracking number daalo!"); return;} setLoading(true); const r=await dispatchOrder(order.id,tracking); setLoading(false); if(r.success){onDispatch(order.id,tracking);setMsg("✅ Dispatched!");}else setMsg("❌ "+r.error); }} disabled={loading}>{loading?"⏳...":"📦 Mark as Dispatched"}</button>
+            <button className="btn-gold" style={{width:"100%"}} onClick={async()=>{ if(!tracking){setMsg("❌ Please enter a tracking number!"); return;} setLoading(true); const r=await dispatchOrder(order.id,tracking); setLoading(false); if(r.success){onDispatch(order.id,tracking);setMsg("✅ Dispatched!");}else setMsg("❌ "+r.error); }} disabled={loading}>{loading?"⏳...":"📦 Mark as Dispatched"}</button>
           </div>
         )}
         {!isSeller && order.status==="dispatched" && (
-          <button className="btn-green" style={{width:"100%",padding:"11px",marginBottom:10}} onClick={async()=>{ setLoading(true); const r=await confirmDelivery(order.id); setLoading(false); if(r.success){onConfirmDelivery(order.id);onClose();}else setMsg("❌ "+r.error); }} disabled={loading}>{loading?"⏳...":"✅ Order Mila — Confirm Karo"}</button>
+          <button className="btn-green" style={{width:"100%",padding:"11px",marginBottom:10}} onClick={async()=>{ setLoading(true); const r=await confirmDelivery(order.id); setLoading(false); if(r.success){onConfirmDelivery(order.id);onClose();}else setMsg("❌ "+r.error); }} disabled={loading}>{loading?"⏳...":"✅ Confirm Delivery Received"}</button>
         )}
         {["token_paid","dispatched"].includes(order.status) && !showDisputeForm && (
-          <button className="btn-ghost" style={{width:"100%",marginBottom:8,color:"var(--red)",borderColor:"rgba(239,68,68,.3)"}} onClick={()=>setShowDisputeForm(true)}>⚠️ Dispute Raise Karo</button>
+          <button className="btn-ghost" style={{width:"100%",marginBottom:8,color:"var(--red)",borderColor:"rgba(239,68,68,.3)"}} onClick={()=>setShowDisputeForm(true)}>⚠️ Raise a Dispute</button>
         )}
         {showDisputeForm && (
           <div style={{background:"rgba(239,68,68,.08)",border:"1px solid rgba(239,68,68,.2)",borderRadius:10,padding:12,marginBottom:12}}>
             <select className="select" value={disputeReason} onChange={e=>setDisputeReason(e.target.value)} style={{marginBottom:10}}>
-              <option value="">-- Reason Select Karo --</option>
+              <option value="">-- Select a Reason --</option>
               {isSeller?(<><option value="Buyer not responding">Buyer respond nahi kar raha</option><option value="False claim">Buyer galat bol raha hai</option></>)
                :(<><option value="Item not received">Item nahi mila</option><option value="Wrong item">Galat item mila</option><option value="Damaged">Damaged mila</option><option value="Seller not responding">Seller respond nahi kar raha</option></>)}
             </select>
@@ -658,7 +658,7 @@ function useCountUp(target, duration = 1800, started = false) {
 }
 
 /* ══════════ LANDING ══════════ */
-function Landing({ onEnter, dark, onToggle, lang, onLangToggle }) {
+function Landing({ onEnter, onTrack, dark, onToggle, lang, onLangToggle }) {
   const t = T[lang] || T.hl;
   const [statsStarted, setStatsStarted] = useState(false);
   const [openFaq, setOpenFaq] = useState(null);
@@ -835,6 +835,9 @@ function Landing({ onEnter, dark, onToggle, lang, onLangToggle }) {
         <div style={{display:"flex",gap:5,alignItems:"center",flexShrink:0}}>
           <LangToggle lang={lang} onToggle={onLangToggle} />
           <ThemeToggle dark={dark} onToggle={onToggle} />
+          <button className="btn-ghost" style={{padding:"7px 10px",fontSize:12,whiteSpace:"nowrap",color:"var(--muted)"}} onClick={onTrack}>
+            📦 <span className="hide-m">Track</span>
+          </button>
           <button className="btn-ghost" style={{padding:"7px 10px",fontSize:12,whiteSpace:"nowrap"}} onClick={()=>onEnter("buyer")}>
             <span className="hide-m">🛍️ </span>{lc.ctaBuyer}
           </button>
@@ -1614,8 +1617,8 @@ function ProfileModal({ user, userId, userType, onClose, onUpdate }) {
 
   const validate = () => {
     const e = {};
-    if (!form.name.trim()) e.name = "Naam zaroori hai";
-    if (form.email && !validateEmail(form.email)) e.email = "Valid email daalo";
+    if (!form.name.trim()) e.name = "Name is required";
+    if (form.email && !validateEmail(form.email)) e.email = "Enter a valid email";
     if (form.phone && !validatePhone(form.phone)) e.phone = "Phone 10 digits ka hona chahiye";
     if (form.newPass && !validatePass(form.newPass)) e.newPass = "Min 6 chars, 1 capital, 1 small, 1 number, 1 special (!@#$)";
     return e;
@@ -1707,16 +1710,16 @@ function Auth({ type, onLogin, onBack, dark, onToggle }) {
   const validate = () => {
     const e = {};
     if (mode === "register") {
-      if (!form.name.trim()) e.name = "Naam zaroori hai";
-      if (!validateEmail(form.email)) e.email = "Valid email daalo (example@gmail.com)";
-      if (!validatePhone(form.phone)) e.phone = "Sirf 10 digits — koi alphabet nahi";
+      if (!form.name.trim()) e.name = "Name is required";
+      if (!validateEmail(form.email)) e.email = "Enter a valid email (e.g. example@gmail.com)";
+      if (!validatePhone(form.phone)) e.phone = "Enter a valid 10-digit phone number";
       if (!validatePass(form.password)) e.password = "Min 6 chars, 1 capital, 1 small, 1 number, 1 special char (!@#$%)";
       if (type === "seller" && form.pan && !validatePAN(form.pan)) e.pan = "PAN format: ABCDE1234F";
-      if (type === "seller" && form.gst && !validateGST(form.gst)) e.gst = "GST 15 characters ka hona chahiye";
-      if (type === "seller" && !form.pan && !form.gst) e.pan = "PAN ya GST mein se ek zaroori hai";
+      if (type === "seller" && form.gst && !validateGST(form.gst)) e.gst = "GST number must be 15 characters";
+      if (type === "seller" && !form.pan && !form.gst) e.pan = "Either PAN or GST number is required";
     } else {
-      if (!validateEmail(form.email)) e.email = "Valid email daalo";
-      if (loginMethod === "password" && !form.password) e.password = "Password daalo";
+      if (!validateEmail(form.email)) e.email = "Enter a valid email";
+      if (loginMethod === "password" && !form.password) e.password = "Please enter your password";
     }
     return e;
   };
@@ -1728,7 +1731,7 @@ function Auth({ type, onLogin, onBack, dark, onToggle }) {
     if (Object.keys(e).length > 0) return;
     // Registration requires email verification
     if (mode === "register" && !regOtpVerified) {
-      alert("❌ Pehle email verify karo! Neeche 'Email Verify Karo' button click karo.");
+      alert("❌ Please verify your email first using the button below.");
       return;
     }
     setLoading(true);
@@ -1744,8 +1747,8 @@ function Auth({ type, onLogin, onBack, dark, onToggle }) {
 
   // Send Register OTP
   const handleSendRegisterOTP = async () => {
-    if (!validateEmail(form.email)) { setErrors({...errors, email:"Valid email daalo"}); return; }
-    if (!form.name.trim()) { setErrors({...errors, name:"Pehle naam daalo"}); return; }
+    if (!validateEmail(form.email)) { setErrors({...errors, email:"Enter a valid email"}); return; }
+    if (!form.name.trim()) { setErrors({...errors, name:"Please enter your name first"}); return; }
     setLoading(true); setRegOtpMsg("");
     const r = await sendRegisterOTP(form.email, form.name);
     setLoading(false);
@@ -1755,7 +1758,7 @@ function Auth({ type, onLogin, onBack, dark, onToggle }) {
 
   // Verify Register OTP
   const handleVerifyRegisterOTP = async () => {
-    if (!regOtp || regOtp.length !== 6) { setRegOtpMsg("❌ 6-digit OTP daalo"); return; }
+    if (!regOtp || regOtp.length !== 6) { setRegOtpMsg("❌ Please enter the 6-digit OTP"); return; }
     setLoading(true); setRegOtpMsg("");
     const r = await verifyRegisterOTP(form.email, regOtp);
     setLoading(false);
@@ -1765,7 +1768,7 @@ function Auth({ type, onLogin, onBack, dark, onToggle }) {
 
   // Send OTP
   const handleSendOTP = async () => {
-    if (!validateEmail(form.email)) { setErrors({email:"Valid email daalo"}); return; }
+    if (!validateEmail(form.email)) { setErrors({email:"Enter a valid email"}); return; }
     setLoading(true); setOtpMsg("");
     const r = await sendOTP(form.email, type);
     setLoading(false);
@@ -1780,7 +1783,7 @@ function Auth({ type, onLogin, onBack, dark, onToggle }) {
 
   // Verify OTP
   const handleVerifyOTP = async () => {
-    if (!otp || otp.length !== 6) { setOtpMsg("❌ 6-digit OTP daalo"); return; }
+    if (!otp || otp.length !== 6) { setOtpMsg("❌ Please enter the 6-digit OTP"); return; }
     setLoading(true); setOtpMsg("");
     const r = await verifyOTP(form.email, type, otp);
     setLoading(false);
@@ -1802,7 +1805,7 @@ function Auth({ type, onLogin, onBack, dark, onToggle }) {
           <div style={{textAlign:"center",marginBottom:22}}>
             <img src={LOGO_SRC} alt="EscaraPay" style={{height:52,marginBottom:12,objectFit:"contain"}} onError={e=>e.target.style.display="none"} />
             <h2 className="syne" style={{fontWeight:800,fontSize:21,marginBottom:4}}>
-              {mode==="login"?"Welcome Back!":`${type==="seller"?"Seller":"Buyer"} Register Karo`}
+              {mode==="login"?"Welcome Back!":`${type==="seller"?"Seller":"Buyer"} Registration`}
             </h2>
           </div>
 
@@ -1863,14 +1866,14 @@ function Auth({ type, onLogin, onBack, dark, onToggle }) {
             {mode==="register" && (
               <div style={{background: regOtpVerified?"rgba(5,150,105,.08)":"rgba(14,165,233,.06)", border:`1px solid ${regOtpVerified?"rgba(5,150,105,.3)":"rgba(14,165,233,.2)"}`, borderRadius:10, padding:12}}>
                 <div style={{fontSize:12,fontWeight:600,marginBottom:8,color:regOtpVerified?"var(--green)":"var(--gold)"}}>
-                  {regOtpVerified ? "✅ Email Verified!" : "📧 Email Verify Karo (Zaroori)"}
+                  {regOtpVerified ? "✅ Email Verified!" : "📧 Verify Your Email (Required)"}
                 </div>
                 {!regOtpVerified && (
                   <>
                     {!regOtpSent ? (
                       <button className="btn-ghost" style={{width:"100%",fontSize:13,color:"var(--gold)",borderColor:"rgba(14,165,233,.3)"}}
                         onClick={handleSendRegisterOTP} disabled={loading}>
-                        {loading?"⏳ OTP bhej raha hai...":"📧 Verification OTP Bhejo"}
+                        {loading?"⏳ Sending OTP...":"📧 Send Verification OTP"}
                       </button>
                     ) : (
                       <div style={{display:"flex",flexDirection:"column",gap:8}}>
@@ -1879,7 +1882,7 @@ function Auth({ type, onLogin, onBack, dark, onToggle }) {
                           style={{fontSize:20,letterSpacing:6,textAlign:"center",fontWeight:700}} />
                         <button className="btn-ghost" style={{width:"100%",fontSize:13,color:"var(--green)",borderColor:"rgba(5,150,105,.3)"}}
                           onClick={handleVerifyRegisterOTP} disabled={loading}>
-                          {loading?"⏳ Verify ho raha hai...":"✅ OTP Verify Karo"}
+                          {loading?"⏳ Verifying...":"✅ Verify OTP"}
                         </button>
                         <div style={{textAlign:"center"}}>
                           {otpTimer > 0
@@ -1918,7 +1921,7 @@ function Auth({ type, onLogin, onBack, dark, onToggle }) {
             {/* KYC for seller register */}
             {mode==="register"&&type==="seller" && (
               <div style={{background:"rgba(14,165,233,.08)",border:"1px solid rgba(14,165,233,.2)",borderRadius:10,padding:12}}>
-                <div style={{fontSize:12,fontWeight:600,marginBottom:8,color:"var(--gold)"}}>📋 KYC (Dono mein se ek zaroori)</div>
+                <div style={{fontSize:12,fontWeight:600,marginBottom:8,color:"var(--gold)"}}>📋 KYC Details (At least one required)</div>
                 <div>
                   <label className="label">PAN Card (ABCDE1234F)</label>
                   <input className="input" placeholder="ABCDE1234F" value={form.pan} maxLength={10}
@@ -1940,12 +1943,12 @@ function Auth({ type, onLogin, onBack, dark, onToggle }) {
               <div>
                 {!otpSent ? (
                   <button className="btn-gold" style={{width:"100%",padding:12}} onClick={handleSendOTP} disabled={loading}>
-                    {loading?"⏳ OTP bhej raha hai...":"📧 OTP Bhejo Mere Email Pe"}
+                    {loading?"⏳ Sending OTP...":"📧 Send OTP to My Email"}
                   </button>
                 ) : (
                   <div style={{display:"flex",flexDirection:"column",gap:10}}>
                     <div style={{background:"rgba(5,150,105,.08)",border:"1px solid rgba(5,150,105,.3)",borderRadius:10,padding:12,fontSize:13,color:"var(--green)"}}>
-                      ✅ OTP bheja gaya — <strong>{form.email}</strong> check karo!
+                      ✅ OTP sent to <strong>{form.email}</strong> — please check your inbox!
                     </div>
                     <div>
                       <label className="label">6-Digit OTP *</label>
@@ -1955,7 +1958,7 @@ function Auth({ type, onLogin, onBack, dark, onToggle }) {
                         onKeyDown={e=>e.key==="Enter"&&handleVerifyOTP()} />
                     </div>
                     <button className="btn-gold" style={{width:"100%",padding:12}} onClick={handleVerifyOTP} disabled={loading}>
-                      {loading?"⏳ Verify ho raha hai...":"✅ OTP Verify Karo & Login"}
+                      {loading?"⏳ Verifying...":"✅ Verify OTP & Login"}
                     </button>
                     <div style={{textAlign:"center"}}>
                       {otpTimer > 0 ? (
@@ -1974,7 +1977,7 @@ function Auth({ type, onLogin, onBack, dark, onToggle }) {
             {/* Password login button */}
             {(mode==="register" || loginMethod==="password") && (
               <button className="btn-gold" style={{width:"100%",padding:12}} onClick={handle} disabled={loading}>
-                {loading?"⏳ Processing...":mode==="login"?"Login Karo":"Account Banao"}
+                {loading?"⏳ Processing...":mode==="login"?"Login":"Create Account"}
               </button>
             )}
 
@@ -2033,14 +2036,14 @@ function SellerDB({ user, userId, onLogout, dark, onToggle }) {
     else alert("❌ "+r.error);
   };
 
-  const copyLink = (orderId) => { navigator.clipboard?.writeText(`${BASE_URL}/pay/${orderId}`); setToast("Link copied! WhatsApp pe bhejo 🚀"); };
+  const copyLink = (orderId) => { navigator.clipboard?.writeText(`${BASE_URL}/pay/${orderId}`); setToast("Link copied! Share on WhatsApp 🚀"); };
   const shareWhatsApp = (orderId, productName, tokenAmount) => {
     const link = `${BASE_URL}/pay/${orderId}`;
     const msg = `🛡️ *EscaraPay Secure Payment*\n\nProduct: ${productName}\nToken Amount: ₹${tokenAmount}\n\nSecure link se pay karo:\n${link}\n\n_Powered by EscaraPay_`;
     window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, "_blank");
   };
 
-  const nav = [{id:"dashboard",icon:"📊",label:"Dashboard"},{id:"orders",icon:"📦",label:"Orders"},{id:"analytics",icon:"📈",label:"Analytics"},{id:"payments",icon:"💰",label:"Payments"},{id:"settings",icon:"⚙️",label:"Settings"}];
+  const nav = [{id:"dashboard",icon:"📊",label:"Dashboard"},{id:"orders",icon:"📦",label:"Orders"},{id:"analytics",icon:"📈",label:"Analytics"},{id:"payments",icon:"💰",label:"Payments"},{id:"payouts",icon:"🏦",label:"Payouts"},{id:"settings",icon:"⚙️",label:"Settings"}];
 
   return (
     <div style={{minHeight:"100vh"}}>
@@ -2076,7 +2079,7 @@ function SellerDB({ user, userId, onLogout, dark, onToggle }) {
         {page==="dashboard" && (
           <div className="fu">
             <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:22,flexWrap:"wrap",gap:10}}>
-              <div><h1 className="syne" style={{fontSize:"clamp(18px,3vw,26px)",fontWeight:800}}>Namaste, {user}! 👋</h1><p style={{color:"var(--muted)",marginTop:3,fontSize:13}}>Aaj ka overview</p></div>
+              <div><h1 className="syne" style={{fontSize:"clamp(18px,3vw,26px)",fontWeight:800}}>Welcome back, {user}! 👋</h1><p style={{color:"var(--muted)",marginTop:3,fontSize:13}}>Today's overview</p></div>
               <button className="btn-gold" style={{fontSize:13,padding:"9px 16px"}} onClick={()=>setShowCreate(true)}>+ New Order</button>
             </div>
             <div className="g4" style={{marginBottom:18}}>
@@ -2254,6 +2257,134 @@ function SellerDB({ user, userId, onLogout, dark, onToggle }) {
             </div>
           </div>
         )}
+        {page==="payouts" && (
+          <div className="fu">
+            <h1 className="syne" style={{fontSize:"clamp(18px,3vw,26px)",fontWeight:800,marginBottom:6}}>Payout History 🏦</h1>
+            <p style={{color:"var(--muted)",fontSize:13,marginBottom:22}}>Sirf released/delivered orders — tumhe jo paisa mila</p>
+
+            {/* Summary */}
+            {(() => {
+              const released = orders.filter(o => ["delivered","cancelled_buyer"].includes(o.status));
+              const totalPaid = released.reduce((a,o)=>a+(o.seller_receives||0),0);
+              const thisMonth = released.filter(o => {
+                const d = new Date(o.released_at || o.updated_at || o.created_at);
+                const now = new Date();
+                return d.getMonth()===now.getMonth() && d.getFullYear()===now.getFullYear();
+              }).reduce((a,o)=>a+(o.seller_receives||0),0);
+              const pending = orders.filter(o=>["token_paid","dispatched"].includes(o.status)).reduce((a,o)=>a+(o.seller_receives||0),0);
+              return (
+                <div className="g3" style={{marginBottom:20}}>
+                  {[
+                    {label:"Total Released",value:`₹${totalPaid.toLocaleString("en-IN")}`,icon:"✅",color:"var(--green)"},
+                    {label:"This Month",value:`₹${thisMonth.toLocaleString("en-IN")}`,icon:"📅",color:"var(--gold)"},
+                    {label:"In Escrow (Hold)",value:`₹${pending.toLocaleString("en-IN")}`,icon:"🔐",color:"var(--blue)"},
+                  ].map(s=>(
+                    <div key={s.label} className="stat-card">
+                      <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start"}}>
+                        <div><div style={{fontSize:11,color:"var(--muted)",marginBottom:6}}>{s.label}</div><div className="syne" style={{fontSize:22,fontWeight:800,color:s.color}}>{s.value}</div></div>
+                        <span style={{fontSize:22}}>{s.icon}</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              );
+            })()}
+
+            {/* Released Payouts Table */}
+            <div className="card" style={{marginBottom:16}}>
+              <h3 className="syne" style={{fontWeight:700,fontSize:15,marginBottom:4}}>✅ Released Payouts</h3>
+              <p style={{color:"var(--muted)",fontSize:12,marginBottom:16}}>Delivered + Buyer Cancel orders (token tumhare paas)</p>
+              {orders.filter(o=>["delivered","cancelled_buyer"].includes(o.status)).length === 0 ? (
+                <div style={{textAlign:"center",padding:30,color:"var(--muted)"}}>
+                  <div style={{fontSize:36,marginBottom:8}}>💸</div>
+                  <div>Abhi koi released payout nahi</div>
+                </div>
+              ) : (
+                <div style={{overflowX:"auto"}}>
+                  <table className="tbl">
+                    <thead>
+                      <tr>
+                        <th>Order ID</th>
+                        <th>Product</th>
+                        <th>Order Amt</th>
+                        <th>Token</th>
+                        <th>Commission (-5%)</th>
+                        <th style={{color:"var(--green)"}}>Tumhe Mila</th>
+                        <th>Type</th>
+                        <th>Date</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {orders.filter(o=>["delivered","cancelled_buyer"].includes(o.status)).map(o=>(
+                        <tr key={o.id}>
+                          <td><span style={{fontFamily:"monospace",color:"var(--gold)",fontSize:11}}>{o.id}</span></td>
+                          <td style={{fontSize:12,maxWidth:120,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{o.product_name}</td>
+                          <td style={{fontSize:12}}>₹{o.order_amount}</td>
+                          <td style={{fontSize:12,color:"var(--blue)"}}>₹{o.token_amount}</td>
+                          <td style={{fontSize:12,color:"var(--red)"}}>-₹{o.escara_commission||0}</td>
+                          <td style={{fontSize:13,fontWeight:800,color:"var(--green)"}}>₹{o.seller_receives||0}</td>
+                          <td>
+                            {o.status==="delivered"
+                              ? <span className="badge bg">✅ Delivered</span>
+                              : <span className="badge bo">🛡️ Buyer Cancel</span>}
+                          </td>
+                          <td style={{fontSize:11,color:"var(--muted)",whiteSpace:"nowrap"}}>
+                            {o.released_at ? new Date(o.released_at).toLocaleDateString("en-IN",{day:"2-digit",month:"short",year:"numeric"})
+                              : o.updated_at ? new Date(o.updated_at).toLocaleDateString("en-IN",{day:"2-digit",month:"short",year:"numeric"})
+                              : "—"}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                  {/* Total row */}
+                  <div style={{background:"rgba(16,185,129,.06)",border:"1px solid rgba(16,185,129,.15)",borderRadius:"0 0 12px 12px",padding:"12px 16px",display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+                    <span style={{fontWeight:700,fontSize:13}}>Total Earnings</span>
+                    <span className="syne" style={{fontWeight:800,fontSize:18,color:"var(--green)"}}>
+                      ₹{orders.filter(o=>["delivered","cancelled_buyer"].includes(o.status)).reduce((a,o)=>a+(o.seller_receives||0),0).toLocaleString("en-IN")}
+                    </span>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Escrow Hold */}
+            {orders.filter(o=>["token_paid","dispatched"].includes(o.status)).length > 0 && (
+              <div className="card" style={{marginBottom:16,borderColor:"rgba(56,189,248,.25)"}}>
+                <h3 className="syne" style={{fontWeight:700,fontSize:15,marginBottom:4}}>🔐 In Escrow (Pending Release)</h3>
+                <p style={{color:"var(--muted)",fontSize:12,marginBottom:14}}>Ye orders deliver hone ke baad payout milega</p>
+                <div style={{overflowX:"auto"}}>
+                  <table className="tbl">
+                    <thead><tr><th>Order ID</th><th>Product</th><th>Token</th><th>Expected Payout</th><th>Status</th></tr></thead>
+                    <tbody>
+                      {orders.filter(o=>["token_paid","dispatched"].includes(o.status)).map(o=>(
+                        <tr key={o.id}>
+                          <td><span style={{fontFamily:"monospace",color:"var(--gold)",fontSize:11}}>{o.id}</span></td>
+                          <td style={{fontSize:12}}>{o.product_name}</td>
+                          <td style={{fontSize:12,color:"var(--blue)"}}>₹{o.token_amount}</td>
+                          <td style={{fontSize:13,fontWeight:700,color:"var(--green)"}}>₹{o.seller_receives||0}</td>
+                          <td><Bdg status={o.status} /></td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            )}
+
+            {/* Payout info box */}
+            <div style={{background:"rgba(14,165,233,.08)",border:"1px solid rgba(14,165,233,.2)",borderRadius:12,padding:16}}>
+              <div className="syne" style={{fontWeight:700,fontSize:14,marginBottom:8}}>🏦 Bank Payout — Coming Soon!</div>
+              <div style={{fontSize:13,color:"var(--muted)",lineHeight:1.8}}>
+                Abhi test mode mein hain. Razorpay KYC complete hone ke baad:<br/>
+                ✅ Direct bank transfer (2-3 business days)<br/>
+                ✅ UPI instant payout<br/>
+                ✅ GST invoice download<br/>
+                ✅ Monthly earnings report
+              </div>
+            </div>
+          </div>
+        )}
         {page==="settings" && (
           <div className="fu">
             <h1 className="syne" style={{fontSize:"clamp(18px,3vw,26px)",fontWeight:800,marginBottom:22}}>Settings</h1>
@@ -2276,7 +2407,7 @@ function SellerDB({ user, userId, onLogout, dark, onToggle }) {
             {!createdLink ? (
               <>
                 <h3 className="syne" style={{fontWeight:800,fontSize:20,marginBottom:4}}>New Protected Order</h3>
-                <p style={{color:"var(--muted)",fontSize:13,marginBottom:20}}>Buyer ke liye secure payment link banao</p>
+                <p style={{color:"var(--muted)",fontSize:13,marginBottom:20}}>Create a secure payment link for your buyer</p>
                 <div style={{display:"flex",flexDirection:"column",gap:12}}>
                   <div><label className="label">Product Name *</label><input className="input" placeholder="Handmade Bag" value={newOrder.product} onChange={e=>setNewOrder({...newOrder,product:e.target.value})} /></div>
                   <div className="g2">
@@ -2288,7 +2419,7 @@ function SellerDB({ user, userId, onLogout, dark, onToggle }) {
                   <div><label className="label">Buyer WhatsApp *</label><input className="input" placeholder="9876543210" value={newOrder.buyer_phone} onChange={e=>setNewOrder({...newOrder,buyer_phone:e.target.value})} /></div>
                   <div style={{display:"flex",gap:10}}>
                     <button className="btn-ghost" style={{flex:1}} onClick={()=>setShowCreate(false)}>Cancel</button>
-                    <button className="btn-gold" style={{flex:2}} onClick={handleCreateOrder} disabled={!newOrder.product||!newOrder.amount||creating}>{creating?"⏳ Bana raha hai...":"🔗 Generate Link"}</button>
+                    <button className="btn-gold" style={{flex:2}} onClick={handleCreateOrder} disabled={!newOrder.product||!newOrder.amount||creating}>{creating?"⏳ Creating...":"🔗 Generate Link"}</button>
                   </div>
                 </div>
               </>
@@ -2479,7 +2610,7 @@ function BuyerDB({ user, userId, userPhone, onLogout, dark, onToggle }) {
             <p style={{color:"var(--muted)",marginBottom:20,fontSize:13}}>Seller ka link paste karo — details dekho aur pay karo</p>
             <div className="card" style={{marginBottom:14}}>
               <label className="label">EscaraPay Order Link</label>
-              <input className="input" placeholder="https://escara-pay.vercel.app/pay/EPXXXXX" value={linkInput} onChange={e=>setLinkInput(e.target.value)} style={{marginBottom:10}} />
+              <input className="input" placeholder="https://escarapay.in/pay/ORDER-ID" value={linkInput} onChange={e=>setLinkInput(e.target.value)} style={{marginBottom:10}} />
               <button className="btn-gold" style={{width:"100%"}} onClick={fetchLinkOrder}>{linkLoading?"⏳ Dhundh raha hai...":"🔍 Order Dekho"}</button>
               {linkError && <div style={{color:"var(--red)",fontSize:12,marginTop:8}}>❌ {linkError}</div>}
             </div>
@@ -2566,6 +2697,210 @@ function BuyerDB({ user, userId, userPhone, onLogout, dark, onToggle }) {
           </div>
         </div>
       )}
+    </div>
+  );
+}
+
+/* ══════════ ORDER TRACKING PAGE ══════════ */
+function TrackPage({ orderId: initId, dark, onToggle, onGoHome }) {
+  const [inputId, setInputId] = useState(initId || "");
+  const [order, setOrder] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [searched, setSearched] = useState(false);
+
+  useEffect(() => {
+    if (initId) doSearch(initId);
+  }, [initId]);
+
+  const doSearch = async (id) => {
+    const tid = (id || inputId).trim().toUpperCase();
+    if (!tid) return;
+    setLoading(true); setError(""); setOrder(null); setSearched(true);
+    const r = await getOrderById(tid);
+    setLoading(false);
+    if (r.success) setOrder(r.data.order);
+    else setError("No order found. Please double-check your Order ID.");
+  };
+
+  const trackingUrl = order ? getTrackingUrl(order.tracking_number) : null;
+  const daysLeft = order ? getDaysLeft(order.dispatched_at || order.updated_at) : 7;
+
+  const steps = [
+    { label: "Order Created",       done: true,                                                                icon: "📋", color: "#10B981" },
+    { label: "Token Paid",          done: order && order.status !== "pending" && order.status !== "pending_seller_confirm", icon: "💳", color: "#0ea5e9" },
+    { label: "Dispatched by Seller",done: order && ["dispatched","delivered","disputed"].includes(order.status), icon: "🚚", color: "#8B5CF6" },
+    { label: "Delivered",           done: order && order.status === "delivered",                               icon: "✅", color: "#10B981" },
+  ];
+
+  return (
+    <div style={{ minHeight: "100vh" }}>
+      <nav className="nav">
+        <Logo onClick={onGoHome} />
+        <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+          <ThemeToggle dark={dark} onToggle={onToggle} />
+          <button className="btn-ghost" style={{ fontSize: 12 }} onClick={onGoHome}>← Home</button>
+        </div>
+      </nav>
+
+      <div style={{ maxWidth: 540, margin: "0 auto", padding: "clamp(20px,5vw,50px) 16px" }}>
+        {/* Header */}
+        <div style={{ textAlign: "center", marginBottom: 28 }}>
+          <div style={{ fontSize: 44, marginBottom: 10 }}>📦</div>
+          <h1 className="syne" style={{ fontWeight: 800, fontSize: "clamp(22px,4vw,30px)", marginBottom: 6 }}>Track Your Order</h1>
+          <p style={{ color: "var(--muted)", fontSize: 14 }}>Enter your Order ID to check status without logging in</p>
+        </div>
+
+        {/* Search Box */}
+        <div className="card" style={{ marginBottom: 20 }}>
+          <label className="label">Order ID</label>
+          <div style={{ display: "flex", gap: 8 }}>
+            <input
+              className="input"
+              placeholder="ESC-XXXXXXXX"
+              value={inputId}
+              onChange={e => setInputId(e.target.value.toUpperCase())}
+              onKeyDown={e => e.key === "Enter" && doSearch()}
+              style={{ fontFamily: "monospace", fontWeight: 700, letterSpacing: 1 }}
+            />
+            <button className="btn-gold" style={{ flexShrink: 0, padding: "11px 20px" }} onClick={() => doSearch()} disabled={loading}>
+              {loading ? "⏳" : "🔍 Track"}
+            </button>
+          </div>
+          <div style={{ fontSize: 11, color: "var(--muted)", marginTop: 8 }}>
+            💡 Your Order ID was shared by the seller or buyer on WhatsApp (e.g. ESC-A1B2C3D4)
+          </div>
+        </div>
+
+        {/* Loading */}
+        {loading && (
+          <div className="card" style={{ textAlign: "center", padding: 40 }}>
+            <div style={{ width: 40, height: 40, border: "3px solid var(--gold)", borderTopColor: "transparent", borderRadius: "50%", animation: "spin .8s linear infinite", margin: "0 auto 12px" }} />
+            <div style={{ color: "var(--muted)" }}>Looking up your order...</div>
+          </div>
+        )}
+
+        {/* Error */}
+        {!loading && searched && error && (
+          <div className="card" style={{ textAlign: "center", padding: 32 }}>
+            <div style={{ fontSize: 36, marginBottom: 10 }}>🔍</div>
+            <div className="syne" style={{ fontWeight: 700, fontSize: 16, marginBottom: 6 }}>No Order Found</div>
+            <div style={{ color: "var(--muted)", fontSize: 13 }}>{error}</div>
+          </div>
+        )}
+
+        {/* Order Found */}
+        {!loading && order && (
+          <div className="fu">
+            {/* Status Banner */}
+            <div style={{
+              background: order.status === "delivered" ? "rgba(16,185,129,.1)" : order.status === "disputed" ? "rgba(139,92,246,.1)" : order.status === "dispatched" ? "rgba(56,189,248,.1)" : "rgba(14,165,233,.1)",
+              border: `1px solid ${order.status === "delivered" ? "rgba(16,185,129,.3)" : order.status === "disputed" ? "rgba(139,92,246,.3)" : order.status === "dispatched" ? "rgba(56,189,248,.3)" : "rgba(14,165,233,.3)"}`,
+              borderRadius: 14, padding: "16px 20px", marginBottom: 16, display: "flex", alignItems: "center", gap: 14
+            }}>
+              <div style={{ fontSize: 32 }}>{(STATUS_META[order.status] || STATUS_META.pending).icon}</div>
+              <div>
+                <div style={{ fontSize: 11, color: "var(--muted)", marginBottom: 2 }}>Current Status</div>
+                <div className="syne" style={{ fontWeight: 800, fontSize: 18 }}>{(STATUS_META[order.status] || STATUS_META.pending).label}</div>
+              </div>
+            </div>
+
+            {/* Order Info */}
+            <div className="card" style={{ marginBottom: 14 }}>
+              <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 12, flexWrap: "wrap", gap: 8 }}>
+                <div>
+                  <div style={{ fontFamily: "monospace", color: "var(--gold)", fontSize: 12, marginBottom: 3 }}>{order.id}</div>
+                  <div className="syne" style={{ fontWeight: 800, fontSize: 18 }}>{order.product_name}</div>
+                </div>
+                <Bdg status={order.status} />
+              </div>
+              <div className="g2" style={{ marginBottom: 12 }}>
+                <div style={{ background: "var(--sf2)", borderRadius: 10, padding: 12 }}>
+                  <div style={{ fontSize: 11, color: "var(--muted)", marginBottom: 2 }}>Order Value</div>
+                  <div className="syne" style={{ fontWeight: 800, fontSize: 20 }}>₹{order.order_amount}</div>
+                </div>
+                <div style={{ background: "rgba(14,165,233,.1)", border: "1px solid rgba(14,165,233,.2)", borderRadius: 10, padding: 12 }}>
+                  <div style={{ fontSize: 11, color: "var(--muted)", marginBottom: 2 }}>Token Protected</div>
+                  <div className="syne" style={{ fontWeight: 800, fontSize: 20, color: "var(--gold)" }}>₹{order.token_amount}</div>
+                </div>
+              </div>
+              {order.seller_name && (
+                <div style={{ fontSize: 13, color: "var(--muted)" }}>Seller: <strong style={{ color: "var(--text)" }}>{order.seller_name}</strong></div>
+              )}
+              {order.created_at && (
+                <div style={{ fontSize: 12, color: "var(--muted)", marginTop: 4 }}>Order Date: {new Date(order.created_at).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" })}</div>
+              )}
+            </div>
+
+            {/* Timeline */}
+            <div className="card" style={{ marginBottom: 14 }}>
+              <div className="syne" style={{ fontWeight: 700, fontSize: 15, marginBottom: 16 }}>🗓️ Order Timeline</div>
+              {steps.map((s, i) => (
+                <div key={i} style={{ display: "flex", gap: 12, paddingBottom: i < steps.length - 1 ? 16 : 0, position: "relative" }}>
+                  {i < steps.length - 1 && <div style={{ position: "absolute", left: 14, top: 30, bottom: 0, width: 2, background: s.done ? "rgba(16,185,129,.3)" : "var(--border)" }} />}
+                  <div style={{ width: 30, height: 30, borderRadius: "50%", flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, background: s.done ? `${s.color}22` : "var(--sf2)", border: `2px solid ${s.done ? s.color : "var(--border)"}`, color: s.done ? s.color : "var(--muted)" }}>
+                    {s.done ? "✓" : s.icon}
+                  </div>
+                  <div style={{ paddingTop: 4, fontSize: 14, fontWeight: s.done ? 600 : 400, color: s.done ? "var(--text)" : "var(--muted)" }}>{s.label}</div>
+                </div>
+              ))}
+            </div>
+
+            {/* Tracking Info */}
+            {order.tracking_number && (
+              <div className="card" style={{ marginBottom: 14, background: "rgba(56,189,248,.06)", borderColor: "rgba(56,189,248,.2)" }}>
+                <div style={{ fontSize: 11, color: "var(--blue)", fontWeight: 700, marginBottom: 6 }}>📦 Courier Tracking</div>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
+                  <code style={{ fontWeight: 700, fontSize: 15, color: "var(--text)" }}>{order.tracking_number}</code>
+                  {trackingUrl && (
+                    <a href={trackingUrl} target="_blank" rel="noreferrer" style={{ background: "var(--blue)", color: "#fff", padding: "7px 14px", borderRadius: 8, fontSize: 12, fontWeight: 600, textDecoration: "none", whiteSpace: "nowrap" }}>
+                      Track on Courier →
+                    </a>
+                  )}
+                </div>
+                {order.dispatched_at && (
+                  <div style={{ fontSize: 12, color: "var(--muted)", marginTop: 8 }}>
+                    Dispatched: {new Date(order.dispatched_at).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" })}
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* 7-day hold info */}
+            {order.status === "dispatched" && (
+              <div style={{ background: "rgba(139,92,246,.08)", border: "1px solid rgba(139,92,246,.2)", borderRadius: 12, padding: 14, marginBottom: 14 }}>
+                <div style={{ fontSize: 13, color: "#A78BFA", fontWeight: 700, marginBottom: 4 }}>⏰ Auto-Release Countdown</div>
+                <div style={{ fontSize: 13, color: "var(--muted)" }}>
+                  The escrow amount will be auto-released to the seller {daysLeft > 0 ? `in ${daysLeft} day${daysLeft===1?"":"s"}` : "today"} if the buyer does not confirm delivery.
+                </div>
+              </div>
+            )}
+
+            {/* Dispute info */}
+            {order.status === "disputed" && order.dispute_reason && (
+              <div style={{ background: "rgba(139,92,246,.08)", border: "1px solid rgba(139,92,246,.2)", borderRadius: 12, padding: 14, marginBottom: 14 }}>
+                <div style={{ fontSize: 13, color: "#A78BFA", fontWeight: 700, marginBottom: 4 }}>⚠️ Dispute Active</div>
+                <div style={{ fontSize: 13, color: "var(--muted)" }}>Reason: {order.dispute_reason}</div>
+                <div style={{ fontSize: 12, color: "var(--muted)", marginTop: 4 }}>Our team will reach out within 24 business hours.</div>
+              </div>
+            )}
+
+            {/* EscaraPay guarantee */}
+            <div style={{ background: "rgba(16,185,129,.06)", border: "1px solid rgba(16,185,129,.15)", borderRadius: 12, padding: 14 }}>
+              <div style={{ fontSize: 13, fontWeight: 700, color: "var(--green)", marginBottom: 6 }}>🛡️ EscaraPay Guarantee</div>
+              <div style={{ fontSize: 12, color: "var(--muted)", lineHeight: 1.7 }}>Your payment is held securely in escrow. Need help? Contact us at support@escarapay.in</div>
+            </div>
+          </div>
+        )}
+
+        {/* Bottom buttons */}
+        <div style={{ display: "flex", gap: 10, marginTop: 20, justifyContent: "center" }}>
+          <button className="btn-ghost" onClick={onGoHome}>← Home</button>
+          {order && (
+            <button className="btn-ghost" style={{ color: "var(--muted)" }} onClick={() => { setOrder(null); setInputId(""); setSearched(false); }}>🔄 New Search</button>
+          )}
+        </div>
+      </div>
     </div>
   );
 }
@@ -3512,6 +3847,7 @@ export default function App() {
   const toggleLang = (l) => { setLang(l); localStorage.setItem("escara_lang",l); };
   const [payOrderId, setPayOrderId] = useState(null);
   const [dealOrderId, setDealOrderId] = useState(null);
+  const [trackOrderId, setTrackOrderId] = useState(null);
   const [adminKey, setAdminKey] = useState(()=> localStorage.getItem("adminKey") || "");
 
   useEffect(()=>{ window._goToPage=(s)=>setScreen(s); },[]);
@@ -3523,19 +3859,22 @@ export default function App() {
     const path=window.location.pathname;
     const pm=path.match(/^\/pay\/([A-Z0-9]+)$/); if(pm){setPayOrderId(pm[1]);setScreen("pay");return;}
     const dm=path.match(/^\/deal\/([A-Z0-9]+)$/); if(dm){setDealOrderId(dm[1]);setScreen("deal");return;}
+    const tm=path.match(/^\/track\/([A-Z0-9-]+)$/i); if(tm){setTrackOrderId(tm[1].toUpperCase());setScreen("track");return;}
+    if(path==="/track"){setScreen("track");return;}
     if(path==="/admin"){setScreen("admin-login");return;}
   },[]);
 
   const props = { dark, onToggle:toggleDark, lang, onLangToggle:toggleLang };
   const handleLogin=(t,n,id,phone)=>{setUserType(t);setUserName(n);setUserId(id);setUserPhone(phone||"");setScreen("dashboard");};
   const handleLogout=()=>{setScreen("landing");setUserType(null);setUserId(null);setUserPhone("");setUserName("");};
-  const goHome=()=>{window.history.pushState({},"","/");setScreen("landing");setPayOrderId(null);setDealOrderId(null);};
+  const goHome=()=>{window.history.pushState({},"","/");setScreen("landing");setPayOrderId(null);setDealOrderId(null);setTrackOrderId(null);};
 
   return (
     <>
       <style>{getStyle(dark)}</style>
       {screen==="pay"         && payOrderId  && <PayPage    orderId={payOrderId}  dark={dark} onToggle={toggleDark} onGoHome={goHome} />}
       {screen==="deal"        && dealOrderId && <DealPage   orderId={dealOrderId} dark={dark} onToggle={toggleDark} onGoHome={goHome} />}
+      {screen==="track"                      && <TrackPage  orderId={trackOrderId} dark={dark} onToggle={toggleDark} onGoHome={goHome} />}
       {screen==="admin-login" && <AdminLogin  onLogin={(k)=>{setAdminKey(k);setScreen("admin");}} dark={dark} onToggle={toggleDark} />}
       {screen==="admin"       && <AdminPanel  adminKey={adminKey} onLogout={()=>{localStorage.removeItem("adminKey");setScreen("landing");}} dark={dark} onToggle={toggleDark} />}
       {screen==="about"       && <AboutPage   onBack={()=>setScreen("landing")} {...props} />}
@@ -3544,7 +3883,7 @@ export default function App() {
       {screen==="refund"      && <RefundPage  onBack={()=>setScreen("landing")} {...props} />}
       {screen==="dispute"     && <DisputePage onBack={()=>setScreen("landing")} {...props} />}
       {screen==="contact"     && <ContactPage onBack={()=>setScreen("landing")} {...props} />}
-      {screen==="landing"     && <Landing     onEnter={t=>{setUserType(t);setScreen("auth");}} {...props} />}
+      {screen==="landing"     && <Landing     onEnter={t=>{setUserType(t);setScreen("auth");}} onTrack={()=>{window.history.pushState({},"","/track");setScreen("track");setTrackOrderId(null);}} {...props} />}
       {screen==="auth"        && <Auth        type={userType} onLogin={handleLogin} onBack={()=>setScreen("landing")} {...props} />}
       {screen==="dashboard"   && userType==="seller" && <SellerDB user={userName||"Seller"} userId={userId} onLogout={handleLogout} {...props} />}
       {screen==="dashboard"   && userType==="buyer"  && <BuyerDB  user={userName||"Buyer"}  userId={userId} userPhone={userPhone} onLogout={handleLogout} {...props} />}
