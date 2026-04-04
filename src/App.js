@@ -838,11 +838,12 @@ function Landing({ onEnter, onTrack, dark, onToggle, lang, onLangToggle }) {
           <button className="btn-ghost" style={{padding:"7px 10px",fontSize:12,whiteSpace:"nowrap",color:"var(--muted)"}} onClick={onTrack}>
             📦 <span className="hide-m">Track</span>
           </button>
-          <button className="btn-ghost" style={{padding:"7px 10px",fontSize:12,whiteSpace:"nowrap"}} onClick={()=>onEnter("buyer")}>
-            <span className="hide-m">🛍️ </span>{lc.ctaBuyer}
+          {/* Desktop only — hide on mobile since hero CTA buttons are visible */}
+          <button className="btn-ghost hide-m" style={{padding:"7px 10px",fontSize:12,whiteSpace:"nowrap"}} onClick={()=>onEnter("buyer")}>
+            🛍️ {lc.ctaBuyer}
           </button>
-          <button className="btn-gold" style={{padding:"7px 10px",fontSize:12,whiteSpace:"nowrap"}} onClick={()=>onEnter("seller")}>
-            <span className="hide-m">🏪 </span>{lc.ctaSeller}
+          <button className="btn-gold hide-m" style={{padding:"7px 10px",fontSize:12,whiteSpace:"nowrap"}} onClick={()=>onEnter("seller")}>
+            🏪 {lc.ctaSeller}
           </button>
         </div>
       </nav>
@@ -3771,7 +3772,29 @@ function TermsPage({ onBack, dark, onToggle }) {
 function ContactPage({ onBack, dark, onToggle }) {
   const [form, setForm] = useState({name:"",email:"",subject:"",message:""});
   const [sent, setSent] = useState(false);
+  const [sending, setSending] = useState(false);
+  const [sendError, setSendError] = useState("");
   const nav = (s) => { window._goToPage(s); };
+
+  const handleSubmit = async () => {
+    if (!form.name || !form.email || !form.subject || !form.message) {
+      setSendError("Please fill in all fields."); return;
+    }
+    setSending(true); setSendError("");
+    try {
+      const res = await fetch("https://escarapay-backend-production.up.railway.app/api/contact", {
+        method:"POST", headers:{"Content-Type":"application/json"},
+        body: JSON.stringify(form),
+      });
+      const data = await res.json();
+      if (res.ok) setSent(true);
+      else setSendError(data.error || "Failed to send. Please email us directly.");
+    } catch(e) {
+      setSendError("Could not connect. Please email us at support@escarapay.in");
+    }
+    setSending(false);
+  };
+
   return (
     <div style={{minHeight:"100vh"}}>
       <LegalNav active="contact" onNav={nav} dark={dark} onToggle={onToggle} />
@@ -3779,10 +3802,9 @@ function ContactPage({ onBack, dark, onToggle }) {
         <div style={{textAlign:"center",marginBottom:40}}>
           <div style={{fontSize:48,marginBottom:12}}>📞</div>
           <h1 className="syne" style={{fontWeight:800,fontSize:"clamp(24px,4vw,36px)",marginBottom:8}}>Contact Us</h1>
-          <p style={{color:"var(--muted)",fontSize:14}}>EscaraPay (India) | We respond within 24 hours | Mon–Sat, 10AM–6PM IST</p>
+          <p style={{color:"var(--muted)",fontSize:14}}>EscaraPay (India) · We respond within 24 hours · Mon–Sat, 10AM–6PM IST</p>
         </div>
 
-        {/* Response time banner */}
         <div style={{background:"rgba(5,150,105,.08)",border:"1px solid rgba(5,150,105,.3)",borderRadius:12,padding:14,marginBottom:24,textAlign:"center"}}>
           <span style={{fontSize:13,fontWeight:600,color:"var(--green)"}}>⚡ Average response time: under 4 hours during business hours</span>
         </div>
@@ -3796,39 +3818,54 @@ function ContactPage({ onBack, dark, onToggle }) {
             <div key={c.title} className="card" style={{textAlign:"center"}}>
               <div style={{fontSize:28,marginBottom:10}}>{c.icon}</div>
               <div className="syne" style={{fontWeight:700,fontSize:13,marginBottom:4}}>{c.title}</div>
-              <div style={{fontSize:12,color:"var(--gold)",wordBreak:"break-all",marginBottom:4}}>{c.value}</div>
+              <a href={`mailto:${c.value}`} style={{fontSize:12,color:"var(--gold)",wordBreak:"break-all",marginBottom:4,display:"block",textDecoration:"none"}}>{c.value}</a>
               <div style={{fontSize:11,color:"var(--muted)"}}>{c.sub}</div>
             </div>
           ))}
         </div>
+
         {!sent ? (
           <div className="card">
-            <h3 className="syne" style={{fontWeight:700,fontSize:18,marginBottom:20}}>Message Bhejo</h3>
+            <h3 className="syne" style={{fontWeight:700,fontSize:18,marginBottom:4}}>Send Us a Message</h3>
+            <p style={{color:"var(--muted)",fontSize:13,marginBottom:20}}>We'll get back to you within 24 hours.</p>
             <div style={{display:"flex",flexDirection:"column",gap:14}}>
               <div className="g2">
-                <div><label className="label">Naam *</label><input className="input" value={form.name} onChange={e=>setForm({...form,name:e.target.value})} /></div>
-                <div><label className="label">Email *</label><input className="input" value={form.email} onChange={e=>setForm({...form,email:e.target.value})} /></div>
+                <div><label className="label">Your Name *</label><input className="input" placeholder="Rahul Sharma" value={form.name} onChange={e=>setForm({...form,name:e.target.value})} /></div>
+                <div><label className="label">Email Address *</label><input className="input" type="email" placeholder="you@email.com" value={form.email} onChange={e=>setForm({...form,email:e.target.value})} /></div>
               </div>
               <div><label className="label">Subject *</label>
                 <select className="select" value={form.subject} onChange={e=>setForm({...form,subject:e.target.value})}>
-                  <option value="">-- Select --</option>
-                  <option>Payment Issue</option><option>Dispute Help</option><option>Refund Request</option>
-                  <option>Account Problem</option><option>Technical Bug</option><option>Partnership</option><option>Other</option>
+                  <option value="">-- Select a topic --</option>
+                  <option>Payment Issue</option>
+                  <option>Dispute Help</option>
+                  <option>Refund Request</option>
+                  <option>Account Problem</option>
+                  <option>Technical Bug</option>
+                  <option>Partnership</option>
+                  <option>Other</option>
                 </select>
               </div>
-              <div><label className="label">Message *</label><textarea className="input" placeholder="Apni problem ya sawaal yahan likhein..." rows={5} value={form.message} onChange={e=>setForm({...form,message:e.target.value})} style={{resize:"vertical"}} /></div>
-              <button className="btn-gold" style={{width:"100%",padding:12}} onClick={()=>{ if(form.name&&form.email&&form.subject&&form.message) setSent(true); else alert("Sab fields bharo!"); }}>📨 Message Bhejo</button>
+              <div><label className="label">Message *</label>
+                <textarea className="input" placeholder="Describe your issue or question in detail..." rows={5} value={form.message} onChange={e=>setForm({...form,message:e.target.value})} style={{resize:"vertical"}} />
+              </div>
+              {sendError && <div style={{background:"rgba(239,68,68,.08)",border:"1px solid rgba(239,68,68,.2)",borderRadius:8,padding:10,fontSize:13,color:"var(--red)"}}>❌ {sendError}</div>}
+              <button className="btn-gold" style={{width:"100%",padding:12}} onClick={handleSubmit} disabled={sending}>
+                {sending ? "⏳ Sending..." : "📨 Send Message"}
+              </button>
             </div>
           </div>
         ) : (
           <div className="card" style={{textAlign:"center",padding:50}}>
             <div style={{fontSize:52,marginBottom:16}}>✅</div>
-            <div className="syne" style={{fontWeight:800,fontSize:22,marginBottom:8}}>Message Mila!</div>
-            <div style={{color:"var(--muted)",fontSize:14,marginBottom:24}}>Hum 24 ghante mein jawaab denge.<br/>Reference: <strong style={{color:"var(--gold)"}}>ESC-{Date.now().toString().slice(-6)}</strong></div>
-            <button className="btn-ghost" onClick={()=>setSent(false)}>← Wapas Jao</button>
+            <div className="syne" style={{fontWeight:800,fontSize:22,marginBottom:8}}>Message Sent!</div>
+            <div style={{color:"var(--muted)",fontSize:14,marginBottom:8}}>Thank you, <strong>{form.name}</strong>. We have received your message.</div>
+            <div style={{color:"var(--muted)",fontSize:13,marginBottom:24}}>We'll respond to <strong style={{color:"var(--gold)"}}>{form.email}</strong> within 24 hours.<br/>
+              Reference: <strong style={{color:"var(--gold)"}}>ESC-{Date.now().toString().slice(-6)}</strong>
+            </div>
+            <button className="btn-ghost" onClick={()=>{setSent(false);setForm({name:"",email:"",subject:"",message:""});}}>← Send Another</button>
           </div>
         )}
-        <div style={{textAlign:"center",marginTop:24}}><button className="btn-ghost" onClick={onBack}>← Back</button></div>
+        <div style={{textAlign:"center",marginTop:24}}><button className="btn-ghost" onClick={onBack}>← Back to Home</button></div>
       </div>
     </div>
   );
