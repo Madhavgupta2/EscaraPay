@@ -2098,7 +2098,7 @@ function SellerDB({ user, userId, onLogout, dark, onToggle }) {
                 <button className="btn-ghost" style={{padding:"5px 12px",fontSize:12}} onClick={()=>setPage("orders")}>View All →</button>
               </div>
               {loadingOrders ? <div style={{textAlign:"center",padding:30,color:"var(--muted)"}}>⏳ Loading...</div>
-               : orders.length===0 ? <div style={{textAlign:"center",padding:40,color:"var(--muted)"}}><div style={{fontSize:40,marginBottom:10}}>📦</div><div style={{fontWeight:600,marginBottom:6}}>Koi order nahi!</div><button className="btn-gold" style={{marginTop:8}} onClick={()=>setShowCreate(true)}>+ New Order Link</button></div>
+               : orders.length===0 ? <div style={{textAlign:"center",padding:40,color:"var(--muted)"}}><div style={{fontSize:40,marginBottom:10}}>📦</div><div style={{fontWeight:600,marginBottom:6}}>No orders yet!</div><button className="btn-gold" style={{marginTop:8}} onClick={()=>setShowCreate(true)}>+ New Order Link</button></div>
                : (
                 <table className="tbl">
                   <thead><tr><th>ID</th><th>Buyer</th><th>Product</th><th>Amount</th><th>Token</th><th>Status</th><th>Action</th></tr></thead>
@@ -2137,7 +2137,7 @@ function SellerDB({ user, userId, onLogout, dark, onToggle }) {
                 <table className="tbl">
                   <thead><tr><th>ID</th><th>Date</th><th>Buyer</th><th>Product</th><th>Amount</th><th>Token</th><th>Status</th><th>Action</th></tr></thead>
                   <tbody>
-                    {filteredOrders.length===0 ? <tr><td colSpan={8} style={{textAlign:"center",color:"var(--muted)",padding:30}}>Koi order nahi</td></tr>
+                    {filteredOrders.length===0 ? <tr><td colSpan={8} style={{textAlign:"center",color:"var(--muted)",padding:30}}>No orders found</td></tr>
                      : filteredOrders.map(o=>(
                       <tr key={o.id}>
                         <td><span style={{fontFamily:"monospace",color:"var(--gold)",fontSize:11}}>{o.id}</span></td>
@@ -2165,7 +2165,7 @@ function SellerDB({ user, userId, onLogout, dark, onToggle }) {
             <div className="g2">
               <div className="card">
                 <h3 className="syne" style={{fontWeight:700,marginBottom:16,fontSize:15}}>Status Breakdown</h3>
-                {orders.length===0 ? <div style={{color:"var(--muted)",fontSize:13}}>Koi orders nahi</div> : Object.entries(STATUS_META).map(([key,val])=>{ const count=orders.filter(o=>o.status===key).length; if(!count) return null; const pct=Math.round((count/orders.length)*100); return (<div key={key} style={{marginBottom:13}}><div style={{display:"flex",justifyContent:"space-between",marginBottom:4}}><span style={{fontSize:12}}>{val.icon} {val.label}</span><span style={{fontSize:12,color:"var(--muted)"}}>{count} ({pct}%)</span></div><div className="pbar"><div className="pfill" style={{width:`${pct}%`}} /></div></div>); })}
+                {orders.length===0 ? <div style={{color:"var(--muted)",fontSize:13}}>No orders found</div> : Object.entries(STATUS_META).map(([key,val])=>{ const count=orders.filter(o=>o.status===key).length; if(!count) return null; const pct=Math.round((count/orders.length)*100); return (<div key={key} style={{marginBottom:13}}><div style={{display:"flex",justifyContent:"space-between",marginBottom:4}}><span style={{fontSize:12}}>{val.icon} {val.label}</span><span style={{fontSize:12,color:"var(--muted)"}}>{count} ({pct}%)</span></div><div className="pbar"><div className="pfill" style={{width:`${pct}%`}} /></div></div>); })}
               </div>
               <div className="card">
                 <h3 className="syne" style={{fontWeight:700,marginBottom:16,fontSize:15}}>Revenue</h3>
@@ -2179,7 +2179,7 @@ function SellerDB({ user, userId, onLogout, dark, onToggle }) {
         {page==="payments" && (
           <div className="fu">
             <h1 className="syne" style={{fontSize:"clamp(18px,3vw,26px)",fontWeight:800,marginBottom:6}}>Payments & Earnings 💰</h1>
-            <p style={{color:"var(--muted)",fontSize:13,marginBottom:22}}>Tumhare saare transactions aur earnings ka overview</p>
+            <p style={{color:"var(--muted)",fontSize:13,marginBottom:22}}>An overview of all your transactions and earnings</p>
 
             {/* Summary Cards */}
             <div className="g3" style={{marginBottom:20}}>
@@ -2205,9 +2205,9 @@ function SellerDB({ user, userId, onLogout, dark, onToggle }) {
                   {label:"Token Amount (min)", value:"₹200", color:"var(--text)"},
                   {label:"Gateway Fee (Buyer pays)", value:"2%", color:"var(--muted)"},
                   {label:"EscaraPay Commission", value:"5%", color:"var(--red)"},
-                  {label:"Seller ko milta hai", value:"95% of token", color:"var(--green)", bold:true},
-                  {label:"Buyer Cancel hone par", value:"Token → Seller ✅", color:"var(--green)"},
-                  {label:"Seller ship na kare", value:"Token → Buyer ↩️", color:"var(--blue)"},
+                  {label:"Seller Receives", value:"95% of token", color:"var(--green)", bold:true},
+                  {label:"Buyer Cancels", value:"Token → Seller ✅", color:"var(--green)"},
+                  {label:"Seller Doesn't Ship", value:"Token → Buyer ↩️", color:"var(--blue)"},
                 ].map(r=>(
                   <div key={r.label} style={{display:"flex",justifyContent:"space-between",padding:"11px 0",borderBottom:"1px solid var(--border)"}}>
                     <span style={{fontSize:13,color:"var(--muted)"}}>{r.label}</span>
@@ -2221,11 +2221,11 @@ function SellerDB({ user, userId, onLogout, dark, onToggle }) {
             <div className="card" style={{marginBottom:16}}>
               <h3 className="syne" style={{fontWeight:700,fontSize:15,marginBottom:16}}>📋 Order-wise Earnings</h3>
               {orders.length===0 ? (
-                <div style={{textAlign:"center",padding:30,color:"var(--muted)"}}>Koi orders nahi abhi</div>
+                <div style={{textAlign:"center",padding:30,color:"var(--muted)"}}>No orders yet</div>
               ) : (
                 <div style={{overflowX:"auto"}}>
                   <table className="tbl">
-                    <thead><tr><th>Order ID</th><th>Product</th><th>Order Amt</th><th>Token</th><th>Commission</th><th>Tumhe Milega</th><th>Status</th></tr></thead>
+                    <thead><tr><th>Order ID</th><th>Product</th><th>Order Amt</th><th>Token</th><th>Commission</th><th>You Receive</th><th>Status</th></tr></thead>
                     <tbody>
                       {orders.map(o=>(
                         <tr key={o.id}>
@@ -2246,9 +2246,9 @@ function SellerDB({ user, userId, onLogout, dark, onToggle }) {
 
             {/* Payout Info */}
             <div style={{background:"rgba(14,165,233,.08)",border:"1px solid rgba(14,165,233,.2)",borderRadius:12,padding:16}}>
-              <div className="syne" style={{fontWeight:700,fontSize:14,marginBottom:10}}>🏦 Payout System — Aata Hai Jaldi!</div>
+              <div className="syne" style={{fontWeight:700,fontSize:14,marginBottom:10}}>🏦 Payout System — Coming Soon!</div>
               <div style={{fontSize:13,color:"var(--muted)",lineHeight:1.8}}>
-                Abhi test mode mein hain — payments simulate hoti hain. Jab Razorpay KYC complete hoga tab:<br/>
+                Currently in test mode — payments are simulated. Once Razorpay KYC is complete:<br/>
                 ✅ Direct bank transfer within 2-3 business days<br/>
                 ✅ UPI instant payout<br/>
                 ✅ Withdrawal history dashboard<br/>
@@ -2297,7 +2297,7 @@ function SellerDB({ user, userId, onLogout, dark, onToggle }) {
               {orders.filter(o=>["delivered","cancelled_buyer"].includes(o.status)).length === 0 ? (
                 <div style={{textAlign:"center",padding:30,color:"var(--muted)"}}>
                   <div style={{fontSize:36,marginBottom:8}}>💸</div>
-                  <div>Abhi koi released payout nahi</div>
+                  <div>No payouts released yet</div>
                 </div>
               ) : (
                 <div style={{overflowX:"auto"}}>
@@ -2309,7 +2309,7 @@ function SellerDB({ user, userId, onLogout, dark, onToggle }) {
                         <th>Order Amt</th>
                         <th>Token</th>
                         <th>Commission (-5%)</th>
-                        <th style={{color:"var(--green)"}}>Tumhe Mila</th>
+                        <th style={{color:"var(--green)"}}>You Received</th>
                         <th>Type</th>
                         <th>Date</th>
                       </tr>
@@ -2376,7 +2376,7 @@ function SellerDB({ user, userId, onLogout, dark, onToggle }) {
             <div style={{background:"rgba(14,165,233,.08)",border:"1px solid rgba(14,165,233,.2)",borderRadius:12,padding:16}}>
               <div className="syne" style={{fontWeight:700,fontSize:14,marginBottom:8}}>🏦 Bank Payout — Coming Soon!</div>
               <div style={{fontSize:13,color:"var(--muted)",lineHeight:1.8}}>
-                Abhi test mode mein hain. Razorpay KYC complete hone ke baad:<br/>
+                Currently in test mode. Once Razorpay KYC is approved:<br/>
                 ✅ Direct bank transfer (2-3 business days)<br/>
                 ✅ UPI instant payout<br/>
                 ✅ GST invoice download<br/>
@@ -2565,7 +2565,7 @@ function BuyerDB({ user, userId, userPhone, onLogout, dark, onToggle }) {
              : orders.length===0 ? (
               <div style={{textAlign:"center",padding:40,color:"var(--muted)"}}>
                 <div style={{fontSize:40,marginBottom:10}}>🛍️</div>
-                <div style={{fontWeight:600,marginBottom:6}}>Koi orders nahi!</div>
+                <div style={{fontWeight:600,marginBottom:6}}>No orders yet!</div>
                 <div style={{display:"flex",gap:10,justifyContent:"center",flexWrap:"wrap",marginTop:14}}>
                   <button className="btn-gold" onClick={()=>setPage("pay_order")}>🔗 Pay via Link</button>
                   <button className="btn-outline" onClick={()=>setPage("create_deal")}>🤝 Create Deal</button>
@@ -3079,7 +3079,7 @@ function UserDetailModal({ user, adminKey, onClose, onUpdate }) {
             {loading
               ? <div style={{textAlign:"center",padding:30,color:"var(--muted)"}}>⏳ Loading orders...</div>
               : userOrders.length===0
-                ? <div style={{textAlign:"center",padding:30,color:"var(--muted)"}}>Koi orders nahi</div>
+                ? <div style={{textAlign:"center",padding:30,color:"var(--muted)"}}>No orders found</div>
                 : <div style={{overflowX:"auto"}}>
                     <table className="tbl">
                       <thead><tr><th>ID</th><th>Product</th><th>Amount</th><th>Token</th><th>Status</th><th>Date</th></tr></thead>
@@ -3248,7 +3248,7 @@ function AdminPanel({ adminKey: propKey, onLogout, dark, onToggle }) {
                 <table className="tbl">
                   <thead><tr><th>Order ID</th><th>Date</th><th>Seller</th><th>Buyer</th><th>Product</th><th>Amount</th><th>Token</th><th>Commission</th><th>Status</th></tr></thead>
                   <tbody>
-                    {filteredOrders.length===0?<tr><td colSpan={9} style={{textAlign:"center",color:"var(--muted)",padding:30}}>Koi order nahi</td></tr>:filteredOrders.map(o=>(
+                    {filteredOrders.length===0?<tr><td colSpan={9} style={{textAlign:"center",color:"var(--muted)",padding:30}}>No orders found</td></tr>:filteredOrders.map(o=>(
                       <tr key={o.id}><td><span style={{fontFamily:"monospace",color:"var(--gold)",fontSize:11}}>{o.id}</span></td><td style={{fontSize:11,color:"var(--muted)"}}>{(o.created_at||"").split("T")[0]}</td><td style={{fontSize:12}}>{o.seller_name||"—"}</td><td style={{fontSize:12}}>{o.buyer_name||"—"}</td><td style={{fontSize:12,color:"var(--muted)"}}>{o.product_name}</td><td style={{fontWeight:600,fontSize:12}}>₹{o.order_amount}</td><td style={{color:"var(--green)",fontWeight:600,fontSize:12}}>₹{o.token_amount}</td><td style={{color:"var(--blue)",fontSize:12}}>₹{o.escara_commission||0}</td><td><Bdg status={o.status} /></td></tr>
                     ))}
                   </tbody>
