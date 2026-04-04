@@ -1,3 +1,10 @@
-# https://www.robotstxt.org/robotstxt.html
 User-agent: *
-Disallow:
+Allow: /
+
+# Block admin panel from indexing
+Disallow: /admin
+Disallow: /pay/
+Disallow: /deal/
+
+# Sitemap location
+Sitemap: https://www.escarapay.in/sitemap.xml
