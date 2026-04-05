@@ -396,7 +396,7 @@ function PayPage({ orderId, dark, onToggle, onGoHome }) {
     getOrderById(orderId).then(r=>{
       setLoading(false);
       if (r.success) setOrder(r.data.order);
-      else setError("Order nahi mila. Link check karo.");
+      else setError("Order not found. Please check the link.");
     });
   },[orderId]);
 
@@ -411,7 +411,7 @@ function PayPage({ orderId, dark, onToggle, onGoHome }) {
   const handlePay = async () => {
     setPayError(""); setPayStep(1);
     const loaded = await loadRazorpay();
-    if (!loaded) { setPayError("Razorpay load nahi hua."); setPayStep(0); return; }
+    if (!loaded) { setPayError("Failed to load payment gateway. Please try again."); setPayStep(0); return; }
     const result = await createPaymentOrder(order.id);
     if (!result.success) { setPayError(result.error); setPayStep(0); return; }
     const { razorpayOrderId, amount, keyId } = result.data;
@@ -455,7 +455,7 @@ function PayPage({ orderId, dark, onToggle, onGoHome }) {
                 <div style={{fontSize:44,marginBottom:12}}>{order.status==="token_paid"?"🔐":"✅"}</div>
                 <div className="syne" style={{fontWeight:800,fontSize:20,marginBottom:10}}>{order.status==="token_paid"?"Token Already Paid!":"Order Processed"}</div>
                 <Bdg status={order.status} />
-                <div style={{color:"var(--muted)",fontSize:13,marginTop:14,marginBottom:20}}>Is order ke liye payment already ho chuka hai.</div>
+                <div style={{color:"var(--muted)",fontSize:13,marginTop:14,marginBottom:20}}>Payment has already been completed for this order.</div>
                 <button className="btn-ghost" onClick={onGoHome}>← Home</button>
               </div>
             ) : (
@@ -473,7 +473,7 @@ function PayPage({ orderId, dark, onToggle, onGoHome }) {
                   </div>
                   <div className="g2" style={{marginBottom:14}}>
                     <div style={{background:"var(--sf2)",borderRadius:10,padding:12,textAlign:"center"}}><div style={{fontSize:11,color:"var(--muted)",marginBottom:2}}>Order Value</div><div className="syne" style={{fontWeight:800,fontSize:22}}>₹{order.order_amount}</div></div>
-                    <div style={{background:"rgba(14,165,233,.15)",border:"1px solid rgba(14,165,233,.3)",borderRadius:10,padding:12,textAlign:"center"}}><div style={{fontSize:11,color:"var(--muted)",marginBottom:2}}>Aap Bharenge</div><div className="syne" style={{fontWeight:800,fontSize:22,color:"var(--gold)"}}>₹{order.buyer_pays||order.token_amount}</div></div>
+                    <div style={{background:"rgba(14,165,233,.15)",border:"1px solid rgba(14,165,233,.3)",borderRadius:10,padding:12,textAlign:"center"}}><div style={{fontSize:11,color:"var(--muted)",marginBottom:2}}>You Pay</div><div className="syne" style={{fontWeight:800,fontSize:22,color:"var(--gold)"}}>₹{order.buyer_pays||order.token_amount}</div></div>
                   </div>
                   <div style={{background:"var(--sf2)",borderRadius:10,padding:12,fontSize:12,marginBottom:14}}>
                     <div style={{fontWeight:600,marginBottom:8,color:"var(--muted)"}}>💰 Breakdown</div>
@@ -489,7 +489,7 @@ function PayPage({ orderId, dark, onToggle, onGoHome }) {
                     ))}
                   </div>
                   <div style={{marginBottom:14}}>
-                    <label className="label">Aapka Naam (optional)</label>
+                    <label className="label">Your Name (optional)</label>
                     <input className="input" placeholder="Rahul Sharma" value={buyerName} onChange={e=>setBuyerName(e.target.value)} style={{marginBottom:10}} />
                     <label className="label">WhatsApp Number (optional)</label>
                     <input className="input" placeholder="9876543210" value={buyerPhone} onChange={e=>setBuyerPhone(e.target.value)} />
@@ -584,11 +584,11 @@ function OrderModal({ order, isSeller, onClose, onDispatch, onConfirmDelivery, o
             <select className="select" value={disputeReason} onChange={e=>setDisputeReason(e.target.value)} style={{marginBottom:10}}>
               <option value="">-- Select a Reason --</option>
               {isSeller?(<><option value="Buyer not responding">Buyer respond nahi kar raha</option><option value="False claim">Buyer galat bol raha hai</option></>)
-               :(<><option value="Item not received">Item nahi mila</option><option value="Wrong item">Galat item mila</option><option value="Damaged">Damaged mila</option><option value="Seller not responding">Seller respond nahi kar raha</option></>)}
+               :(<><option value="Item not received">Item not received</option><option value="Wrong item">Wrong item received</option><option value="Damaged">Item received damaged</option><option value="Seller not responding">Seller not responding</option></>)}
             </select>
             <div style={{display:"flex",gap:8}}>
               <button className="btn-ghost" style={{flex:1}} onClick={()=>setShowDisputeForm(false)}>Cancel</button>
-              <button className="btn-red" style={{flex:2,padding:"9px"}} onClick={async()=>{ if(!disputeReason){setMsg("❌ Reason select karo!"); return;} setLoading(true); const r=await raiseDispute(order.id,disputeReason,isSeller?"seller":"buyer"); setLoading(false); if(r.success){onDispute&&onDispute(order.id);setMsg("✅ Dispute raise ho gaya!");}else setMsg("❌ "+r.error); }} disabled={loading}>{loading?"⏳...":"Submit"}</button>
+              <button className="btn-red" style={{flex:2,padding:"9px"}} onClick={async()=>{ if(!disputeReason){setMsg("❌ Please select a reason!"); return;} setLoading(true); const r=await raiseDispute(order.id,disputeReason,isSeller?"seller":"buyer"); setLoading(false); if(r.success){onDispute&&onDispute(order.id);setMsg("✅ Dispute raised successfully!");}else setMsg("❌ "+r.error); }} disabled={loading}>{loading?"⏳...":"Submit"}</button>
             </div>
           </div>
         )}
@@ -1565,7 +1565,7 @@ function Landing({ onEnter, onTrack, dark, onToggle, lang, onLangToggle }) {
             </div>
           </div>
           <div style={{borderTop:"1px solid rgba(255,255,255,.08)",paddingTop:20,display:"flex",justifyContent:"space-between",alignItems:"center",flexWrap:"wrap",gap:10}}>
-            <div style={{fontSize:11,color:"rgba(255,255,255,.35)"}}>© 2026 EscaraPay (India). All rights reserved. | Jurisdiction: Uttar Pradesh, India</div>
+            <div style={{fontSize:11,color:"rgba(255,255,255,.35)"}}>© 2026 EscaraPay (India) · MSME Reg: UDYAM-UP-23-0036110. All rights reserved. | Jurisdiction: Uttar Pradesh, India</div>
             <div style={{display:"flex",gap:16}}>
               {[["Terms","terms"],["Privacy","privacy"],["Refund","refund"],["Dispute","dispute"]].map(([l,s])=>(
                 <span key={l} style={{fontSize:11,color:"rgba(255,255,255,.35)",cursor:"pointer",transition:"color .2s"}}
@@ -1638,7 +1638,7 @@ function ProfileModal({ user, userId, userType, onClose, onUpdate }) {
       });
       const data = await res.json();
       setLoading(false);
-      if (data.success) { setMsg("✅ Profile update ho gaya!"); onUpdate(form.name); }
+      if (data.success) { setMsg("✅ Profile updated successfully!"); onUpdate(form.name); }
       else setMsg("❌ " + data.error);
     } catch(e) { setLoading(false); setMsg("❌ Backend se connect nahi hua!"); }
   };
@@ -1661,12 +1661,12 @@ function ProfileModal({ user, userId, userType, onClose, onUpdate }) {
             <FieldError msg={errors.name} />
           </div>
           <div>
-            <label className="label">Email (change karo)</label>
+            <label className="label">Email Address</label>
             <input className="input" placeholder="naya@email.com" value={form.email} onChange={e=>{setForm({...form,email:e.target.value});setErrors({...errors,email:""});}} />
             <FieldError msg={errors.email} />
           </div>
           <div>
-            <label className="label">Phone (change karo)</label>
+            <label className="label">Phone Number</label>
             <input className="input" placeholder="10 digit number" maxLength={10} value={form.phone} onChange={e=>{setForm({...form,phone:e.target.value.replace(/\D/g,"")});setErrors({...errors,phone:""});}} />
             <FieldError msg={errors.phone} />
           </div>
@@ -2040,7 +2040,7 @@ function SellerDB({ user, userId, onLogout, dark, onToggle }) {
   const copyLink = (orderId) => { navigator.clipboard?.writeText(`${BASE_URL}/pay/${orderId}`); setToast("Link copied! Share on WhatsApp 🚀"); };
   const shareWhatsApp = (orderId, productName, tokenAmount) => {
     const link = `${BASE_URL}/pay/${orderId}`;
-    const msg = `🛡️ *EscaraPay Secure Payment*\n\nProduct: ${productName}\nToken Amount: ₹${tokenAmount}\n\nSecure link se pay karo:\n${link}\n\n_Powered by EscaraPay_`;
+    const msg = `🛡️ *EscaraPay Secure Payment*\n\nProduct: ${productName}\nToken Amount: ₹${tokenAmount}\n\nPay securely via this link:\n${link}\n\n_Powered by EscaraPay_`;
     window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, "_blank");
   };
 
@@ -2353,7 +2353,7 @@ function SellerDB({ user, userId, onLogout, dark, onToggle }) {
             {orders.filter(o=>["token_paid","dispatched"].includes(o.status)).length > 0 && (
               <div className="card" style={{marginBottom:16,borderColor:"rgba(56,189,248,.25)"}}>
                 <h3 className="syne" style={{fontWeight:700,fontSize:15,marginBottom:4}}>🔐 In Escrow (Pending Release)</h3>
-                <p style={{color:"var(--muted)",fontSize:12,marginBottom:14}}>Ye orders deliver hone ke baad payout milega</p>
+                <p style={{color:"var(--muted)",fontSize:12,marginBottom:14}}>These orders will be paid out once delivered</p>
                 <div style={{overflowX:"auto"}}>
                   <table className="tbl">
                     <thead><tr><th>Order ID</th><th>Product</th><th>Token</th><th>Expected Payout</th><th>Status</th></tr></thead>
@@ -2480,7 +2480,7 @@ function BuyerDB({ user, userId, userPhone, onLogout, dark, onToggle }) {
   const handlePay = async(order)=>{
     setPayError(""); setPayStep(1);
     const loaded=await loadRazorpay();
-    if(!loaded){setPayError("Razorpay load nahi hua.");setPayStep(0);return;}
+    if(!loaded){setPayError("Failed to load payment gateway. Please try again.");setPayStep(0);return;}
     const result=await createPaymentOrder(order.id);
     if(!result.success){setPayError(result.error);setPayStep(0);return;}
     const {razorpayOrderId,amount,keyId}=result.data;
@@ -2501,18 +2501,18 @@ function BuyerDB({ user, userId, userPhone, onLogout, dark, onToggle }) {
 
   const fetchLinkOrder=async()=>{
     setLinkError(""); setLinkOrder(null);
-    if(!linkInput){setLinkError("Link paste karo!");return;}
+    if(!linkInput){setLinkError("Please paste the payment link!");return;}
     const match=linkInput.match(/EP[A-Z0-9]+/);
-    if(!match){setLinkError("Valid EscaraPay link nahi hai!");return;}
+    if(!match){setLinkError("Invalid EscaraPay link!");return;}
     setLinkLoading(true);
     const r=await getOrderById(match[0]);
     setLinkLoading(false);
     if(r.success) setLinkOrder(r.data.order);
-    else setLinkError("Order nahi mila: "+r.error);
+    else setLinkError("Order not found: "+r.error);
   };
 
   const handleCreateDeal = async()=>{
-    if(!dealForm.product||!dealForm.amount){alert("❌ Product aur amount zaroori hain!"); return;}
+    if(!dealForm.product||!dealForm.amount){alert("❌ Product name and amount are required!"); return;}
     setDealCreating(true);
     try {
       const res = await fetch(`${BACKEND_URL}/api/orders/buyer-create`, {
@@ -2608,11 +2608,11 @@ function BuyerDB({ user, userId, userPhone, onLogout, dark, onToggle }) {
         {page==="pay_order" && (
           <div className="fu" style={{maxWidth:500}}>
             <h1 className="syne" style={{fontSize:"clamp(18px,3vw,24px)",fontWeight:800,marginBottom:8}}>Order Link se Pay Karo</h1>
-            <p style={{color:"var(--muted)",marginBottom:20,fontSize:13}}>Seller ka link paste karo — details dekho aur pay karo</p>
+            <p style={{color:"var(--muted)",marginBottom:20,fontSize:13}}>Paste the seller's payment link to view details and pay securely</p>
             <div className="card" style={{marginBottom:14}}>
               <label className="label">EscaraPay Order Link</label>
               <input className="input" placeholder="https://escarapay.in/pay/ORDER-ID" value={linkInput} onChange={e=>setLinkInput(e.target.value)} style={{marginBottom:10}} />
-              <button className="btn-gold" style={{width:"100%"}} onClick={fetchLinkOrder}>{linkLoading?"⏳ Dhundh raha hai...":"🔍 Order Dekho"}</button>
+              <button className="btn-gold" style={{width:"100%"}} onClick={fetchLinkOrder}>{linkLoading?"⏳ Looking up order...":"🔍 Order Dekho"}</button>
               {linkError && <div style={{color:"var(--red)",fontSize:12,marginTop:8}}>❌ {linkError}</div>}
             </div>
             {linkOrder && (
@@ -2628,7 +2628,7 @@ function BuyerDB({ user, userId, userPhone, onLogout, dark, onToggle }) {
                 {linkOrder.status==="pending" ? (
                   <button className="btn-gold pulse" style={{width:"100%",padding:13,fontSize:15}} onClick={()=>handlePay(linkOrder)}>💳 Pay ₹{linkOrder.buyer_pays||linkOrder.token_amount} Token</button>
                 ) : (
-                  <div style={{textAlign:"center",padding:12,color:"var(--muted)",fontSize:13}}>Payment already ho chuka hai &nbsp;<Bdg status={linkOrder.status} /></div>
+                  <div style={{textAlign:"center",padding:12,color:"var(--muted)",fontSize:13}}>Payment already completed &nbsp;<Bdg status={linkOrder.status} /></div>
                 )}
               </div>
             )}
@@ -2638,7 +2638,7 @@ function BuyerDB({ user, userId, userPhone, onLogout, dark, onToggle }) {
         {page==="create_deal" && (
           <div className="fu" style={{maxWidth:520}}>
             <h1 className="syne" style={{fontSize:"clamp(18px,3vw,24px)",fontWeight:800,marginBottom:8}}>Deal Banao 🤝</h1>
-            <p style={{color:"var(--muted)",marginBottom:16,fontSize:13}}>Seller par trust nahi? Tum khud deal banao — seller confirm karega — phir safely pay karo.</p>
+            <p style={{color:"var(--muted)",marginBottom:16,fontSize:13}}>Want extra security? Create the deal yourself — the seller will confirm, then you pay safely.</p>
             {!dealLink ? (
               <div className="card">
                 <div style={{display:"flex",flexDirection:"column",gap:12}}>
@@ -2650,7 +2650,7 @@ function BuyerDB({ user, userId, userPhone, onLogout, dark, onToggle }) {
                   {dealForm.amount && <div style={{background:"rgba(14,165,233,.1)",border:"1px solid rgba(14,165,233,.25)",borderRadius:10,padding:14}}><div style={{fontSize:11,color:"var(--muted)",marginBottom:2}}>Aap Token Bharenge</div><div className="syne" style={{fontSize:24,fontWeight:800,color:"var(--gold)"}}>₹{Math.round(tokenPreview2*1.02)}</div></div>}
                   <div><label className="label">Seller Ka Naam (optional)</label><input className="input" placeholder="Meena Crafts" value={dealForm.seller_name} onChange={e=>setDealForm({...dealForm,seller_name:e.target.value})} /></div>
                   <div><label className="label">Seller Ka WhatsApp (optional)</label><input className="input" placeholder="9876543210" value={dealForm.seller_phone} onChange={e=>setDealForm({...dealForm,seller_phone:e.target.value})} /></div>
-                  <button className="btn-gold" style={{width:"100%",padding:12}} onClick={handleCreateDeal} disabled={!dealForm.product||!dealForm.amount||dealCreating}>{dealCreating?"⏳ Deal bana raha hai...":"🤝 Deal Link Generate Karo"}</button>
+                  <button className="btn-gold" style={{width:"100%",padding:12}} onClick={handleCreateDeal} disabled={!dealForm.product||!dealForm.amount||dealCreating}>{dealCreating?"⏳ Creating deal...":"🤝 Generate Deal Link"}</button>
                 </div>
               </div>
             ) : (
@@ -2691,9 +2691,9 @@ function BuyerDB({ user, userId, userPhone, onLogout, dark, onToggle }) {
         <div className="overlay">
           <div className="modal" style={{textAlign:"center"}}>
             {payError?(<><div style={{fontSize:40,marginBottom:12}}>❌</div><div className="syne" style={{fontWeight:800,fontSize:18,color:"var(--red)",marginBottom:8}}>Payment Failed</div><div style={{color:"var(--muted)",fontSize:13,marginBottom:16}}>{payError}</div><button className="btn-ghost" style={{width:"100%"}} onClick={()=>{setPayError("");setPayStep(0);}}>Close</button></>)
-             :payStep===1?(<><div style={{width:44,height:44,border:"3px solid var(--gold)",borderTopColor:"transparent",borderRadius:"50%",animation:"spin .8s linear infinite",margin:"0 auto 16px"}} /><div className="syne" style={{fontWeight:700,fontSize:16}}>Razorpay Load ho raha hai...</div></>)
-             :payStep===2?(<><div style={{width:44,height:44,border:"3px solid var(--green)",borderTopColor:"transparent",borderRadius:"50%",animation:"spin .8s linear infinite",margin:"0 auto 16px"}} /><div className="syne" style={{fontWeight:700,fontSize:16}}>Verify ho rahi hai...</div></>)
-             :payStep===3?(<><div style={{fontSize:52,marginBottom:12}}>🎉</div><div className="syne" style={{fontWeight:800,fontSize:21,color:"var(--green)",marginBottom:8}}>Token Secured!</div><div style={{color:"var(--muted)",fontSize:13}}>Seller ko delivery ke 7 din baad release hoga ✅</div></>)
+             :payStep===1?(<><div style={{width:44,height:44,border:"3px solid var(--gold)",borderTopColor:"transparent",borderRadius:"50%",animation:"spin .8s linear infinite",margin:"0 auto 16px"}} /><div className="syne" style={{fontWeight:700,fontSize:16}}>Loading payment gateway...</div></>)
+             :payStep===2?(<><div style={{width:44,height:44,border:"3px solid var(--green)",borderTopColor:"transparent",borderRadius:"50%",animation:"spin .8s linear infinite",margin:"0 auto 16px"}} /><div className="syne" style={{fontWeight:700,fontSize:16}}>Verifying payment...</div></>)
+             :payStep===3?(<><div style={{fontSize:52,marginBottom:12}}>🎉</div><div className="syne" style={{fontWeight:800,fontSize:21,color:"var(--green)",marginBottom:8}}>Token Secured!</div><div style={{color:"var(--muted)",fontSize:13}}>Funds will be released to seller after delivery confirmation ✅</div></>)
              :null}
           </div>
         </div>
@@ -2916,7 +2916,7 @@ function DealPage({ orderId, dark, onToggle, onGoHome }) {
   const [paymentLink, setPaymentLink] = useState("");
   const [toast, setToast] = useState("");
 
-  useEffect(()=>{ getOrderById(orderId).then(r=>{ setLoading(false); if(r.success) setOrder(r.data.order); else setError("Deal nahi mili."); }); },[orderId]);
+  useEffect(()=>{ getOrderById(orderId).then(r=>{ setLoading(false); if(r.success) setOrder(r.data.order); else setError("Deal not found."); }); },[orderId]);
 
   const handleConfirm = async () => {
     setConfirming(true);
@@ -2927,7 +2927,7 @@ function DealPage({ orderId, dark, onToggle, onGoHome }) {
       const data = await res.json();
       setConfirming(false);
       if (data.success) { setConfirmed(true); setPaymentLink(data.paymentLink); }
-      else setError(data.error||"Confirm nahi hua");
+      else setError(data.error||"Confirmation failed");
     } catch(e) { setConfirming(false); setError("Backend se connect nahi hua!"); }
   };
 
@@ -2944,7 +2944,7 @@ function DealPage({ orderId, dark, onToggle, onGoHome }) {
             <div className="card fu" style={{textAlign:"center",padding:40}}>
               <div style={{fontSize:60,marginBottom:16}}>🎉</div>
               <div className="syne" style={{fontWeight:800,fontSize:24,color:"var(--green)",marginBottom:8}}>Deal Confirmed!</div>
-              <div style={{color:"var(--muted)",fontSize:14,marginBottom:20}}>Ab buyer ko payment link bhejo</div>
+              <div style={{color:"var(--muted)",fontSize:14,marginBottom:20}}>Now share the payment link with the buyer</div>
               <div style={{background:"var(--sf2)",borderRadius:8,padding:"10px 12px",marginBottom:10,wordBreak:"break-all"}}><code style={{fontSize:12,color:"var(--gold)"}}>{paymentLink}</code></div>
               <button className="btn-gold" style={{width:"100%"}} onClick={()=>{ navigator.clipboard?.writeText(paymentLink); setToast("Payment link copied!"); }}>📋 Link Copy Karo</button>
             </div>
@@ -2963,9 +2963,9 @@ function DealPage({ orderId, dark, onToggle, onGoHome }) {
                 </div>
                 <div className="g2" style={{marginBottom:16}}>
                   <div style={{background:"var(--sf2)",borderRadius:10,padding:12,textAlign:"center"}}><div style={{fontSize:11,color:"var(--muted)",marginBottom:2}}>Order Value</div><div className="syne" style={{fontWeight:800,fontSize:22}}>₹{order.order_amount}</div></div>
-                  <div style={{background:"rgba(5,150,105,.15)",borderRadius:10,padding:12,textAlign:"center"}}><div style={{fontSize:11,color:"var(--muted)",marginBottom:2}}>Aapko Milega</div><div className="syne" style={{fontWeight:800,fontSize:22,color:"var(--green)"}}>₹{order.seller_receives}</div></div>
+                  <div style={{background:"rgba(5,150,105,.15)",borderRadius:10,padding:12,textAlign:"center"}}><div style={{fontSize:11,color:"var(--muted)",marginBottom:2}}>You Will Receive</div><div className="syne" style={{fontWeight:800,fontSize:22,color:"var(--green)"}}>₹{order.seller_receives}</div></div>
                 </div>
-                <button className="btn-green" style={{width:"100%",padding:"16px",fontSize:16,borderRadius:12,marginBottom:10}} onClick={handleConfirm} disabled={confirming}>{confirming?"⏳ Confirm ho raha hai...":"✅ Haan! Main Yeh Order Ship Karunga"}</button>
+                <button className="btn-green" style={{width:"100%",padding:"16px",fontSize:16,borderRadius:12,marginBottom:10}} onClick={handleConfirm} disabled={confirming}>{confirming?"⏳ Confirming...":"✅ Yes! I Will Ship This Order"}</button>
                 <button className="btn-ghost" style={{width:"100%"}} onClick={onGoHome}>❌ Decline</button>
               </div>
             </div>
@@ -3322,7 +3322,7 @@ function AdminLogin({ onLogin, dark, onToggle }) {
   const LOCAL_PASSWORDS = ["admin123", "escarapay-admin-2026"];
 
   const handle = async () => {
-    if (!password) { setError("❌ Password daalo!"); return; }
+    if (!password) { setError("❌ Please enter the password!"); return; }
     setLoading(true); setError("");
     if (LOCAL_PASSWORDS.includes(password)) { setLoading(false); localStorage.setItem("adminKey",password); onLogin(password); return; }
     try {
