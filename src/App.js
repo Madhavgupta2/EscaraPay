@@ -1537,7 +1537,7 @@ function Landing({ onEnter, onTrack, dark, onToggle, lang, onLangToggle }) {
                 <span style={{fontFamily:"'Outfit',sans-serif",fontWeight:800,fontSize:16,color:"#fff"}}>EscaraPay</span>
               </div>
               <p style={{fontSize:12,color:"rgba(255,255,255,.5)",lineHeight:1.85,marginBottom:12}}>India's trusted payment protection platform for WhatsApp & Instagram sellers.</p>
-              <div style={{fontSize:11,color:"rgba(255,255,255,.35)"}}>CIN: Applied for Registration<br/>GST: Applied</div>
+              <div style={{fontSize:11,color:"rgba(255,255,255,.35)"}}>MSME Reg: UDYAM-UP-23-0036110<br/>CIN: Applied for Registration</div>
             </div>
             <div>
               <div style={{fontSize:11,fontWeight:700,color:"rgba(255,255,255,.4)",textTransform:"uppercase",letterSpacing:1.2,marginBottom:14}}>Company</div>
