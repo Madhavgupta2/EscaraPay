@@ -142,6 +142,13 @@ function getStyle(dark) {
   @keyframes breathe{0%,100%{transform:scale(1)}50%{transform:scale(1.03)}}
   @keyframes borderGlow{0%,100%{border-color:rgba(36,161,226,.2)}50%{border-color:rgba(36,161,226,.6)}}
   @keyframes dotPulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.6;transform:scale(.85)}}
+  @keyframes typewriter{from{width:0}to{width:100%}}
+  @keyframes blinkCursor{0%,100%{border-color:var(--gold)}50%{border-color:transparent}}
+  @keyframes gradientShift{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
+  @keyframes slideUpFade{from{opacity:0;transform:translateY(40px)}to{opacity:1;transform:translateY(0)}}
+  @keyframes scaleIn{from{opacity:0;transform:scale(.92)}to{opacity:1;transform:scale(1)}}
+  @keyframes glowPulse{0%,100%{opacity:.6;transform:scale(1)}50%{opacity:1;transform:scale(1.15)}}
+  @keyframes chipFadeIn{from{opacity:0;transform:translateY(10px) scale(.95)}to{opacity:1;transform:translateY(0) scale(1)}}
 
   /* ── Utility animation classes ── */
   .fu {animation:fadeUp .6s cubic-bezier(.22,.68,0,1.2) forwards}
@@ -658,6 +665,37 @@ function useCountUp(target, duration = 1800, started = false) {
 }
 
 /* ══════════ LANDING ══════════ */
+/* ══════════ TYPEWRITER COMPONENT ══════════ */
+function TypeWriter({ words, dark }) {
+  const [idx, setIdx] = useState(0);
+  const [displayed, setDisplayed] = useState("");
+  const [deleting, setDeleting] = useState(false);
+  const [pause, setPause] = useState(false);
+
+  useEffect(() => {
+    if (pause) { const t = setTimeout(() => setPause(false), 1800); return () => clearTimeout(t); }
+    const word = words[idx];
+    if (!deleting && displayed === word) { setPause(true); setDeleting(true); return; }
+    if (deleting && displayed === "") { setDeleting(false); setIdx((idx + 1) % words.length); return; }
+    const speed = deleting ? 40 : 80;
+    const t = setTimeout(() => {
+      setDisplayed(deleting ? word.slice(0, displayed.length - 1) : word.slice(0, displayed.length + 1));
+    }, speed);
+    return () => clearTimeout(t);
+  }, [displayed, deleting, pause, idx, words]);
+
+  return (
+    <span style={{
+      color: "var(--gold)",
+      borderRight: "3px solid var(--gold)",
+      paddingRight: 4,
+      animation: "blinkCursor 0.8s step-end infinite",
+      minWidth: 2,
+      display: "inline-block",
+    }}>{displayed}</span>
+  );
+}
+
 function Landing({ onEnter, onTrack, dark, onToggle, lang, onLangToggle }) {
   const t = T[lang] || T.hl;
   const [statsStarted, setStatsStarted] = useState(false);
@@ -852,82 +890,125 @@ function Landing({ onEnter, onTrack, dark, onToggle, lang, onLangToggle }) {
       <div style={{
         position:"relative",overflow:"hidden",
         background: dark
-          ? "linear-gradient(135deg,#06060e 0%,#0d1a2e 50%,#06060e 100%)"
-          : "linear-gradient(135deg,#e8f4fd 0%,#dbeffe 40%,#e0f2fe 100%)",
-        padding:"clamp(56px,10vw,100px) clamp(16px,5vw,40px) clamp(60px,9vw,90px)",
+          ? "linear-gradient(160deg,#05080f 0%,#091525 40%,#0a0e1a 100%)"
+          : "linear-gradient(160deg,#f0f8ff 0%,#e0f0ff 40%,#f5faff 100%)",
+        padding:"clamp(70px,12vw,120px) clamp(16px,5vw,40px) clamp(80px,10vw,110px)",
         textAlign:"center"
       }}>
-        {/* Decorative blobs */}
-        <div style={{position:"absolute",top:"-60px",left:"10%",width:320,height:320,borderRadius:"50%",background:"rgba(14,165,233,.07)",filter:"blur(70px)",pointerEvents:"none"}} />
-        <div style={{position:"absolute",bottom:"-40px",right:"8%",width:260,height:260,borderRadius:"50%",background:"rgba(56,189,248,.06)",filter:"blur(60px)",pointerEvents:"none"}} />
-        <div style={{position:"absolute",top:"30%",left:"50%",transform:"translateX(-50%)",width:500,height:200,borderRadius:"50%",background:"rgba(14,165,233,.04)",filter:"blur(50px)",pointerEvents:"none"}} />
+        {/* Animated background grid */}
+        <div style={{
+          position:"absolute",inset:0,
+          backgroundImage: dark
+            ? "radial-gradient(circle at 1px 1px, rgba(14,165,233,.08) 1px, transparent 0)"
+            : "radial-gradient(circle at 1px 1px, rgba(14,165,233,.06) 1px, transparent 0)",
+          backgroundSize:"40px 40px",
+          pointerEvents:"none"
+        }} />
 
-        {/* Pill badge */}
-        <div className="fu" style={{marginBottom:18}}>
+        {/* Glowing orbs */}
+        <div style={{position:"absolute",top:"-80px",left:"5%",width:500,height:500,borderRadius:"50%",background:"rgba(14,165,233,.06)",filter:"blur(90px)",pointerEvents:"none",animation:"glowPulse 6s ease-in-out infinite"}} />
+        <div style={{position:"absolute",bottom:"-60px",right:"5%",width:400,height:400,borderRadius:"50%",background:"rgba(56,189,248,.05)",filter:"blur(80px)",pointerEvents:"none",animation:"glowPulse 8s ease-in-out infinite reverse"}} />
+        <div style={{position:"absolute",top:"50%",left:"50%",transform:"translate(-50%,-50%)",width:600,height:300,borderRadius:"50%",background:"rgba(14,165,233,.03)",filter:"blur(60px)",pointerEvents:"none"}} />
+
+        {/* Live badge */}
+        <div style={{animation:"slideUpFade .6s ease both",marginBottom:20}}>
           <span style={{
-            display:"inline-flex",alignItems:"center",gap:7,
-            background: dark?"rgba(14,165,233,.12)":"rgba(14,165,233,.1)",
-            border:"1px solid rgba(14,165,233,.3)",
-            borderRadius:100,padding:"6px 16px",
-            fontSize:12,fontWeight:600,color:"var(--gold)",letterSpacing:".3px"
+            display:"inline-flex",alignItems:"center",gap:8,
+            background: dark?"rgba(14,165,233,.1)":"rgba(14,165,233,.08)",
+            border:"1px solid rgba(14,165,233,.25)",
+            borderRadius:100,padding:"7px 18px",
+            fontSize:12,fontWeight:600,color:"var(--gold)",letterSpacing:".5px"
           }}>
-            <span style={{width:7,height:7,borderRadius:"50%",background:"var(--gold)",display:"inline-block",boxShadow:"0 0 8px var(--gold)"}} />
+            <span style={{
+              width:8,height:8,borderRadius:"50%",background:"#22c55e",display:"inline-block",
+              boxShadow:"0 0 0 3px rgba(34,197,94,.2)",animation:"dotPulse 1.5s ease-in-out infinite"
+            }} />
             {lc.heroTag}
           </span>
         </div>
 
-        {/* H1 */}
-        <h1 className="syne fu2" style={{
-          fontSize:"clamp(36px,6.5vw,76px)",fontWeight:800,lineHeight:1.08,marginBottom:12,letterSpacing:"-1.5px"
+        {/* H1 with typewriter */}
+        <h1 className="syne" style={{
+          fontSize:"clamp(38px,6.5vw,80px)",fontWeight:800,lineHeight:1.05,
+          marginBottom:16,letterSpacing:"-2px",
+          animation:"slideUpFade .7s .1s ease both"
         }}>
-          <span className="shimmer">{lc.heroH1a}</span>
+          <span style={{
+            background:"linear-gradient(135deg,var(--gold) 0%,#38bdf8 50%,var(--gold) 100%)",
+            backgroundSize:"200% auto",
+            WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent",backgroundClip:"text",
+            animation:"gradientShift 4s linear infinite"
+          }}>{lc.heroH1a}</span>
         </h1>
-        <h2 className="syne fu2" style={{
-          fontSize:"clamp(18px,3vw,34px)",fontWeight:700,lineHeight:1.25,marginBottom:22,
-          color: dark?"rgba(255,255,255,.85)":"rgba(12,35,64,.8)"
+
+        {/* Typewriter subtitle */}
+        <h2 className="syne" style={{
+          fontSize:"clamp(18px,3vw,32px)",fontWeight:700,lineHeight:1.3,marginBottom:10,
+          color: dark?"rgba(255,255,255,.9)":"rgba(12,35,64,.85)",
+          animation:"slideUpFade .7s .2s ease both"
         }}>
-          {lc.heroH1b}
+          {lang==="en" ? (
+            <>Stop <TypeWriter words={["RTO Losses","Fake Orders","Payment Fraud","Buyer Disputes"]} dark={dark} /> Forever</>
+          ) : lang==="hi" ? (
+            <>रोकें <TypeWriter words={["RTO नुकसान","फेक ऑर्डर","पेमेंट फ्रॉड"]} dark={dark} /> हमेशा के लिए</>
+          ) : (
+            <>Rokein <TypeWriter words={["RTO Loss","Fake Orders","Payment Fraud","Buyer Disputes"]} dark={dark} /> Hamesha</>
+          )}
         </h2>
 
-        <p className="fu3" style={{
-          color:"var(--muted)",fontSize:"clamp(14px,1.7vw,17px)",
-          maxWidth:560,margin:"0 auto 36px",lineHeight:1.75
+        <p style={{
+          color:"var(--muted)",fontSize:"clamp(14px,1.6vw,17px)",
+          maxWidth:540,margin:"0 auto 40px",lineHeight:1.8,
+          animation:"slideUpFade .7s .3s ease both"
         }}>
           {lc.heroDesc}
         </p>
 
         {/* CTA Buttons */}
-        <div className="fu3" style={{display:"flex",gap:12,justifyContent:"center",flexWrap:"wrap",marginBottom:44}}>
+        <div style={{display:"flex",gap:14,justifyContent:"center",flexWrap:"wrap",marginBottom:48,animation:"slideUpFade .7s .4s ease both"}}>
           <button
-            className="btn-gold pulse"
-            style={{fontSize:15,padding:"14px 38px",borderRadius:12,letterSpacing:".2px"}}
+            className="btn-gold"
+            style={{
+              fontSize:15,padding:"15px 40px",borderRadius:14,letterSpacing:".3px",
+              boxShadow:"0 8px 32px rgba(14,165,233,.35)",
+              animation:"pulseCyan 2.5s infinite"
+            }}
             onClick={()=>onEnter("seller")}
           >
             🏪 {lc.ctaSeller}
           </button>
           <button
             className="btn-outline"
-            style={{fontSize:15,padding:"13px 38px",borderRadius:12,letterSpacing:".2px"}}
+            style={{fontSize:15,padding:"14px 40px",borderRadius:14,letterSpacing:".3px"}}
             onClick={()=>onEnter("buyer")}
           >
             🛍️ {lc.ctaBuyer}
           </button>
         </div>
 
-        {/* Trust chips */}
-        <div className="fu3" style={{display:"flex",gap:10,justifyContent:"center",flexWrap:"wrap"}}>
+        {/* Trust chips — staggered animation */}
+        <div style={{display:"flex",gap:10,justifyContent:"center",flexWrap:"wrap"}}>
           {[
-            {icon:"🔒","text":"Razorpay Secured"},
-            {icon:"🛡️","text":"Payment Protected"},
-            {icon:"⚡","text":"RBI Compliant"},
-            {icon:"✅","text":"2-Min Setup"},
+            {icon:"🔒",text:"Razorpay Secured",delay:".5s"},
+            {icon:"🛡️",text:"Payment Protected",delay:".6s"},
+            {icon:"⚡",text:"RBI Compliant",delay:".7s"},
+            {icon:"✅",text:"2-Min Setup",delay:".8s"},
+            {icon:"🏆",text:"MSME Registered",delay:".9s"},
           ].map(chip=>(
             <span key={chip.text} style={{
-              display:"inline-flex",alignItems:"center",gap:5,
-              background: dark?"rgba(255,255,255,.05)":"rgba(14,165,233,.07)",
-              border:"1px solid var(--border)",borderRadius:100,
-              padding:"5px 13px",fontSize:11,fontWeight:600,color:"var(--muted)"
-            }}>
+              display:"inline-flex",alignItems:"center",gap:6,
+              background: dark?"rgba(255,255,255,.04)":"rgba(14,165,233,.06)",
+              border:"1px solid",
+              borderColor: dark?"rgba(255,255,255,.08)":"rgba(14,165,233,.15)",
+              borderRadius:100,padding:"6px 14px",
+              fontSize:11,fontWeight:600,color:"var(--muted)",
+              animation:`chipFadeIn .5s ${chip.delay} ease both`,
+              backdropFilter:"blur(8px)",
+              transition:"all .2s"
+            }}
+            onMouseEnter={e=>{e.currentTarget.style.borderColor="rgba(14,165,233,.4)";e.currentTarget.style.color="var(--gold)";e.currentTarget.style.background=dark?"rgba(14,165,233,.1)":"rgba(14,165,233,.1)";}}
+            onMouseLeave={e=>{e.currentTarget.style.borderColor=dark?"rgba(255,255,255,.08)":"rgba(14,165,233,.15)";e.currentTarget.style.color="var(--muted)";e.currentTarget.style.background=dark?"rgba(255,255,255,.04)":"rgba(14,165,233,.06)";}}
+            >
               {chip.icon} {chip.text}
             </span>
           ))}
@@ -935,10 +1016,15 @@ function Landing({ onEnter, onTrack, dark, onToggle, lang, onLangToggle }) {
       </div>
 
       {/* ── HOW IT WORKS ── */}
-      <div style={{padding:"70px clamp(16px,5vw,40px)",background:"var(--surface)"}}>
-        <div style={{textAlign:"center",marginBottom:48}}>
-          <p style={{fontSize:12,fontWeight:700,color:"var(--gold)",letterSpacing:"2px",textTransform:"uppercase",marginBottom:10}}>PROCESS</p>
-          <h2 className="syne" style={{fontSize:"clamp(24px,3.5vw,40px)",fontWeight:800,marginBottom:12,letterSpacing:"-0.5px"}}>
+      <div style={{padding:"80px clamp(16px,5vw,40px)",background:"var(--surface)"}}>
+        <div className="reveal" style={{textAlign:"center",marginBottom:52}}>
+          <span style={{
+            display:"inline-block",background:"rgba(14,165,233,.1)",
+            border:"1px solid rgba(14,165,233,.2)",borderRadius:100,
+            padding:"4px 16px",fontSize:11,fontWeight:700,color:"var(--gold)",
+            letterSpacing:"2px",textTransform:"uppercase",marginBottom:14
+          }}>PROCESS</span>
+          <h2 className="syne" style={{fontSize:"clamp(26px,3.5vw,44px)",fontWeight:800,marginBottom:14,letterSpacing:"-0.5px"}}>
             {lc.howTitle}
           </h2>
           <p style={{color:"var(--muted)",fontSize:15,maxWidth:480,margin:"0 auto",lineHeight:1.6}}>
@@ -1000,8 +1086,8 @@ function Landing({ onEnter, onTrack, dark, onToggle, lang, onLangToggle }) {
       </div>
 
       {/* ── WHY CHOOSE ── */}
-      <div style={{padding:"70px clamp(16px,5vw,40px)",background:"var(--sf2)"}}>
-        <div style={{textAlign:"center",marginBottom:48}}>
+      <div style={{padding:"80px clamp(16px,5vw,40px)",background:"var(--sf2)"}}>
+        <div className="reveal" style={{textAlign:"center",marginBottom:52}}>
           <p style={{fontSize:12,fontWeight:700,color:"var(--gold)",letterSpacing:"2px",textTransform:"uppercase",marginBottom:10}}>BENEFITS</p>
           <h2 className="syne" style={{fontSize:"clamp(24px,3.5vw,40px)",fontWeight:800,marginBottom:12,letterSpacing:"-0.5px"}}>
             {lc.whyTitle}
