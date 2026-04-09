@@ -274,7 +274,7 @@ function getStyle(dark) {
 
   /* ── Shimmer text ── */
   .shimmer{
-    background:linear-gradient(90deg,var(--gold),${dark?"#93C5FD":"#4A1C81"},var(--gold2),var(--gold));
+    background:linear-gradient(90deg,#29B6F6,#1565C0,#3730A3,#00B4FF,#1565C0,#29B6F6);
     background-size:300% auto;
     -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
     animation:shimmer 4s linear infinite;
@@ -933,12 +933,7 @@ function Landing({ onEnter, onTrack, dark, onToggle, lang, onLangToggle }) {
           marginBottom:16,letterSpacing:"-2px",
           animation:"slideUpFade .7s .1s ease both"
         }}>
-          <span style={{
-            background:"linear-gradient(135deg,var(--gold) 0%,#38bdf8 50%,var(--gold) 100%)",
-            backgroundSize:"200% auto",
-            WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent",backgroundClip:"text",
-            animation:"gradientShift 4s linear infinite"
-          }}>{lc.heroH1a}</span>
+          <span className="shimmer">{lc.heroH1a}</span>
         </h1>
 
         {/* Typewriter subtitle */}
