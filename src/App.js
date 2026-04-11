@@ -407,37 +407,33 @@ function PayPage({ orderId, dark, onToggle, onGoHome }) {
     });
   },[orderId]);
 
-  const loadRazorpay = () => new Promise(resolve=>{
-    if (document.getElementById("rzp-script")) { resolve(true); return; }
-    const s = document.createElement("script"); s.id="rzp-script";
-    s.src="https://checkout.razorpay.com/v1/checkout.js";
-    s.onload=()=>resolve(true); s.onerror=()=>resolve(false);
+  const loadCashfree = () => new Promise((resolve, reject) => {
+    if (document.getElementById("cashfree-script")) { resolve(); return; }
+    const s = document.createElement("script");
+    s.id = "cashfree-script";
+    s.src = "https://sdk.cashfree.com/js/v3/cashfree.js";
+    s.onload = resolve; s.onerror = reject;
     document.body.appendChild(s);
   });
 
   const handlePay = async () => {
     setPayError(""); setPayStep(1);
-    const loaded = await loadRazorpay();
-    if (!loaded) { setPayError("Failed to load payment gateway. Please try again."); setPayStep(0); return; }
+    try {
+      await loadCashfree();
+    } catch(e) { setPayError("Payment gateway load nahi hua. Please try again."); setPayStep(0); return; }
     const result = await createPaymentOrder(order.id);
     if (!result.success) { setPayError(result.error); setPayStep(0); return; }
-    const { razorpayOrderId, amount, keyId } = result.data;
+    const { paymentSessionId } = result.data;
     setPayStep(0);
-    new window.Razorpay({
-      key: keyId || process.env.REACT_APP_RAZORPAY_KEY_ID,
-      amount, currency:"INR", name:"EscaraPay",
-      description:`Token: ${order.product_name}`,
-      order_id: razorpayOrderId,
-      handler: async (response) => {
-        setPayStep(2);
-        const verify = await verifyPayment(response.razorpay_order_id, response.razorpay_payment_id, response.razorpay_signature, order.id);
-        if (verify.success) { setPayStep(3); setOrder(prev=>({...prev,status:"token_paid"})); }
-        else { setPayError("Verify failed: "+verify.error); setPayStep(0); }
-      },
-      prefill: { name: buyerName||order?.buyer_name||"", contact: buyerPhone||order?.buyer_phone||"" },
-      theme: { color:"#f0b429" },
-      modal: { ondismiss: ()=>setPayStep(0) },
-    }).open();
+    const cashfree = window.Cashfree({ mode: "production" });
+    cashfree.checkout({ paymentSessionId, redirectTarget: "_modal" }).then(async (res) => {
+      if (res.error) { setPayError(res.error.message || "Payment failed"); return; }
+      if (res.paymentDetails?.paymentStatus === "FAILED") { setPayError("Payment failed. Please try again."); return; }
+      setPayStep(2);
+      const verify = await verifyPayment(null, null, null, order.id);
+      if (verify.success) { setPayStep(3); setOrder(prev=>({...prev,status:"token_paid"})); }
+      else { setPayError("Verify failed: "+verify.error); setPayStep(0); }
+    }).catch(e => { setPayError("Payment cancelled or failed."); setPayStep(0); });
   };
 
   return (
@@ -506,7 +502,7 @@ function PayPage({ orderId, dark, onToggle, onGoHome }) {
                 <button className="btn-gold pulse" style={{width:"100%",padding:"16px",fontSize:16,borderRadius:12,marginBottom:12}} onClick={handlePay}>
                   💳 Pay ₹{order.buyer_pays||order.token_amount} Token
                 </button>
-                <div style={{textAlign:"center",fontSize:12,color:"var(--muted)"}}>🔒 Secured by Razorpay • UPI, Cards, NetBanking</div>
+                <div style={{textAlign:"center",fontSize:12,color:"var(--muted)"}}>🔒 Secured by Cashfree • UPI, Cards, NetBanking</div>
               </div>
             )
           )}
@@ -729,7 +725,7 @@ function Landing({ onEnter, onTrack, dark, onToggle, lang, onLangToggle }) {
         { icon:"📦", title:"Guaranteed RTO Protection", desc:"Escara Pay discourages casual or fake orders and protects your margins.", color:"rgba(5,150,105,.15)", bdr:"rgba(5,150,105,.35)" },
         { icon:"⚡", title:"2-Minute Rapid Setup", desc:"Our streamlined onboarding process lets you create your first secure payment link in just 2 minutes.", color:"rgba(240,180,41,.15)", bdr:"rgba(240,180,41,.35)" },
         { icon:"💬", title:"WhatsApp-Native Experience", desc:"Create, share, and track your protected orders directly within WhatsApp.", color:"rgba(37,211,102,.15)", bdr:"rgba(37,211,102,.35)" },
-        { icon:"🔒", title:"Razorpay-Powered Security", desc:"Razorpay's infrastructure ensures every payment is encrypted and 100% secure.", color:"rgba(124,58,237,.15)", bdr:"rgba(124,58,237,.35)" },
+        { icon:"🔒", title:"Cashfree-Powered Security", desc:"Cashfree's infrastructure ensures every payment is encrypted and 100% secure.", color:"rgba(124,58,237,.15)", bdr:"rgba(124,58,237,.35)" },
         { icon:"⚖️", title:"Expert Dispute Resolution", desc:"Our mediators review the evidence and provide a fast, fair resolution.", color:"rgba(239,68,68,.15)", bdr:"rgba(239,68,68,.35)" },
       ],
       tokenCards: [
@@ -797,7 +793,7 @@ function Landing({ onEnter, onTrack, dark, onToggle, lang, onLangToggle }) {
         { icon:"📦", title:"Guaranteed RTO Protection", desc:"Escara Pay fake orders rokta hai aur aapka margin bachata hai.", color:"rgba(5,150,105,.15)", bdr:"rgba(5,150,105,.35)" },
         { icon:"⚡", title:"2-Minute Rapid Setup", desc:"Hamare streamlined process se sirf 2 minute mein pehla secure payment link banao.", color:"rgba(240,180,41,.15)", bdr:"rgba(240,180,41,.35)" },
         { icon:"💬", title:"WhatsApp-Native Experience", desc:"WhatsApp mein seedha orders banao, share karo aur track karo.", color:"rgba(37,211,102,.15)", bdr:"rgba(37,211,102,.35)" },
-        { icon:"🔒", title:"Razorpay-Powered Security", desc:"Razorpay ka infrastructure har payment ko encrypted aur 100% secure rakhta hai.", color:"rgba(124,58,237,.15)", bdr:"rgba(124,58,237,.35)" },
+        { icon:"🔒", title:"Cashfree-Powered Security", desc:"Cashfree ka infrastructure har payment ko encrypted aur 100% secure rakhta hai.", color:"rgba(124,58,237,.15)", bdr:"rgba(124,58,237,.35)" },
         { icon:"⚖️", title:"Expert Dispute Resolution", desc:"Hamare mediators evidence dekhkar fast aur fair resolution dete hain.", color:"rgba(239,68,68,.15)", bdr:"rgba(239,68,68,.35)" },
       ],
       tokenCards: [
@@ -846,23 +842,23 @@ function Landing({ onEnter, onTrack, dark, onToggle, lang, onLangToggle }) {
     { q:"EscaraPay पर न्यूनतम टोकन राशि क्या है?", a:"न्यूनतम टोकन ₹200 है। यह ऑर्डर वैल्यू का एक प्रतिशत होता है जो एस्क्रो में सुरक्षित रखा जाता है।" },
     { q:"अगर सेलर ने आइटम नहीं भेजा तो क्या होगा?", a:"अगर सेलर निर्धारित समय में आइटम नहीं भेजता, तो टोकन पूरी तरह बायर को वापस कर दिया जाएगा।" },
     { q:"टोकन का पैसा सेलर को कब मिलेगा?", a:"डिलीवरी की पुष्टि के बाद 7 दिनों में या जब बायर खुद कन्फर्म कर दे, तभी पैसा रिलीज होता है।" },
-    { q:"क्या EscaraPay RBI से approved है?", a:"EscaraPay Razorpay के ज़रिए पेमेंट प्रोसेस करता है जो RBI-compliant और PCI DSS certified है।" },
+    { q:"क्या EscaraPay RBI से approved है?", a:"EscaraPay Cashfree के ज़रिए पेमेंट प्रोसेस करता है जो RBI-compliant और PCI DSS certified है।" },
     { q:"विवाद कैसे उठाएं?", a:"डिलीवरी के 7 दिनों के अंदर अपने डैशबोर्ड में जाकर 'Dispute Raise Karo' बटन दबाएं। हमारी टीम 24 घंटे में जवाब देगी।" },
-    { q:"क्या कोई hidden charges हैं?", a:"नहीं। केवल 2% Razorpay gateway fee है जो बायर को पेमेंट के समय दिखाई जाती है। कोई छुपी हुई फीस नहीं।" },
+    { q:"क्या कोई hidden charges हैं?", a:"नहीं। केवल 2% Cashfree gateway fee है जो बायर को पेमेंट के समय दिखाई जाती है। कोई छुपी हुई फीस नहीं।" },
   ] : lang==="en" ? [
     { q:"What is the minimum token amount on EscaraPay?", a:"The minimum token is ₹200. It is a percentage of the order value that is held securely in our protected vault until delivery is confirmed." },
     { q:"What if the seller doesn't ship the item?", a:"If the seller fails to ship within the agreed time, the full token amount is automatically refunded to the buyer." },
     { q:"When does the seller receive the token payment?", a:"The payment is released to the seller within 7 days of delivery confirmation, or immediately when the buyer manually confirms receipt." },
-    { q:"Is EscaraPay approved by RBI?", a:"EscaraPay processes payments via Razorpay, which is fully RBI-compliant and PCI DSS Level 1 certified, ensuring maximum security." },
+    { q:"Is EscaraPay approved by RBI?", a:"EscaraPay processes payments via Cashfree, which is fully RBI-compliant and PCI DSS Level 1 certified, ensuring maximum security." },
     { q:"How do I raise a dispute?", a:"Within 7 days of delivery, go to your dashboard and click 'Raise Dispute'. Our team will investigate and respond within 24 hours." },
-    { q:"Are there any hidden charges?", a:"No hidden charges. Only a 2% Razorpay gateway fee is applied, which is shown transparently at the time of payment." },
+    { q:"Are there any hidden charges?", a:"No hidden charges. Only a 2% Cashfree gateway fee is applied, which is shown transparently at the time of payment." },
   ] : [
     { q:"EscaraPay pe minimum token kitna hota hai?", a:"Minimum token ₹200 hai. Yeh order value ka ek percentage hota hai jo delivery confirm hone tak protected vault mein safe rakha jaata hai." },
     { q:"Agar seller ne item nahi bheja toh kya hoga?", a:"Agar seller decided time mein item nahi bhejta, toh poora token amount buyer ko automatically wapas kar diya jaata hai." },
     { q:"Seller ko token payment kab milegi?", a:"Delivery confirmation ke 7 din ke andar, ya jab buyer khud confirm kare — tab payment seller ko release hoti hai." },
-    { q:"Kya EscaraPay RBI se approved hai?", a:"EscaraPay Razorpay ke zariye payments process karta hai jo RBI-compliant aur PCI DSS Level 1 certified hai." },
+    { q:"Kya EscaraPay RBI se approved hai?", a:"EscaraPay Cashfree ke zariye payments process karta hai jo RBI-compliant aur PCI DSS Level 1 certified hai." },
     { q:"Dispute kaise raise karein?", a:"Delivery ke 7 din ke andar dashboard mein jaao aur 'Dispute Raise Karo' button dabao. Hamari team 24 ghante mein jawab degi." },
-    { q:"Koi hidden charges hain kya?", a:"Koi hidden charge nahi. Sirf 2% Razorpay gateway fee hai jo payment ke waqt clearly dikhti hai." },
+    { q:"Koi hidden charges hain kya?", a:"Koi hidden charge nahi. Sirf 2% Cashfree gateway fee hai jo payment ke waqt clearly dikhti hai." },
   ];
 
   return (
@@ -984,7 +980,7 @@ function Landing({ onEnter, onTrack, dark, onToggle, lang, onLangToggle }) {
         {/* Trust chips — staggered animation */}
         <div style={{display:"flex",gap:10,justifyContent:"center",flexWrap:"wrap"}}>
           {[
-            {icon:"🔒",text:"Razorpay Secured",delay:".5s"},
+            {icon:"🔒",text:"Cashfree Secured",delay:".5s"},
             {icon:"🛡️",text:"Payment Protected",delay:".6s"},
             {icon:"⚡",text:"RBI Compliant",delay:".7s"},
             {icon:"✅",text:"2-Min Setup",delay:".8s"},
@@ -1420,8 +1416,8 @@ function Landing({ onEnter, onTrack, dark, onToggle, lang, onLangToggle }) {
                 title: lang==="hi"?"प्रायोरिटी सपोर्ट":lang==="en"?"Priority Support":"Priority Support",
                 desc: lang==="hi"?"Early sellers को 24/7 dedicated support मिलेगी — कोई भी समस्या तुरंत सुलझेगी।":lang==="en"?"Early sellers get dedicated 24/7 support — every issue resolved instantly.":"Early sellers ko 24/7 dedicated support milegi — koi bhi problem turant suljhegi." },
               { icon:"🔒", color:"rgba(16,185,129,.15)", bdr:"rgba(16,185,129,.3)",
-                title: lang==="hi"?"Razorpay सिक्योर पेमेंट":lang==="en"?"Razorpay Secured":"Razorpay Secured",
-                desc: lang==="hi"?"हर पेमेंट RBI-compliant Razorpay से secure है — आपका और buyer का पैसा safe.":lang==="en"?"Every payment secured via RBI-compliant Razorpay — your money, always safe.":"Har payment RBI-compliant Razorpay se secure hai — aapka aur buyer ka paisa safe." },
+                title: lang==="hi"?"Cashfree सिक्योर पेमेंट":lang==="en"?"Cashfree Secured":"Cashfree Secured",
+                desc: lang==="hi"?"हर पेमेंट RBI-compliant Cashfree से secure है — आपका और buyer का पैसा safe.":lang==="en"?"Every payment secured via RBI-compliant Cashfree — your money, always safe.":"Har payment RBI-compliant Cashfree se secure hai — aapka aur buyer ka paisa safe."},
               { icon:"📊", color:"rgba(240,180,41,.12)", bdr:"rgba(240,180,41,.3)",
                 title: lang==="hi"?"फीडबैक से प्लेटफॉर्म शेप करें":lang==="en"?"Shape the Platform":"Platform Shape Karo",
                 desc: lang==="hi"?"Early users के suggestions से ही हम features बनाएंगे। आपकी आवाज़ सुनी जाएगी।":lang==="en"?"We build features based on early user feedback. Your voice matters here.":"Early users ke suggestions se hi hum features banayenge. Aapki awaaz suni jayegi." },
@@ -1599,7 +1595,7 @@ function Landing({ onEnter, onTrack, dark, onToggle, lang, onLangToggle }) {
             {icon:"🔒",text:"Secure Payments"},
             {icon:"🛡️",text:"Payment Protection"},
             {icon:"⚡",text:"Fast & Safe"},
-            {icon:"✅",text:"Powered by Razorpay (RBI Compliant)"},
+            {icon:"✅",text:"Powered by Cashfree (RBI Compliant)"},
           ].map(b=>(
             <div key={b.text} style={{display:"flex",alignItems:"center",gap:6,fontSize:12,fontWeight:600,color:"var(--gold)",whiteSpace:"nowrap"}}>
               <span>{b.icon}</span><span>{b.text}</span>
@@ -2330,7 +2326,7 @@ function SellerDB({ user, userId, onLogout, dark, onToggle }) {
             <div style={{background:"rgba(14,165,233,.08)",border:"1px solid rgba(14,165,233,.2)",borderRadius:12,padding:16}}>
               <div className="syne" style={{fontWeight:700,fontSize:14,marginBottom:10}}>🏦 Payout System — Coming Soon!</div>
               <div style={{fontSize:13,color:"var(--muted)",lineHeight:1.8}}>
-                Currently in test mode — payments are simulated. Once Razorpay KYC is complete:<br/>
+                Cashfree Live mode active hai! Bank transfer shortly after delivery:<br/>
                 ✅ Direct bank transfer within 2-3 business days<br/>
                 ✅ UPI instant payout<br/>
                 ✅ Withdrawal history dashboard<br/>
@@ -2458,7 +2454,7 @@ function SellerDB({ user, userId, onLogout, dark, onToggle }) {
             <div style={{background:"rgba(14,165,233,.08)",border:"1px solid rgba(14,165,233,.2)",borderRadius:12,padding:16}}>
               <div className="syne" style={{fontWeight:700,fontSize:14,marginBottom:8}}>🏦 Bank Payout — Coming Soon!</div>
               <div style={{fontSize:13,color:"var(--muted)",lineHeight:1.8}}>
-                Currently in test mode. Once Razorpay KYC is approved:<br/>
+                Currently in test mode. Cashfree Live mode active:<br/>
                 ✅ Direct bank transfer (2-3 business days)<br/>
                 ✅ UPI instant payout<br/>
                 ✅ GST invoice download<br/>
@@ -2550,34 +2546,36 @@ function BuyerDB({ user, userId, userPhone, onLogout, dark, onToggle }) {
     load();
   },[userPhone]);
 
-  const loadRazorpay = () => new Promise(resolve=>{
-    if(document.getElementById("rzp-script")){resolve(true);return;}
-    const s=document.createElement("script"); s.id="rzp-script";
-    s.src="https://checkout.razorpay.com/v1/checkout.js";
-    s.onload=()=>resolve(true); s.onerror=()=>resolve(false);
+  const loadCashfree = () => new Promise((resolve, reject) => {
+    if (document.getElementById("cashfree-script")) { resolve(); return; }
+    const s = document.createElement("script");
+    s.id = "cashfree-script";
+    s.src = "https://sdk.cashfree.com/js/v3/cashfree.js";
+    s.onload = resolve; s.onerror = reject;
     document.body.appendChild(s);
   });
 
   const handlePay = async(order)=>{
     setPayError(""); setPayStep(1);
-    const loaded=await loadRazorpay();
-    if(!loaded){setPayError("Failed to load payment gateway. Please try again.");setPayStep(0);return;}
+    try { await loadCashfree(); }
+    catch(e) { setPayError("Payment gateway load nahi hua. Please try again."); setPayStep(0); return; }
     const result=await createPaymentOrder(order.id);
     if(!result.success){setPayError(result.error);setPayStep(0);return;}
-    const {razorpayOrderId,amount,keyId}=result.data;
+    const { paymentSessionId } = result.data;
     setPayStep(0);
-    new window.Razorpay({
-      key:keyId||process.env.REACT_APP_RAZORPAY_KEY_ID, amount, currency:"INR", name:"EscaraPay",
-      description:`Token: ${order.product_name}`, order_id:razorpayOrderId,
-      handler:async(response)=>{
-        setPayStep(2);
-        const verify=await verifyPayment(response.razorpay_order_id,response.razorpay_payment_id,response.razorpay_signature,order.id);
-        if(verify.success){setPayStep(3);setOrders(prev=>prev.map(o=>o.id===order.id?{...o,status:"token_paid"}:o));setLinkOrder(prev=>prev&&prev.id===order.id?{...prev,status:"token_paid"}:prev);setTimeout(()=>{setPayStep(0);},2500);}
-        else{setPayError("Verify failed: "+verify.error);setPayStep(0);}
-      },
-      prefill:{name:user}, theme:{color:"#f0b429"},
-      modal:{ondismiss:()=>setPayStep(0)},
-    }).open();
+    const cashfree = window.Cashfree({ mode: "production" });
+    cashfree.checkout({ paymentSessionId, redirectTarget: "_modal" }).then(async(res) => {
+      if (res.error) { setPayError(res.error.message || "Payment failed"); return; }
+      if (res.paymentDetails?.paymentStatus === "FAILED") { setPayError("Payment failed. Please try again."); return; }
+      setPayStep(2);
+      const verify=await verifyPayment(null,null,null,order.id);
+      if(verify.success){
+        setPayStep(3);
+        setOrders(prev=>prev.map(o=>o.id===order.id?{...o,status:"token_paid"}:o));
+        setLinkOrder(prev=>prev&&prev.id===order.id?{...prev,status:"token_paid"}:prev);
+        setTimeout(()=>{setPayStep(0);},2500);
+      } else { setPayError("Verify failed: "+verify.error); setPayStep(0); }
+    }).catch(e => { setPayError("Payment cancelled or failed."); setPayStep(0); });
   };
 
   const fetchLinkOrder=async()=>{
@@ -3493,7 +3491,7 @@ function AboutPage({ onBack, dark, onToggle, lang, onLangToggle }) {
               {n:"2",c:"var(--blue)", en:"Buyer Pays Token", hi:"बायर टोकन पेमेंट करता है", hl:"Buyer Token Pay Karta Hai",
                de:"Pays via UPI/Card/NetBanking. Token locked in EscaraPay protected vault.",
                dh:"UPI/कार्ड से भुगतान करता है। टोकन एस्क्रो में लॉक।",
-               dl:"Razorpay ke through UPI/Card/NetBanking se pay. Token EscaraPay protected vault mein lock."},
+               dl:"Cashfree ke through UPI/Card/NetBanking se pay. Token EscaraPay protected vault mein lock."},
               {n:"3",c:"var(--accent)", en:"Seller Dispatches", hi:"सेलर भेजता है", hl:"Seller Dispatch Karta Hai",
                de:"Token secured → seller ships confidently with tracking ID.",
                dh:"टोकन सुरक्षित → सेलर निश्चिंत होकर ट्रैकिंग ID के साथ भेजता है।",
@@ -3642,13 +3640,13 @@ function RefundPage({ onBack, dark, onToggle }) {
         {[
           {t:"1. When You Get a Refund",icon:"✅",color:"var(--green)",sections:[
             {head:"Non-Delivery by Seller",body:"If the seller does not dispatch your order within the agreed time, 100% of your token amount is refunded to your original payment method. Processing time: 5–7 business days."},
-            {head:"Seller Cancellation",body:"If the seller cancels the order before dispatch, your full token is refunded. The 2% gateway fee is non-refundable as it is charged by Razorpay directly."},
+            {head:"Seller Cancellation",body:"If the seller cancels the order before dispatch, your full token is refunded. The 2% gateway fee is non-refundable as it is charged by Cashfree directly."},
             {head:"Successful Dispute Resolution (Buyer)",body:"If EscaraPay's dispute team determines the seller is at fault (e.g., item not received, wrong item, damaged goods), the token amount is refunded to you within 5–7 business days."},
           ]},
           {t:"2. When You Do NOT Get a Refund",icon:"❌",color:"var(--red)",sections:[
             {head:"Delivery Confirmed by Buyer",body:"Once you confirm delivery, the payment is permanently released to the seller. This action cannot be reversed."},
             {head:"Auto-Release After 7 Days",body:"If you do not raise a dispute within 48 hours of expected delivery, the token auto-releases to the seller after 7 days. No refund after auto-release."},
-            {head:"Gateway Fee (2%)",body:"The 2% payment gateway fee charged by Razorpay is non-refundable in all cases, as it is collected by the payment processor, not by EscaraPay."},
+            {head:"Gateway Fee (2%)",body:"The 2% payment gateway fee charged by Cashfree is non-refundable in all cases, as it is collected by Cashfree, not by EscaraPay."},
             {head:"EscaraPay Commission (5%)",body:"EscaraPay's 5% service commission is non-refundable once a transaction is initiated, as it covers platform infrastructure and dispute resolution services."},
           ]},
           {t:"3. Refund Timeline",icon:"⏱️",color:"var(--blue)",sections:[
@@ -3664,7 +3662,7 @@ function RefundPage({ onBack, dark, onToggle }) {
           ]},
           {t:"5. EscaraPay's Role",icon:"🛡️",color:"var(--muted)",sections:[
             {head:"Facilitator Only",body:"EscaraPay is a payment protection facilitator. We do not manufacture, sell, or ship any products. We are responsible only for holding and releasing the protected token amount as per our policy."},
-            {head:"Payments via Razorpay",body:"All payments are processed through Razorpay, an RBI-authorized payment aggregator. EscaraPay does not directly hold or process payment card data."},
+            {head:"Payments via Cashfree",body:"All payments are processed through Cashfree, an RBI-authorized payment aggregator. EscaraPay does not directly hold or process payment card data."},
           ]},
         ].map(section=>(
           <div key={section.t} className="card" style={{marginBottom:16}}>
@@ -3767,9 +3765,9 @@ function PrivacyPage({ onBack, dark, onToggle }) {
         {[
           {t:"1. Information We Collect", c:"EscaraPay collects the following when you register or transact: Full name, email address, phone number (10 digits), PAN card or GST number (sellers only, for KYC), UPI ID (optional, for payouts), transaction history and order details, device information and IP address for security and fraud prevention."},
           {t:"2. How We Use Your Information", c:"Your data is used strictly to: process and manage protected payment transactions securely, verify identity to prevent fraud and unauthorized access, send transaction notifications, alerts, and OTPs, resolve disputes between buyers and sellers, comply with Indian financial regulations (IT Act 2000, PMLA 2002, RBI guidelines), improve platform performance and user experience."},
-          {t:"3. Payment Data & Razorpay", c:"EscaraPay uses Razorpay as our payment gateway — an RBI-authorized and PCI-DSS Level 1 certified payment aggregator. EscaraPay does NOT store card numbers, CVV, or banking credentials. Token amounts are held in secure trust accounts. All transactions are encrypted using 256-bit SSL/TLS."},
+          {t:"3. Payment Data & Cashfree", c:"EscaraPay uses Cashfree as our payment gateway — an RBI-authorized and PCI-DSS Level 1 certified payment aggregator. EscaraPay does NOT store card numbers, CVV, or banking credentials. Token amounts are held in secure trust accounts. All transactions are encrypted using 256-bit SSL/TLS."},
           {t:"4. KYC & Seller Data", c:"Sellers must provide PAN Card or GST Number for KYC as required by Indian financial laws. This data is encrypted at rest (AES-256), accessible only by authorized compliance personnel, never shared for marketing, and retained for 7 years as per PMLA 2002 requirements."},
-          {t:"5. Data Sharing", c:"We do NOT sell, rent, or trade your personal data. Data is shared only with: Razorpay (payment processing), law enforcement agencies when legally required by Indian courts or regulators, dispute resolution partners during fraud investigations. We notify you where legally permissible before sharing."},
+          {t:"5. Data Sharing", c:"We do NOT sell, rent, or trade your personal data. Data is shared only with: Cashfree (payment processing), law enforcement agencies when legally required by Indian courts or regulators, dispute resolution partners during fraud investigations. We notify you where legally permissible before sharing."},
           {t:"6. Data Security", c:"Our security measures include: SSL/TLS encryption in transit, AES-256 encryption at rest, strict role-based access controls, regular third-party security audits, industry-standard password hashing (bcrypt). However, no method of internet transmission is 100% secure."},
           {t:"7. Your Rights", c:"Under Indian data protection principles, you have the right to: access all personal data we hold about you, request correction of inaccurate information, request account deletion (subject to legal retention requirements), withdraw consent for non-essential data use, raise concerns at privacy@escarapay.in. We respond to all requests within 30 days."},
           {t:"8. Data Retention", c:"Transaction records are retained for 7 years as mandated by PMLA 2002. Account data is retained as long as your account is active. On deletion request, personal data is anonymized — anonymized statistical data may be retained for analytics."},

@@ -1,4 +1,3 @@
-
 const BASE_URL = "https://escarapay-backend-production.up.railway.app";
 
 /* ── Auth ── */
@@ -136,11 +135,11 @@ export const createPaymentOrder = async (orderId) => {
   } catch (err) { return { success: false, error: "Backend se connect nahi hua." }; }
 };
 
-export const verifyPayment = async (razorpayOrderId, razorpayPaymentId, razorpaySignature, escaraOrderId) => {
+export const verifyPayment = async (rzpOrderId, rzpPaymentId, rzpSignature, escaraOrderId) => {
   try {
     const res = await fetch(`${BASE_URL}/api/payment/verify`, {
       method: "POST", headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ razorpay_order_id: razorpayOrderId, razorpay_payment_id: razorpayPaymentId, razorpay_signature: razorpaySignature, escara_order_id: escaraOrderId }),
+      body: JSON.stringify({ orderId: escaraOrderId }),
     });
     const data = await res.json();
     if (!res.ok) return { success: false, error: data.error || "Payment verify failed" };
