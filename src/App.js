@@ -1417,7 +1417,7 @@ function Landing({ onEnter, onTrack, dark, onToggle, lang, onLangToggle }) {
                 desc: lang==="hi"?"Early sellers को 24/7 dedicated support मिलेगी — कोई भी समस्या तुरंत सुलझेगी।":lang==="en"?"Early sellers get dedicated 24/7 support — every issue resolved instantly.":"Early sellers ko 24/7 dedicated support milegi — koi bhi problem turant suljhegi." },
               { icon:"🔒", color:"rgba(16,185,129,.15)", bdr:"rgba(16,185,129,.3)",
                 title: lang==="hi"?"Cashfree सिक्योर पेमेंट":lang==="en"?"Cashfree Secured":"Cashfree Secured",
-                desc: lang==="hi"?"हर पेमेंट RBI-compliant Cashfree से secure है — आपका और buyer का पैसा safe.":lang==="en"?"Every payment secured via RBI-compliant Cashfree — your money, always safe.":"Har payment RBI-compliant Cashfree se secure hai — aapka aur buyer ka paisa safe."},
+                desc: lang==="hi"?"हर पेमेंट RBI-compliant Cashfree से secure है — आपका और buyer का पैसा safe.":lang==="en"?"Every payment secured via RBI-compliant Cashfree — your money, always safe.":"Har payment RBI-compliant Cashfree se secure hai — aapka aur buyer ka paisa safe." },
               { icon:"📊", color:"rgba(240,180,41,.12)", bdr:"rgba(240,180,41,.3)",
                 title: lang==="hi"?"फीडबैक से प्लेटफॉर्म शेप करें":lang==="en"?"Shape the Platform":"Platform Shape Karo",
                 desc: lang==="hi"?"Early users के suggestions से ही हम features बनाएंगे। आपकी आवाज़ सुनी जाएगी।":lang==="en"?"We build features based on early user feedback. Your voice matters here.":"Early users ke suggestions se hi hum features banayenge. Aapki awaaz suni jayegi." },
@@ -2450,16 +2450,53 @@ function SellerDB({ user, userId, onLogout, dark, onToggle }) {
               </div>
             )}
 
-            {/* Payout info box */}
-            <div style={{background:"rgba(14,165,233,.08)",border:"1px solid rgba(14,165,233,.2)",borderRadius:12,padding:16}}>
-              <div className="syne" style={{fontWeight:700,fontSize:14,marginBottom:8}}>🏦 Bank Payout — Coming Soon!</div>
-              <div style={{fontSize:13,color:"var(--muted)",lineHeight:1.8}}>
-                Currently in test mode. Cashfree Live mode active:<br/>
-                ✅ Direct bank transfer (2-3 business days)<br/>
-                ✅ UPI instant payout<br/>
-                ✅ GST invoice download<br/>
-                ✅ Monthly earnings report
+                        {/* Payout Status — Live */}
+            {orders.filter(o=>["delivered","cancelled_buyer"].includes(o.status)).map(o=>(
+              <div key={o.id} style={{
+                background: o.payout_status==="paid"?"rgba(16,185,129,.06)":"rgba(251,146,60,.06)",
+                border:`1px solid ${o.payout_status==="paid"?"rgba(16,185,129,.25)":"rgba(251,146,60,.25)"}`,
+                borderRadius:12,padding:14,marginBottom:10
+              }}>
+                <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",flexWrap:"wrap",gap:8}}>
+                  <div>
+                    <div style={{fontFamily:"monospace",color:"var(--gold)",fontSize:11,marginBottom:2}}>{o.id}</div>
+                    <div style={{fontWeight:600,fontSize:14}}>{o.product_name}</div>
+                    <div style={{fontSize:13,color:"var(--muted)",marginTop:3}}>
+                      Token: ₹{o.token_amount} → <strong style={{color:"var(--green)"}}>Aapko: ₹{o.seller_receives}</strong>
+                    </div>
+                  </div>
+                  <div>{o.payout_status==="paid"?<span className="badge bg">✅ Payment Received</span>:<span className="badge borange">⏳ Payment Pending</span>}</div>
+                </div>
+                {o.payout_status==="paid" && (
+                  <div style={{marginTop:10,padding:10,background:"rgba(16,185,129,.1)",borderRadius:8,fontSize:12}}>
+                    <div style={{fontWeight:700,color:"var(--green)",marginBottom:6}}>💰 Payment Details:</div>
+                    <div style={{display:"flex",flexDirection:"column",gap:4,color:"var(--muted)"}}>
+                      {o.payout_method && <div>Method: <strong style={{color:"var(--text)"}}>{o.payout_method?.toUpperCase()}</strong></div>}
+                      {o.payout_upi && <div>UPI ID: <strong style={{color:"var(--text)",fontFamily:"monospace"}}>{o.payout_upi}</strong></div>}
+                      {o.payout_bank && <div>Bank: <strong style={{color:"var(--text)",fontFamily:"monospace"}}>{o.payout_bank}</strong></div>}
+                      {o.payout_ref && <div>UTR/Ref No: <strong style={{color:"var(--gold)",fontFamily:"monospace",fontSize:13}}>{o.payout_ref}</strong></div>}
+                      {o.payout_amount && <div>Amount: <strong style={{color:"var(--green)",fontSize:14}}>₹{o.payout_amount}</strong></div>}
+                      {o.payout_at && <div>Date: <strong style={{color:"var(--text)"}}>{new Date(o.payout_at).toLocaleString("en-IN")}</strong></div>}
+                      {o.payout_note && <div>Note: <strong style={{color:"var(--text)"}}>{o.payout_note}</strong></div>}
+                    </div>
+                  </div>
+                )}
+                {(!o.payout_status || o.payout_status==="pending") && (
+                  <div style={{marginTop:8,fontSize:12,color:"var(--muted)",padding:"8px 10px",background:"rgba(251,146,60,.08)",borderRadius:8}}>
+                    ⏳ EscaraPay jald hi aapka payment UPI/Bank mein transfer karega. Query? support@escarapay.in
+                  </div>
+                )}
               </div>
+            ))}
+            {orders.filter(o=>["delivered","cancelled_buyer"].includes(o.status)).length===0 && (
+              <div style={{textAlign:"center",padding:24,color:"var(--muted)",background:"var(--sf2)",borderRadius:12}}>
+                <div style={{fontSize:36,marginBottom:8}}>💸</div>
+                <div style={{fontSize:13}}>Abhi koi completed order nahi. Deliver karo — payment milegi!</div>
+              </div>
+            )}
+            <div style={{background:"rgba(14,165,233,.08)",border:"1px solid rgba(14,165,233,.2)",borderRadius:12,padding:14,marginTop:4}}>
+              <div style={{fontWeight:700,fontSize:13,marginBottom:4}}>📞 Payment Query?</div>
+              <div style={{fontSize:12,color:"var(--muted)"}}>support@escarapay.in | 24 hours mein reply</div>
             </div>
           </div>
         )}
@@ -3067,6 +3104,11 @@ function UserDetailModal({ user, adminKey, onClose, onUpdate }) {
   const [banReason, setBanReason] = useState("");
   const [msg, setMsg] = useState("");
   const [tab, setTab] = useState("actions");
+  // Payout state
+  const [payoutOrder, setPayoutOrder] = useState(null);
+  const [payoutForm, setPayoutForm] = useState({ payout_to:"seller", payout_method:"upi", payout_ref:"", payout_upi:"", payout_bank:"", payout_amount:"", payout_note:"" });
+  const [payoutLoading, setPayoutLoading] = useState(false);
+  const [payoutMsg, setPayoutMsg] = useState("");
 
   const hdrs = { "Content-Type":"application/json", "x-admin-key": adminKey };
 
@@ -3091,19 +3133,42 @@ function UserDetailModal({ user, adminKey, onClose, onUpdate }) {
       });
       const d = await r.json();
       setActionLoading("");
-      if(d.success) {
-        setMsg(d.message);
-        setTimeout(()=>{ onUpdate(user.id, action); }, 1500);
-      } else setMsg("❌ "+d.error);
+      if(d.success) { setMsg(d.message); setTimeout(()=>{ onUpdate(user.id, action); }, 1500); }
+      else setMsg("❌ "+d.error);
     } catch(e) { setActionLoading(""); setMsg("❌ Network error!"); }
+  };
+
+  const doManualPayout = async () => {
+    if (!payoutOrder) { setPayoutMsg("❌ Pehle order select karo"); return; }
+    if (!payoutForm.payout_ref) { setPayoutMsg("❌ Transaction reference/UTR zaroori hai"); return; }
+    if (payoutForm.payout_method === "upi" && !payoutForm.payout_upi) { setPayoutMsg("❌ UPI ID daalo"); return; }
+    if (payoutForm.payout_method === "bank" && !payoutForm.payout_bank) { setPayoutMsg("❌ Bank details daalo"); return; }
+    setPayoutLoading(true); setPayoutMsg("");
+    try {
+      const r = await fetch(`${ADMIN_URL}/api/admin/orders/${payoutOrder.id}/manual-payout`, {
+        method:"POST", headers: hdrs,
+        body: JSON.stringify({ ...payoutForm, payout_amount: payoutForm.payout_amount || payoutOrder.seller_receives, admin_name:"Admin" })
+      });
+      const d = await r.json();
+      setPayoutLoading(false);
+      if (d.success) {
+        setPayoutMsg("✅ " + d.message);
+        setUserOrders(prev => prev.map(o => o.id === payoutOrder.id ? { ...o, payout_status:"paid", payout_ref: payoutForm.payout_ref } : o));
+        setPayoutOrder(null);
+        setPayoutForm({ payout_to:"seller", payout_method:"upi", payout_ref:"", payout_upi:"", payout_bank:"", payout_amount:"", payout_note:"" });
+      } else setPayoutMsg("❌ " + d.error);
+    } catch(e) { setPayoutLoading(false); setPayoutMsg("❌ Network error!"); }
   };
 
   const isBanned = user.user_status === "banned";
   const warnCount = user.warning_count || 0;
+  const deliveredOrders = userOrders.filter(o => ["delivered","cancelled_buyer"].includes(o.status));
+  const pendingPayouts = deliveredOrders.filter(o => !o.payout_status || o.payout_status === "pending");
+  const donePayouts = deliveredOrders.filter(o => o.payout_status === "paid");
 
   return (
     <div className="overlay" onClick={onClose}>
-      <div className="modal" style={{maxWidth:520}} onClick={e=>e.stopPropagation()}>
+      <div className="modal" style={{maxWidth:560}} onClick={e=>e.stopPropagation()}>
 
         {/* Header */}
         <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:16}}>
@@ -3118,14 +3183,18 @@ function UserDetailModal({ user, adminKey, onClose, onUpdate }) {
             <span className={`badge ${isBanned?"br":warnCount>0?"borange":"bg"}`}>
               {isBanned?"🚫 Banned":warnCount>0?`⚠️ ${warnCount} Warning`:"✅ Active"}
             </span>
+            {pendingPayouts.length > 0 && <span className="badge borange">💸 {pendingPayouts.length} Payout Pending</span>}
             <button className="btn-ghost" style={{padding:"4px 10px",fontSize:12}} onClick={onClose}>✕</button>
           </div>
         </div>
 
         {/* Tabs */}
         <div style={{display:"flex",gap:4,marginBottom:16,background:"var(--sf2)",padding:4,borderRadius:10}}>
-          {[["details","👤 Details"],["orders","📦 Orders"],["actions","⚙️ Actions"]].map(([id,label])=>(
-            <button key={id} onClick={()=>setTab(id)} style={{flex:1,padding:"7px",border:"none",borderRadius:8,cursor:"pointer",background:tab===id?"var(--gold)":"transparent",color:tab===id?"#fff":"var(--muted)",fontFamily:"'Outfit',sans-serif",fontWeight:600,fontSize:12,transition:"all .2s"}}>{label}</button>
+          {[["details","👤 Details"],["orders","📦 Orders"],["payouts","💸 Payouts"],["actions","⚙️ Actions"]].map(([id,label])=>(
+            <button key={id} onClick={()=>setTab(id)} style={{flex:1,padding:"7px",border:"none",borderRadius:8,cursor:"pointer",background:tab===id?"var(--gold)":"transparent",color:tab===id?"#fff":"var(--muted)",fontFamily:"'Outfit',sans-serif",fontWeight:600,fontSize:11,transition:"all .2s",position:"relative"}}>
+              {label}
+              {id==="payouts" && pendingPayouts.length>0 && <span style={{position:"absolute",top:-4,right:-2,background:"var(--red)",color:"#fff",borderRadius:"50%",width:14,height:14,fontSize:9,display:"flex",alignItems:"center",justifyContent:"center",fontWeight:700}}>{pendingPayouts.length}</span>}
+            </button>
           ))}
         </div>
 
@@ -3133,17 +3202,17 @@ function UserDetailModal({ user, adminKey, onClose, onUpdate }) {
         {tab==="details" && (
           <div style={{display:"flex",flexDirection:"column",gap:8}}>
             {[
-              ["Name",     user.name,                    undefined],
-              ["Email",    user.email,                   undefined],
-              ["Phone",    user.phone,                   undefined],
-              ["Role",     user.role,                    undefined],
-              ["Password", user.password||"—",           "var(--red)"],
-              ["PAN",      user.pan_number||"—",         user.pan_number?"var(--green)":undefined],
-              ["GST",      user.gst_number||"—",         user.gst_number?"var(--green)":undefined],
-              ["Shop",     user.shop_name||"—",          undefined],
-              ["Joined",   (user.created_at||"").split("T")[0], undefined],
-              ["Warnings", String(warnCount),            warnCount>0?"var(--red)":undefined],
-              ["Status",   isBanned?"Banned":"Active",   isBanned?"var(--red)":"var(--green)"],
+              ["Name", user.name, undefined],
+              ["Email", user.email, undefined],
+              ["Phone", user.phone, undefined],
+              ["Role", user.role, undefined],
+              ["Password", user.password||"—", "var(--red)"],
+              ["PAN", user.pan_number||"—", user.pan_number?"var(--green)":undefined],
+              ["GST", user.gst_number||"—", user.gst_number?"var(--green)":undefined],
+              ["Shop", user.shop_name||"—", undefined],
+              ["Joined", (user.created_at||"").split("T")[0], undefined],
+              ["Warnings", String(warnCount), warnCount>0?"var(--red)":undefined],
+              ["Status", isBanned?"Banned":"Active", isBanned?"var(--red)":"var(--green)"],
             ].map(([label,val,color])=>(
               <div key={label} style={{display:"flex",justifyContent:"space-between",padding:"9px 12px",background:"var(--sf2)",borderRadius:8}}>
                 <span style={{fontSize:12,color:"var(--muted)",fontWeight:500}}>{label}</span>
@@ -3162,7 +3231,7 @@ function UserDetailModal({ user, adminKey, onClose, onUpdate }) {
                 ? <div style={{textAlign:"center",padding:30,color:"var(--muted)"}}>No orders found</div>
                 : <div style={{overflowX:"auto"}}>
                     <table className="tbl">
-                      <thead><tr><th>ID</th><th>Product</th><th>Amount</th><th>Token</th><th>Status</th><th>Date</th></tr></thead>
+                      <thead><tr><th>ID</th><th>Product</th><th>Amount</th><th>Token</th><th>Status</th><th>Payout</th><th>Date</th></tr></thead>
                       <tbody>{userOrders.map(o=>(
                         <tr key={o.id}>
                           <td style={{fontFamily:"monospace",color:"var(--gold)",fontSize:11}}>{o.id}</td>
@@ -3170,6 +3239,13 @@ function UserDetailModal({ user, adminKey, onClose, onUpdate }) {
                           <td style={{fontSize:12,fontWeight:600}}>₹{o.order_amount}</td>
                           <td style={{fontSize:12,color:"var(--green)"}}>₹{o.token_amount}</td>
                           <td><Bdg status={o.status} /></td>
+                          <td>
+                            {["delivered","cancelled_buyer"].includes(o.status) ? (
+                              o.payout_status === "paid"
+                                ? <span className="badge bg" style={{fontSize:10}}>✅ Paid</span>
+                                : <span className="badge borange" style={{fontSize:10}}>⏳ Pending</span>
+                            ) : "—"}
+                          </td>
                           <td style={{fontSize:11,color:"var(--muted)"}}>{(o.created_at||"").split("T")[0]}</td>
                         </tr>
                       ))}</tbody>
@@ -3179,10 +3255,128 @@ function UserDetailModal({ user, adminKey, onClose, onUpdate }) {
           </div>
         )}
 
+        {/* PAYOUTS TAB */}
+        {tab==="payouts" && (
+          <div style={{display:"flex",flexDirection:"column",gap:12}}>
+
+            {/* Pending Payouts */}
+            <div>
+              <div style={{fontSize:12,fontWeight:700,color:"var(--muted)",marginBottom:8,textTransform:"uppercase",letterSpacing:"1px"}}>⏳ Pending Payouts ({pendingPayouts.length})</div>
+              {pendingPayouts.length === 0
+                ? <div style={{textAlign:"center",padding:16,color:"var(--muted)",fontSize:13,background:"var(--sf2)",borderRadius:10}}>✅ Sab payouts complete!</div>
+                : pendingPayouts.map(o => (
+                  <div key={o.id} style={{background: payoutOrder?.id===o.id?"rgba(14,165,233,.1)":"var(--sf2)",border:`1px solid ${payoutOrder?.id===o.id?"rgba(14,165,233,.4)":"var(--border)"}`,borderRadius:10,padding:12,marginBottom:8,cursor:"pointer"}}
+                    onClick={()=>{ setPayoutOrder(o); setPayoutForm(prev=>({...prev, payout_amount: o.seller_receives, payout_to: "seller"})); }}>
+                    <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+                      <div>
+                        <div style={{fontFamily:"monospace",color:"var(--gold)",fontSize:11}}>{o.id}</div>
+                        <div style={{fontWeight:600,fontSize:13}}>{o.product_name}</div>
+                        <div style={{fontSize:12,color:"var(--muted)"}}>Token: ₹{o.token_amount} | <span style={{color:"var(--green)",fontWeight:700}}>Pay: ₹{o.seller_receives}</span></div>
+                      </div>
+                      <div style={{textAlign:"right"}}>
+                        <Bdg status={o.status} />
+                        {payoutOrder?.id===o.id && <div style={{fontSize:11,color:"var(--gold)",marginTop:4}}>✏️ Selected</div>}
+                      </div>
+                    </div>
+                  </div>
+                ))
+              }
+            </div>
+
+            {/* Payout Form */}
+            {payoutOrder && (
+              <div style={{background:"rgba(14,165,233,.06)",border:"1px solid rgba(14,165,233,.25)",borderRadius:12,padding:14}}>
+                <div style={{fontWeight:700,fontSize:14,color:"var(--gold)",marginBottom:12}}>💸 Manual Payout — {payoutOrder.id}</div>
+
+                <div style={{display:"flex",gap:8,marginBottom:10}}>
+                  <div style={{flex:1}}>
+                    <label className="label">Payout To *</label>
+                    <select className="select" value={payoutForm.payout_to} onChange={e=>setPayoutForm({...payoutForm,payout_to:e.target.value})}>
+                      <option value="seller">Seller (95%)</option>
+                      <option value="buyer">Buyer (Refund)</option>
+                    </select>
+                  </div>
+                  <div style={{flex:1}}>
+                    <label className="label">Method *</label>
+                    <select className="select" value={payoutForm.payout_method} onChange={e=>setPayoutForm({...payoutForm,payout_method:e.target.value})}>
+                      <option value="upi">UPI</option>
+                      <option value="bank">Bank Transfer</option>
+                      <option value="cash">Cash</option>
+                    </select>
+                  </div>
+                </div>
+
+                {payoutForm.payout_method === "upi" && (
+                  <div style={{marginBottom:10}}>
+                    <label className="label">UPI ID *</label>
+                    <input className="input" placeholder="seller@upi" value={payoutForm.payout_upi} onChange={e=>setPayoutForm({...payoutForm,payout_upi:e.target.value})} />
+                  </div>
+                )}
+                {payoutForm.payout_method === "bank" && (
+                  <div style={{marginBottom:10}}>
+                    <label className="label">Bank Details (Acc No / IFSC) *</label>
+                    <input className="input" placeholder="50100XXXXXX / HDFC0001234" value={payoutForm.payout_bank} onChange={e=>setPayoutForm({...payoutForm,payout_bank:e.target.value})} />
+                  </div>
+                )}
+
+                <div style={{display:"flex",gap:8,marginBottom:10}}>
+                  <div style={{flex:1}}>
+                    <label className="label">Amount (₹) *</label>
+                    <input className="input" type="number" placeholder={payoutOrder.seller_receives} value={payoutForm.payout_amount} onChange={e=>setPayoutForm({...payoutForm,payout_amount:e.target.value})} />
+                  </div>
+                  <div style={{flex:1}}>
+                    <label className="label">UTR / Ref No *</label>
+                    <input className="input" placeholder="UTR123456789" value={payoutForm.payout_ref} onChange={e=>setPayoutForm({...payoutForm,payout_ref:e.target.value})} />
+                  </div>
+                </div>
+
+                <div style={{marginBottom:10}}>
+                  <label className="label">Note (optional)</label>
+                  <input className="input" placeholder="e.g. HDFC se bheja" value={payoutForm.payout_note} onChange={e=>setPayoutForm({...payoutForm,payout_note:e.target.value})} />
+                </div>
+
+                {payoutMsg && <div style={{padding:10,borderRadius:8,background:"var(--sf2)",fontSize:13,marginBottom:8,color:payoutMsg.startsWith("✅")?"var(--green)":"var(--red)"}}>{payoutMsg}</div>}
+
+                <div style={{display:"flex",gap:8}}>
+                  <button className="btn-ghost" style={{flex:1}} onClick={()=>{setPayoutOrder(null);setPayoutMsg("");}}>Cancel</button>
+                  <button className="btn-green" style={{flex:2}} onClick={doManualPayout} disabled={payoutLoading}>
+                    {payoutLoading?"⏳ Marking...":"✅ Mark as Paid & Notify"}
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* Done Payouts */}
+            {donePayouts.length > 0 && (
+              <div>
+                <div style={{fontSize:12,fontWeight:700,color:"var(--muted)",marginBottom:8,textTransform:"uppercase",letterSpacing:"1px"}}>✅ Completed Payouts ({donePayouts.length})</div>
+                {donePayouts.map(o=>(
+                  <div key={o.id} style={{background:"rgba(16,185,129,.06)",border:"1px solid rgba(16,185,129,.2)",borderRadius:10,padding:12,marginBottom:8}}>
+                    <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start"}}>
+                      <div>
+                        <div style={{fontFamily:"monospace",color:"var(--gold)",fontSize:11}}>{o.id}</div>
+                        <div style={{fontWeight:600,fontSize:13}}>{o.product_name}</div>
+                        <div style={{fontSize:12,color:"var(--muted)",marginTop:3}}>
+                          Amount: <strong style={{color:"var(--green)"}}>₹{o.payout_amount || o.seller_receives}</strong>
+                          {o.payout_method && <> • {o.payout_method?.toUpperCase()}</>}
+                          {o.payout_upi && <> • {o.payout_upi}</>}
+                          {o.payout_bank && <> • {o.payout_bank}</>}
+                        </div>
+                        {o.payout_ref && <div style={{fontSize:11,color:"var(--muted)",marginTop:2}}>UTR: <strong style={{fontFamily:"monospace"}}>{o.payout_ref}</strong></div>}
+                        {o.payout_at && <div style={{fontSize:11,color:"var(--muted)"}}>{new Date(o.payout_at).toLocaleString("en-IN")}</div>}
+                      </div>
+                      <span className="badge bg" style={{fontSize:10}}>✅ Paid</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
         {/* Actions Tab */}
         {tab==="actions" && (
           <div style={{display:"flex",flexDirection:"column",gap:14}}>
-
             {/* Warn */}
             <div style={{background:"rgba(251,146,60,.1)",border:"1px solid rgba(251,146,60,.3)",borderRadius:12,padding:14}}>
               <div style={{fontWeight:700,color:"#fb923c",marginBottom:8,fontSize:13}}>⚠️ Warning Send Karo</div>
@@ -3191,7 +3385,6 @@ function UserDetailModal({ user, adminKey, onClose, onUpdate }) {
                 {actionLoading==="warn"?"⏳ Sending...":"⚠️ Send Warning"}
               </button>
             </div>
-
             {/* Ban / Unban */}
             {!isBanned ? (
               <div style={{background:"rgba(239,68,68,.1)",border:"1px solid rgba(239,68,68,.3)",borderRadius:12,padding:14}}>
@@ -3209,7 +3402,6 @@ function UserDetailModal({ user, adminKey, onClose, onUpdate }) {
                 </button>
               </div>
             )}
-
             {msg && (
               <div style={{padding:12,borderRadius:8,background:"var(--sf2)",fontSize:13,fontWeight:600,textAlign:"center",
                 color:msg.startsWith("✅")?"var(--green)":msg.startsWith("⚠️")?"#fb923c":"var(--red)"}}>
@@ -3222,6 +3414,7 @@ function UserDetailModal({ user, adminKey, onClose, onUpdate }) {
     </div>
   );
 }
+
 
 function AdminPanel({ adminKey: propKey, onLogout, dark, onToggle }) {
   const [adminKey] = useState(()=> propKey || localStorage.getItem("adminKey") || "admin123");
