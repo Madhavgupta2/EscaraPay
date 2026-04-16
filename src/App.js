@@ -83,14 +83,14 @@ const T = {
     hero1: "WhatsApp Deal Ka",
     hero2: "Sabse Safe Tarika",
     heroDesc: "Seller ka RTO loss khatam. Buyer ka fraud ka darr khatam. Minimum ₹200 token se dono ko 100% protection.",
-    sellerBtn: "Seller — Free Shuru Karo",
+    sellerBtn: "Seller — Start Free",
     buyerBtn: "Buyer — Safe Order Do",
     howWorks: "Kaise Kaam Karta Hai?",
     sellerView: "Seller View",
     buyerView: "Buyer View",
     myOrders: "Mere Orders",
-    payViaLink: "Link se Pay Karo",
-    createDeal: "Deal Banao",
+    payViaLink: "Pay via Link",
+    createDeal: "Create Deal",
     help: "Help",
     dashboard: "Dashboard",
     allOrders: "Saare Orders",
@@ -98,10 +98,10 @@ const T = {
     payments: "Payments",
     settings: "Settings",
     logout: "Logout",
-    login: "Login Karo",
-    register: "Register Karo",
+    login: "Login",
+    register: "Register",
     newOrder: "+ Naya Order Link",
-    noOrders: "Koi orders nahi abhi!",
+    noOrders: "No orders yet!",
     loading: "Load ho raha hai...",
   },
 };
@@ -420,7 +420,7 @@ function PayPage({ orderId, dark, onToggle, onGoHome }) {
     setPayError(""); setPayStep(1);
     try {
       await loadCashfree();
-    } catch(e) { setPayError("Payment gateway load nahi hua. Please try again."); setPayStep(0); return; }
+    } catch(e) { setPayError("Payment gateway failed to load. Please try again."); setPayStep(0); return; }
     const result = await createPaymentOrder(order.id);
     if (!result.success) { setPayError(result.error); setPayStep(0); return; }
     const { paymentSessionId } = result.data;
@@ -449,7 +449,7 @@ function PayPage({ orderId, dark, onToggle, onGoHome }) {
         <div style={{width:"100%",maxWidth:460}}>
           {loading && <div className="card" style={{textAlign:"center",padding:50}}><div style={{width:44,height:44,border:"3px solid var(--gold)",borderTopColor:"transparent",borderRadius:"50%",animation:"spin .8s linear infinite",margin:"0 auto 16px"}} /><div style={{color:"var(--muted)"}}>Order load ho raha hai...</div></div>}
           {error && <div className="card" style={{textAlign:"center",padding:40}}><div style={{fontSize:40,marginBottom:12}}>❌</div><div className="syne" style={{fontWeight:800,fontSize:18,marginBottom:8}}>No Order Found</div><div style={{color:"var(--muted)",fontSize:13,marginBottom:20}}>{error}</div><button className="btn-ghost" onClick={onGoHome}>← Home</button></div>}
-          {payStep===3 && <div className="card fu" style={{textAlign:"center",padding:40}}><div style={{fontSize:60,marginBottom:16}}>🎉</div><div className="syne" style={{fontWeight:800,fontSize:24,color:"var(--green)",marginBottom:8}}>Token Secured!</div><div style={{color:"var(--muted)",fontSize:14,marginBottom:20}}>₹{order?.token_amount} protection vault mein secure ho gaya</div><div style={{background:"rgba(14,165,233,.1)",border:"1px solid rgba(14,165,233,.2)",borderRadius:12,padding:14,marginBottom:16}}><div style={{fontSize:11,color:"var(--muted)",marginBottom:4}}>Order ID save karo:</div><div style={{fontFamily:"monospace",fontWeight:700,color:"var(--gold)",fontSize:16}}>{order?.id}</div></div><button className="btn-ghost" onClick={onGoHome}>← Home pe Jao</button></div>}
+          {payStep===3 && <div className="card fu" style={{textAlign:"center",padding:40}}><div style={{fontSize:60,marginBottom:16}}>🎉</div><div className="syne" style={{fontWeight:800,fontSize:24,color:"var(--green)",marginBottom:8}}>Token Secured!</div><div style={{color:"var(--muted)",fontSize:14,marginBottom:20}}>₹{order?.token_amount} protection vault mein secure ho gaya</div><div style={{background:"rgba(14,165,233,.1)",border:"1px solid rgba(14,165,233,.2)",borderRadius:12,padding:14,marginBottom:16}}><div style={{fontSize:11,color:"var(--muted)",marginBottom:4}}>Save your Order ID:</div><div style={{fontFamily:"monospace",fontWeight:700,color:"var(--gold)",fontSize:16}}>{order?.id}</div></div><button className="btn-ghost" onClick={onGoHome}>← Home pe Jao</button></div>}
           {payStep===2 && <div className="card" style={{textAlign:"center",padding:50}}><div style={{width:44,height:44,border:"3px solid var(--green)",borderTopColor:"transparent",borderRadius:"50%",animation:"spin .8s linear infinite",margin:"0 auto 16px"}} /><div className="syne" style={{fontWeight:700,fontSize:16}}>Payment Verify ho rahi hai...</div></div>}
           {payStep===1 && <div className="card" style={{textAlign:"center",padding:50}}><div style={{width:44,height:44,border:"3px solid var(--gold)",borderTopColor:"transparent",borderRadius:"50%",animation:"spin .8s linear infinite",margin:"0 auto 16px"}} /><div className="syne" style={{fontWeight:700,fontSize:16}}>Payment Gateway Load ho raha hai...</div></div>}
           {order && !loading && payStep===0 && (
@@ -487,7 +487,7 @@ function PayPage({ orderId, dark, onToggle, onGoHome }) {
                   </div>
                   <div style={{background:"rgba(5,150,105,.08)",border:"1px solid rgba(5,150,105,.2)",borderRadius:10,padding:12,marginBottom:14}}>
                     <div style={{fontSize:12,fontWeight:700,color:"var(--green)",marginBottom:6}}>🛡️ EscaraPay Guarantee</div>
-                    {["Token seller ko tab tak nahi milega jab tak deliver na ho","Order nahi aaya? Token wapas milega","Delivery ke 7 din mein dispute raise kar sakte ho","Team 24 ghante mein help karegi"].map(tx=>(
+                    {["Token is held securely until delivery is confirmed","Item not received? Full token refund guaranteed","Raise a dispute within 7 days of delivery","Our team responds within 24 hours"].map(tx=>(
                       <div key={tx} style={{display:"flex",gap:7,fontSize:12,color:"var(--muted)",marginBottom:4}}><span style={{color:"var(--green)"}}>✓</span><span>{tx}</span></div>
                     ))}
                   </div>
@@ -586,7 +586,7 @@ function OrderModal({ order, isSeller, onClose, onDispatch, onConfirmDelivery, o
           <div style={{background:"rgba(239,68,68,.08)",border:"1px solid rgba(239,68,68,.2)",borderRadius:10,padding:12,marginBottom:12}}>
             <select className="select" value={disputeReason} onChange={e=>setDisputeReason(e.target.value)} style={{marginBottom:10}}>
               <option value="">-- Select a Reason --</option>
-              {isSeller?(<><option value="Buyer not responding">Buyer respond nahi kar raha</option><option value="False claim">Buyer galat bol raha hai</option></>)
+              {isSeller?(<><option value="Buyer not responding">Buyer is not responding</option><option value="False claim">Buyer is making a false claim</option></>)
                :(<><option value="Item not received">Item not received</option><option value="Wrong item">Wrong item received</option><option value="Damaged">Item received damaged</option><option value="Seller not responding">Seller not responding</option></>)}
             </select>
             <div style={{display:"flex",gap:8}}>
@@ -777,16 +777,16 @@ function Landing({ onEnter, onTrack, dark, onToggle, lang, onLangToggle }) {
       ctaBuyer: "Login as Buyer",
       howTitle: "Escara Pay Kaise Kaam Karta Hai?",
       whyTitle: "Escara Pay Kyun Choose Karein?",
-      whySub: "Confidence ke saath Trade Karo & Bina Risk Badhao",
+      whySub: "Trade with Confidence & Grow Without Risk",
       tokenTitle: "Token Hold System",
       tokenSub: "Aapka paisa hamesha safe hai.",
       steps: [
-        { num:"01", icon:"📝", title:"Register & Agree Karo", desc:"Dono parties sign up karti hain aur price aur terms par agree karti hain." },
-        { num:"02", icon:"🔗", title:"Payment Link Generate Karo", desc:"Seller apne dashboard se seedha ek secure Escara Pay order link banata hai." },
-        { num:"03", icon:"💬", title:"WhatsApp pe Share Karo", desc:"Link turant WhatsApp ke zariye Buyer ko bheja jaata hai." },
+        { num:"01", icon:"📝", title:"Register & Agree", desc:"Dono parties sign up karti hain aur price aur terms par agree karti hain." },
+        { num:"02", icon:"🔗", title:"Generate Payment Link", desc:"Seller apne dashboard se seedha ek secure Escara Pay order link banata hai." },
+        { num:"03", icon:"💬", title:"Share via WhatsApp", desc:"Link turant WhatsApp ke zariye Buyer ko bheja jaata hai." },
         { num:"04", icon:"🔐", title:"Secure Deposit", desc:"Buyer link kholkar funds Escara Pay ke secure vault mein pay karta hai." },
-        { num:"05", icon:"🚚", title:"Ship & Track Karo", desc:"Seller saamaan deliver karta hai aur tracking details deta hai." },
-        { num:"06", icon:"✅", title:"Inspect & Release Karo", desc:"Buyer ki approval ke baad Escara Pay Seller ko payment release karta hai." },
+        { num:"05", icon:"🚚", title:"Ship & Track", desc:"Seller saamaan deliver karta hai aur tracking details deta hai." },
+        { num:"06", icon:"✅", title:"Inspect & Release", desc:"Buyer ki approval ke baad Escara Pay Seller ko payment release karta hai." },
       ],
       benefits: [
         { icon:"🛡️", title:"Zero Fraud Risk", desc:"'Payment nahi mili' ya 'item nahi bheja' jaisi scams ka darr khatam.", color:"rgba(14,165,233,.15)", bdr:"rgba(14,165,233,.35)" },
@@ -2073,6 +2073,75 @@ function Auth({ type, onLogin, onBack, dark, onToggle }) {
   );
 }
 
+
+/* ══════════ SELLER SETTINGS COMPONENT ══════════ */
+function SellerSettings({ userId, userName, BACKEND_URL }) {
+  const [form, setForm] = useState({ shop_name:"", phone:"", upi_id:"" });
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [msg, setMsg] = useState("");
+
+  useEffect(() => {
+    const load = async () => {
+      try {
+        const r = await fetch(`${BACKEND_URL}/api/users/${userId}/profile`);
+        const d = await r.json();
+        if (d.success && d.user) {
+          setForm({ shop_name: d.user.shop_name||"", phone: d.user.phone||"", upi_id: d.user.upi_id||"" });
+        }
+      } catch(e) {}
+      setLoading(false);
+    };
+    if (userId) load();
+  }, [userId, BACKEND_URL]);
+
+  const handleSave = async () => {
+    setSaving(true); setMsg("");
+    try {
+      const r = await fetch(`${BACKEND_URL}/api/users/${userId}/update-profile`, {
+        method:"POST", headers:{"Content-Type":"application/json"},
+        body: JSON.stringify(form),
+      });
+      const d = await r.json();
+      setSaving(false);
+      if (d.success) setMsg("✅ Profile updated successfully!");
+      else setMsg("❌ " + (d.error || "Update failed"));
+    } catch(e) { setSaving(false); setMsg("❌ Could not connect to server."); }
+  };
+
+  if (loading) return <div style={{padding:40,textAlign:"center",color:"var(--muted)"}}>⏳ Loading...</div>;
+
+  return (
+    <div className="fu">
+      <h1 className="syne" style={{fontSize:"clamp(18px,3vw,26px)",fontWeight:800,marginBottom:22}}>Settings</h1>
+      <div className="card" style={{maxWidth:480}}>
+        <h3 className="syne" style={{fontWeight:700,marginBottom:16,fontSize:15}}>Profile & Payment Details</h3>
+        <div style={{display:"flex",flexDirection:"column",gap:14}}>
+          <div>
+            <label className="label">Shop Name</label>
+            <input className="input" placeholder="Your Shop Name" value={form.shop_name} onChange={e=>setForm({...form,shop_name:e.target.value})} />
+          </div>
+          <div>
+            <label className="label">Phone Number</label>
+            <input className="input" placeholder="10-digit phone number" maxLength={10} value={form.phone} onChange={e=>setForm({...form,phone:e.target.value.replace(/[^0-9]/g,"")})} />
+          </div>
+          <div>
+            <label className="label">UPI ID <span style={{color:"var(--green)",fontSize:11,fontWeight:600}}>★ For receiving payments</span></label>
+            <input className="input" placeholder="yourname@upi (e.g. 9876543210@ybl)" value={form.upi_id} onChange={e=>setForm({...form,upi_id:e.target.value})} />
+            <div style={{fontSize:11,color:"var(--muted)",marginTop:4}}>EscaraPay will send your earnings to this UPI ID after delivery confirmation.</div>
+          </div>
+          {msg && <div style={{padding:10,borderRadius:8,fontSize:13,fontWeight:600,background:msg.startsWith("✅")?"rgba(5,150,105,.1)":"rgba(239,68,68,.1)",color:msg.startsWith("✅")?"var(--green)":"var(--red)"}}>{msg}</div>}
+          <button className="btn-gold" style={{padding:"12px"}} onClick={handleSave} disabled={saving}>{saving?"⏳ Saving...":"💾 Save Changes"}</button>
+        </div>
+        <div style={{marginTop:20,padding:14,background:"rgba(14,165,233,.06)",border:"1px solid rgba(14,165,233,.2)",borderRadius:10}}>
+          <div style={{fontWeight:700,fontSize:13,marginBottom:6}}>💡 Why add UPI ID?</div>
+          <div style={{fontSize:12,color:"var(--muted)",lineHeight:1.7}}>When a buyer confirms delivery, EscaraPay sends your 95% token amount to this UPI ID. Your UPI ID is kept private from buyers.</div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 /* ══════════ SELLER DASHBOARD ══════════ */
 function SellerDB({ user, userId, onLogout, dark, onToggle }) {
   const [page, setPage] = useState("dashboard");
@@ -2326,7 +2395,7 @@ function SellerDB({ user, userId, onLogout, dark, onToggle }) {
             <div style={{background:"rgba(14,165,233,.08)",border:"1px solid rgba(14,165,233,.2)",borderRadius:12,padding:16}}>
               <div className="syne" style={{fontWeight:700,fontSize:14,marginBottom:10}}>🏦 Payout System — Coming Soon!</div>
               <div style={{fontSize:13,color:"var(--muted)",lineHeight:1.8}}>
-                Cashfree Live mode active hai! Bank transfer shortly after delivery:<br/>
+                Cashfree Live mode active. Bank transfers processed after delivery:<br/>
                 ✅ Direct bank transfer within 2-3 business days<br/>
                 ✅ UPI instant payout<br/>
                 ✅ Withdrawal history dashboard<br/>
@@ -2483,7 +2552,7 @@ function SellerDB({ user, userId, onLogout, dark, onToggle }) {
                 )}
                 {(!o.payout_status || o.payout_status==="pending") && (
                   <div style={{marginTop:8,fontSize:12,color:"var(--muted)",padding:"8px 10px",background:"rgba(251,146,60,.08)",borderRadius:8}}>
-                    ⏳ EscaraPay jald hi aapka payment UPI/Bank mein transfer karega. Query? support@escarapay.in
+                    ⏳ Payment will be transferred to your UPI/Bank shortly. Queries? support@escarapay.in
                   </div>
                 )}
               </div>
@@ -2491,7 +2560,7 @@ function SellerDB({ user, userId, onLogout, dark, onToggle }) {
             {orders.filter(o=>["delivered","cancelled_buyer"].includes(o.status)).length===0 && (
               <div style={{textAlign:"center",padding:24,color:"var(--muted)",background:"var(--sf2)",borderRadius:12}}>
                 <div style={{fontSize:36,marginBottom:8}}>💸</div>
-                <div style={{fontSize:13}}>Abhi koi completed order nahi. Deliver karo — payment milegi!</div>
+                <div style={{fontSize:13}}>Abhi koi completed order nahi. Deliver orders to receive payment!</div>
               </div>
             )}
             <div style={{background:"rgba(14,165,233,.08)",border:"1px solid rgba(14,165,233,.2)",borderRadius:12,padding:14,marginTop:4}}>
@@ -2501,18 +2570,7 @@ function SellerDB({ user, userId, onLogout, dark, onToggle }) {
           </div>
         )}
         {page==="settings" && (
-          <div className="fu">
-            <h1 className="syne" style={{fontSize:"clamp(18px,3vw,26px)",fontWeight:800,marginBottom:22}}>Settings</h1>
-            <div className="card" style={{maxWidth:460}}>
-              <h3 className="syne" style={{fontWeight:700,marginBottom:16,fontSize:15}}>Profile</h3>
-              <div style={{display:"flex",flexDirection:"column",gap:12}}>
-                <div><label className="label">Shop Name</label><input className="input" defaultValue={user} /></div>
-                <div><label className="label">Phone</label><input className="input" placeholder="9876543210" /></div>
-                <div><label className="label">UPI ID</label><input className="input" placeholder="yourname@upi" /></div>
-                <button className="btn-gold">Save Changes</button>
-              </div>
-            </div>
-          </div>
+          <SellerSettings userId={userId} userName={user} BACKEND_URL={BACKEND_URL} />
         )}
       </div>
 
@@ -2529,7 +2587,7 @@ function SellerDB({ user, userId, onLogout, dark, onToggle }) {
                     <div><label className="label">Order Amount (₹) *</label><input className="input" type="number" placeholder="1500" value={newOrder.amount} onChange={e=>setNewOrder({...newOrder,amount:e.target.value})} /></div>
                     <div><label className="label">Token %</label><select className="select" value={newOrder.token_pct} onChange={e=>setNewOrder({...newOrder,token_pct:e.target.value})}><option value="5">5%</option><option value="10">10%</option><option value="15">15%</option><option value="20">20%</option></select></div>
                   </div>
-                  {newOrder.amount && <div style={{background:"rgba(14,165,233,.1)",border:"1px solid rgba(14,165,233,.25)",borderRadius:10,padding:14}}><div style={{fontSize:11,color:"var(--muted)",marginBottom:2}}>Buyer Bharenga</div><div className="syne" style={{fontSize:24,fontWeight:800,color:"var(--gold)"}}>₹{Math.round(tokenPreview*1.02)}</div>{minApplied&&<div style={{fontSize:11,color:"var(--muted)",marginTop:4}}>Min ₹200 applied</div>}</div>}
+                  {newOrder.amount && <div style={{background:"rgba(14,165,233,.1)",border:"1px solid rgba(14,165,233,.25)",borderRadius:10,padding:14}}><div style={{fontSize:11,color:"var(--muted)",marginBottom:2}}>Buyer Bharenga</div><div className="syne" style={{fontSize:24,fontWeight:800,color:"var(--gold)"}}>₹{Math.round(tokenPreview*1.02)}</div>{minApplied&&<div style={{fontSize:11,color:"var(--muted)",marginTop:4}}>Minimum token ₹200 applied</div>}</div>}
                   <div><label className="label">Buyer Name</label><input className="input" placeholder="Rahul Sharma" value={newOrder.buyer_name} onChange={e=>setNewOrder({...newOrder,buyer_name:e.target.value})} /></div>
                   <div><label className="label">Buyer WhatsApp *</label><input className="input" placeholder="9876543210" value={newOrder.buyer_phone} onChange={e=>setNewOrder({...newOrder,buyer_phone:e.target.value})} /></div>
                   <div style={{display:"flex",gap:10}}>
@@ -2595,7 +2653,7 @@ function BuyerDB({ user, userId, userPhone, onLogout, dark, onToggle }) {
   const handlePay = async(order)=>{
     setPayError(""); setPayStep(1);
     try { await loadCashfree(); }
-    catch(e) { setPayError("Payment gateway load nahi hua. Please try again."); setPayStep(0); return; }
+    catch(e) { setPayError("Payment gateway failed to load. Please try again."); setPayStep(0); return; }
     const result=await createPaymentOrder(order.id);
     if(!result.success){setPayError(result.error);setPayStep(0);return;}
     const { paymentSessionId } = result.data;
@@ -2673,12 +2731,12 @@ function BuyerDB({ user, userId, userPhone, onLogout, dark, onToggle }) {
         {page==="orders" && (
           <div className="fu">
             <h1 className="syne" style={{fontSize:"clamp(18px,3vw,26px)",fontWeight:800,marginBottom:18}}>My Orders</h1>
-            {(!userPhone||userPhone.trim()==="") && <div style={{background:"rgba(239,68,68,.1)",border:"1px solid rgba(239,68,68,.3)",borderRadius:10,padding:14,marginBottom:16,fontSize:13}}>⚠️ Phone number nahi mila! Logout karke dobara login karo.</div>}
+            {(!userPhone||userPhone.trim()==="") && <div style={{background:"rgba(239,68,68,.1)",border:"1px solid rgba(239,68,68,.3)",borderRadius:10,padding:14,marginBottom:16,fontSize:13}}>⚠️ Phone number not found. Please logout and login again.</div>}
             <div style={{display:"flex",gap:8,flexWrap:"wrap",marginBottom:18}}>
               <div className={`chip ${filterStatus==="all"?"active":""}`} onClick={()=>setFilterStatus("all")}>All ({orders.length})</div>
               {Object.entries(STATUS_META).map(([key,val])=>{ const count=orders.filter(o=>o.status===key).length; if(!count) return null; return <div key={key} className={`chip ${filterStatus===key?"active":""}`} onClick={()=>setFilterStatus(key)}>{val.icon} {val.label} ({count})</div>; })}
             </div>
-            {loadingOrders ? <div style={{textAlign:"center",padding:40,color:"var(--muted)"}}>⏳ Orders load ho rahe hain...</div>
+            {loadingOrders ? <div style={{textAlign:"center",padding:40,color:"var(--muted)"}}>⏳ Loading orders...</div>
              : orders.length===0 ? (
               <div style={{textAlign:"center",padding:40,color:"var(--muted)"}}>
                 <div style={{fontSize:40,marginBottom:10}}>🛍️</div>
@@ -2707,7 +2765,7 @@ function BuyerDB({ user, userId, userPhone, onLogout, dark, onToggle }) {
                         <Bdg status={o.status} />
                       </div>
                       {o.tracking_number && <div className="tracking-box"><div style={{flex:1}}><div style={{fontSize:11,color:"var(--blue)",fontWeight:600,marginBottom:2}}>📦 Tracking</div><div style={{fontFamily:"monospace",fontWeight:700}}>{o.tracking_number}</div></div>{trackingUrl&&<a href={trackingUrl} target="_blank" rel="noreferrer" style={{background:"var(--blue)",color:"#fff",padding:"6px 12px",borderRadius:8,fontSize:12,fontWeight:600,textDecoration:"none"}}>Track →</a>}</div>}
-                      {o.status==="dispatched"&&daysLeft!==null&&<div className="hold-box"><div style={{fontSize:12,color:"#a78bfa",fontWeight:600}}>⏰ {daysLeft>0?`Token Hold: ${daysLeft} din aur`:"Auto-release ready!"}</div></div>}
+                      {o.status==="dispatched"&&daysLeft!==null&&<div className="hold-box"><div style={{fontSize:12,color:"#a78bfa",fontWeight:600}}>⏰ {daysLeft>0?`Token Hold: ${daysLeft} day${daysLeft===1?"":"s"} remaining`:"Auto-release ready!"}</div></div>}
                       <div style={{display:"flex",gap:8,flexWrap:"wrap"}}>
                         {o.status==="pending"&&<button className="btn-gold" style={{padding:"7px 14px",fontSize:13}} onClick={()=>handlePay(o)}>💳 Pay ₹{o.token_amount}</button>}
                         {o.status==="dispatched"&&<button className="btn-green" style={{padding:"7px 14px",fontSize:13}} onClick={()=>confirmDelivery(o.id).then(r=>{if(r.success)setOrders(prev=>prev.map(x=>x.id===o.id?{...x,status:"delivered"}:x));})}>✅ Delivery Confirm</button>}
@@ -2723,12 +2781,12 @@ function BuyerDB({ user, userId, userPhone, onLogout, dark, onToggle }) {
 
         {page==="pay_order" && (
           <div className="fu" style={{maxWidth:500}}>
-            <h1 className="syne" style={{fontSize:"clamp(18px,3vw,24px)",fontWeight:800,marginBottom:8}}>Order Link se Pay Karo</h1>
+            <h1 className="syne" style={{fontSize:"clamp(18px,3vw,24px)",fontWeight:800,marginBottom:8}}>Pay via Order Link</h1>
             <p style={{color:"var(--muted)",marginBottom:20,fontSize:13}}>Paste the seller's payment link to view details and pay securely</p>
             <div className="card" style={{marginBottom:14}}>
               <label className="label">EscaraPay Order Link</label>
               <input className="input" placeholder="https://escarapay.in/pay/ORDER-ID" value={linkInput} onChange={e=>setLinkInput(e.target.value)} style={{marginBottom:10}} />
-              <button className="btn-gold" style={{width:"100%"}} onClick={fetchLinkOrder}>{linkLoading?"⏳ Looking up order...":"🔍 Order Dekho"}</button>
+              <button className="btn-gold" style={{width:"100%"}} onClick={fetchLinkOrder}>{linkLoading?"⏳ Looking up order...":"🔍 Find Order"}</button>
               {linkError && <div style={{color:"var(--red)",fontSize:12,marginTop:8}}>❌ {linkError}</div>}
             </div>
             {linkOrder && (
@@ -2753,7 +2811,7 @@ function BuyerDB({ user, userId, userPhone, onLogout, dark, onToggle }) {
 
         {page==="create_deal" && (
           <div className="fu" style={{maxWidth:520}}>
-            <h1 className="syne" style={{fontSize:"clamp(18px,3vw,24px)",fontWeight:800,marginBottom:8}}>Deal Banao 🤝</h1>
+            <h1 className="syne" style={{fontSize:"clamp(18px,3vw,24px)",fontWeight:800,marginBottom:8}}>Create a Deal 🤝</h1>
             <p style={{color:"var(--muted)",marginBottom:16,fontSize:13}}>Want extra security? Create the deal yourself — the seller will confirm, then you pay safely.</p>
             {!dealLink ? (
               <div className="card">
@@ -2787,10 +2845,10 @@ function BuyerDB({ user, userId, userPhone, onLogout, dark, onToggle }) {
           <div className="fu" style={{maxWidth:560}}>
             <h1 className="syne" style={{fontSize:"clamp(18px,3vw,24px)",fontWeight:800,marginBottom:22}}>Help & Safety</h1>
             {[
-              {q:"Create Deal aur Pay via Link mein kya fark hai?",a:"Pay via Link: Seller ne order banaya. Create Deal: Tum order banao, seller confirm kare. Dono mein payment protection same!"},
-              {q:"Token kab release hoga seller ko?",a:"Delivery confirm ke baad 7 din hold. Dispute nahi → auto-release."},
-              {q:"Order nahi aaya?",a:"'View Details' → 'Dispute Raise Karo'. 24 ghante mein team investigate karegi."},
-              {q:"Tracking kaise kare?",a:"Order card mein 'Track →' button click karo."},
+              {q:"What is the difference between Create Deal and Pay via Link?",a:"Pay via Link: Seller created the order. Create Deal: You create the order, seller confirms. Both offer the same protection!"},
+              {q:"When does the seller receive the token?",a:"Token is held for 7 days after delivery confirmation. No dispute → auto-released to seller."},
+              {q:"Item not received?",a:"Go to 'View Details' → 'Raise Dispute'. Our team investigates within 24 hours."},
+              {q:"How do I track my order?",a:"Click the 'Track →' button on your order card."},
             ].map(({q,a})=>(
               <div key={q} className="card" style={{marginBottom:10}}>
                 <div style={{fontWeight:600,marginBottom:6,color:"var(--gold)",fontSize:13}}>❓ {q}</div>
@@ -3054,7 +3112,7 @@ function DealPage({ orderId, dark, onToggle, onGoHome }) {
       <div style={{display:"flex",alignItems:"center",justifyContent:"center",minHeight:"calc(100vh - 62px)",padding:20}}>
         <div style={{width:"100%",maxWidth:480}}>
           {loading && <div className="card" style={{textAlign:"center",padding:50}}><div style={{width:44,height:44,border:"3px solid var(--gold)",borderTopColor:"transparent",borderRadius:"50%",animation:"spin .8s linear infinite",margin:"0 auto 16px"}} /><div style={{color:"var(--muted)"}}>Deal load ho rahi hai...</div></div>}
-          {error && <div className="card" style={{textAlign:"center",padding:40}}><div style={{fontSize:40,marginBottom:12}}>❌</div><div className="syne" style={{fontWeight:800,fontSize:18,marginBottom:8}}>Deal Nahi Mili</div><div style={{color:"var(--muted)",fontSize:13,marginBottom:20}}>{error}</div><button className="btn-ghost" onClick={onGoHome}>← Home</button></div>}
+          {error && <div className="card" style={{textAlign:"center",padding:40}}><div style={{fontSize:40,marginBottom:12}}>❌</div><div className="syne" style={{fontWeight:800,fontSize:18,marginBottom:8}}>Deal Not Found</div><div style={{color:"var(--muted)",fontSize:13,marginBottom:20}}>{error}</div><button className="btn-ghost" onClick={onGoHome}>← Home</button></div>}
           {order && order.status!=="pending_seller_confirm" && !confirmed && <div className="card" style={{textAlign:"center",padding:40}}><div style={{fontSize:44,marginBottom:12}}>✅</div><div className="syne" style={{fontWeight:800,fontSize:20,marginBottom:8}}>Deal Already Confirmed!</div><Bdg status={order.status} /><div style={{marginTop:14}}><button className="btn-ghost" onClick={onGoHome}>← Home</button></div></div>}
           {confirmed && (
             <div className="card fu" style={{textAlign:"center",padding:40}}>
@@ -3062,14 +3120,14 @@ function DealPage({ orderId, dark, onToggle, onGoHome }) {
               <div className="syne" style={{fontWeight:800,fontSize:24,color:"var(--green)",marginBottom:8}}>Deal Confirmed!</div>
               <div style={{color:"var(--muted)",fontSize:14,marginBottom:20}}>Now share the payment link with the buyer</div>
               <div style={{background:"var(--sf2)",borderRadius:8,padding:"10px 12px",marginBottom:10,wordBreak:"break-all"}}><code style={{fontSize:12,color:"var(--gold)"}}>{paymentLink}</code></div>
-              <button className="btn-gold" style={{width:"100%"}} onClick={()=>{ navigator.clipboard?.writeText(paymentLink); setToast("Payment link copied!"); }}>📋 Link Copy Karo</button>
+              <button className="btn-gold" style={{width:"100%"}} onClick={()=>{ navigator.clipboard?.writeText(paymentLink); setToast("Payment link copied!"); }}>📋 Copy Link</button>
             </div>
           )}
           {order && order.status==="pending_seller_confirm" && !confirmed && !loading && (
             <div className="fu">
               <div style={{textAlign:"center",marginBottom:20}}>
                 <div className="badge borange" style={{fontSize:13,marginBottom:8}}>🤝 Buyer ne Deal Bheja Hai</div>
-                <h2 className="syne" style={{fontWeight:800,fontSize:22}}>Deal Confirm Karo</h2>
+                <h2 className="syne" style={{fontWeight:800,fontSize:22}}>Confirm This Deal</h2>
               </div>
               <div className="card" style={{marginBottom:14}}>
                 <div style={{marginBottom:16}}>
@@ -3210,6 +3268,7 @@ function UserDetailModal({ user, adminKey, onClose, onUpdate }) {
               ["PAN", user.pan_number||"—", user.pan_number?"var(--green)":undefined],
               ["GST", user.gst_number||"—", user.gst_number?"var(--green)":undefined],
               ["Shop", user.shop_name||"—", undefined],
+              ["UPI ID", user.upi_id||"—", user.upi_id?"var(--green)":undefined],
               ["Joined", (user.created_at||"").split("T")[0], undefined],
               ["Warnings", String(warnCount), warnCount>0?"var(--red)":undefined],
               ["Status", isBanned?"Banned":"Active", isBanned?"var(--red)":"var(--green)"],
@@ -3379,7 +3438,7 @@ function UserDetailModal({ user, adminKey, onClose, onUpdate }) {
           <div style={{display:"flex",flexDirection:"column",gap:14}}>
             {/* Warn */}
             <div style={{background:"rgba(251,146,60,.1)",border:"1px solid rgba(251,146,60,.3)",borderRadius:12,padding:14}}>
-              <div style={{fontWeight:700,color:"#fb923c",marginBottom:8,fontSize:13}}>⚠️ Warning Send Karo</div>
+              <div style={{fontWeight:700,color:"#fb923c",marginBottom:8,fontSize:13}}>⚠️ Send Warning</div>
               <input className="input" placeholder="Warning reason (e.g. Suspicious activity)" value={warnReason} onChange={e=>setWarnReason(e.target.value)} style={{marginBottom:8}} />
               <button className="btn-ghost" style={{width:"100%",color:"#fb923c",borderColor:"rgba(251,146,60,.4)"}} onClick={()=>doAction("warn")} disabled={!!actionLoading}>
                 {actionLoading==="warn"?"⏳ Sending...":"⚠️ Send Warning"}
@@ -3388,7 +3447,7 @@ function UserDetailModal({ user, adminKey, onClose, onUpdate }) {
             {/* Ban / Unban */}
             {!isBanned ? (
               <div style={{background:"rgba(239,68,68,.1)",border:"1px solid rgba(239,68,68,.3)",borderRadius:12,padding:14}}>
-                <div style={{fontWeight:700,color:"var(--red)",marginBottom:8,fontSize:13}}>🚫 User Ban Karo</div>
+                <div style={{fontWeight:700,color:"var(--red)",marginBottom:8,fontSize:13}}>🚫 Ban This User</div>
                 <input className="input" placeholder="Ban reason (e.g. Fraud, fake orders)" value={banReason} onChange={e=>setBanReason(e.target.value)} style={{marginBottom:8}} />
                 <button className="btn-red" style={{width:"100%"}} onClick={()=>doAction("ban")} disabled={!!actionLoading}>
                   {actionLoading==="ban"?"⏳ Banning...":"🚫 Ban This User"}
@@ -3396,7 +3455,7 @@ function UserDetailModal({ user, adminKey, onClose, onUpdate }) {
               </div>
             ) : (
               <div style={{background:"rgba(5,150,105,.1)",border:"1px solid rgba(5,150,105,.3)",borderRadius:12,padding:14}}>
-                <div style={{fontWeight:700,color:"var(--green)",marginBottom:8,fontSize:13}}>✅ User Unban Karo</div>
+                <div style={{fontWeight:700,color:"var(--green)",marginBottom:8,fontSize:13}}>✅ Unban This User</div>
                 <button className="btn-green" style={{width:"100%"}} onClick={()=>doAction("unban")} disabled={!!actionLoading}>
                   {actionLoading==="unban"?"⏳ Unbanning...":"✅ Unban This User"}
                 </button>
@@ -3566,7 +3625,7 @@ function AdminPanel({ adminKey: propKey, onLogout, dark, onToggle }) {
         {page==="disputes" && (
           <div className="fu">
             <h1 className="syne" style={{fontWeight:800,fontSize:"clamp(18px,3vw,26px)",marginBottom:18}}>Disputes {disputes.length>0&&<span className="badge br" style={{fontSize:14}}>🔥 {disputes.length}</span>}</h1>
-            {loading?<div style={{textAlign:"center",padding:30,color:"var(--muted)"}}>⏳ Loading...</div>:disputes.length===0?(<div className="card" style={{textAlign:"center",padding:50}}><div style={{fontSize:40,marginBottom:10}}>🎉</div><div className="syne" style={{fontWeight:700,fontSize:18}}>Koi Dispute Nahi!</div></div>):(
+            {loading?<div style={{textAlign:"center",padding:30,color:"var(--muted)"}}>⏳ Loading...</div>:disputes.length===0?(<div className="card" style={{textAlign:"center",padding:50}}><div style={{fontSize:40,marginBottom:10}}>🎉</div><div className="syne" style={{fontWeight:700,fontSize:18}}>No Active Disputes!</div></div>):(
               <div style={{display:"flex",flexDirection:"column",gap:12}}>
                 {disputes.map(o=>(
                   <div key={o.id} className="card" style={{borderColor:"rgba(239,68,68,.3)"}}>
@@ -4004,7 +4063,7 @@ function TermsPage({ onBack, dark, onToggle }) {
 
         {/* Dispute section highlighted */}
         <div className="card" style={{marginBottom:14,background:"rgba(239,68,68,.05)",borderColor:"rgba(239,68,68,.3)"}}>
-          <h3 className="syne" style={{fontWeight:700,fontSize:15,marginBottom:12,color:"var(--red)"}}>5. Dispute Policy (Vistar mein)</h3>
+          <h3 className="syne" style={{fontWeight:700,fontSize:15,marginBottom:12,color:"var(--red)"}}>5. Dispute Policy (In Detail)</h3>
           <div style={{display:"flex",flexDirection:"column",gap:10}}>
             {[
               {icon:"⏰",t:"Dispute Window",d:"Buyers must raise a dispute within 48 hours of expected delivery date. After 48 hours, token auto-releases to seller."},
