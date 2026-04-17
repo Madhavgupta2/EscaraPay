@@ -360,6 +360,99 @@ function Toast({ msg, onDone }) {
   return <div className="copy-toast">✅ {msg}</div>;
 }
 
+/* ── Token Receipt Download ── */
+function downloadReceipt(order, role) {
+  const now = new Date();
+  const dateStr = now.toLocaleDateString("en-IN", { day:"2-digit", month:"long", year:"numeric", timeZone:"Asia/Kolkata" });
+  const timeStr = now.toLocaleTimeString("en-IN", { hour:"2-digit", minute:"2-digit", hour12:true, timeZone:"Asia/Kolkata" });
+  const receiptNum = "RCP-" + order.id + "-" + Date.now().toString().slice(-4);
+  const html = `<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8"/>
+<title>EscaraPay Token Receipt — ${order.id}</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{font-family:'Segoe UI',Arial,sans-serif;background:#f0f4f8;display:flex;justify-content:center;padding:30px 10px;}
+  .receipt{background:#fff;border-radius:18px;max-width:480px;width:100%;box-shadow:0 4px 24px rgba(0,0,0,.10);overflow:hidden;}
+  .header{background:linear-gradient(135deg,#0ea5e9,#1a84c4);padding:28px 28px 20px;color:#fff;text-align:center;}
+  .logo{font-size:26px;font-weight:900;letter-spacing:-1px;margin-bottom:4px;}
+  .tagline{font-size:11px;opacity:.85;letter-spacing:.5px;}
+  .badge{display:inline-block;background:rgba(255,255,255,.25);border:1px solid rgba(255,255,255,.4);padding:4px 14px;border-radius:20px;font-size:11px;font-weight:700;margin-top:10px;letter-spacing:.5px;}
+  .body{padding:24px 28px;}
+  .title{font-size:15px;font-weight:700;color:#1e293b;margin-bottom:6px;}
+  .subtitle{font-size:12px;color:#64748b;margin-bottom:20px;}
+  .row{display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid #f1f5f9;font-size:13px;}
+  .row:last-child{border-bottom:none;}
+  .row .lbl{color:#64748b;}
+  .row .val{font-weight:600;color:#1e293b;text-align:right;}
+  .row .val.big{font-size:16px;font-weight:800;color:#0ea5e9;}
+  .row .val.green{color:#059669;}
+  .divider{border:none;border-top:2px dashed #e2e8f0;margin:14px 0;}
+  .section-title{font-size:11px;font-weight:700;color:#94a3b8;letter-spacing:.8px;text-transform:uppercase;margin-bottom:10px;}
+  .status-chip{display:inline-flex;align-items:center;gap:6px;background:#dcfce7;color:#166534;padding:5px 14px;border-radius:20px;font-size:12px;font-weight:700;margin:12px 0;}
+  .footer{background:#f8fafc;padding:16px 28px;text-align:center;border-top:1px solid #f1f5f9;}
+  .footer-text{font-size:11px;color:#94a3b8;line-height:1.8;}
+  .watermark{color:#0ea5e9;font-weight:700;font-size:11px;}
+  @media print{body{background:#fff;padding:0;}  .receipt{box-shadow:none;border-radius:0;max-width:100%;} .no-print{display:none;}}
+</style>
+</head>
+<body>
+<div class="receipt">
+  <div class="header">
+    <div class="logo">EscaraPay</div>
+    <div class="tagline">India's Trusted Payment Protection Platform</div>
+    <div class="badge">🔐 TOKEN PAYMENT RECEIPT</div>
+  </div>
+  <div class="body">
+    <div class="title">Payment Confirmation</div>
+    <div class="subtitle">Receipt No: ${receiptNum}</div>
+    <div class="status-chip">✅ Token Secured Successfully</div>
+    <hr class="divider"/>
+    <div class="section-title">Order Details</div>
+    <div class="row"><span class="lbl">Order ID</span><span class="val">${order.id}</span></div>
+    <div class="row"><span class="lbl">Product</span><span class="val">${order.product_name}</span></div>
+    <div class="row"><span class="lbl">Seller</span><span class="val">${order.seller_name || order.seller_name_manual || "—"}</span></div>
+    <div class="row"><span class="lbl">Buyer</span><span class="val">${order.buyer_name || "—"}</span></div>
+    <div class="row"><span class="lbl">Order Value</span><span class="val">₹${Number(order.order_amount).toFixed(2)}</span></div>
+    <hr class="divider"/>
+    <div class="section-title">Payment Breakdown</div>
+    <div class="row"><span class="lbl">Token Amount (${order.token_pct || 10}%)</span><span class="val">₹${Number(order.token_amount).toFixed(2)}</span></div>
+    <div class="row"><span class="lbl">Gateway Fee (2%)</span><span class="val">₹${Number(order.gateway_fee).toFixed(2)}</span></div>
+    <div class="row"><span class="lbl">Total Paid by Buyer</span><span class="val big">₹${Number(order.buyer_pays).toFixed(2)}</span></div>
+    ${role !== "buyer" ? `<hr class="divider"/>
+    <div class="section-title">Payout Info (Seller)</div>
+    <div class="row"><span class="lbl">Platform Commission (5%)</span><span class="val">₹${Number(order.escara_commission).toFixed(2)}</span></div>
+    <div class="row"><span class="lbl">Seller Receives (on delivery)</span><span class="val green">₹${Number(order.seller_receives).toFixed(2)}</span></div>` : ""}
+    <hr class="divider"/>
+    <div class="section-title">Transaction Info</div>
+    <div class="row"><span class="lbl">Payment Gateway</span><span class="val">Cashfree (RBI Authorized)</span></div>
+    <div class="row"><span class="lbl">Date</span><span class="val">${dateStr}</span></div>
+    <div class="row"><span class="lbl">Time (IST)</span><span class="val">${timeStr}</span></div>
+    <div class="row"><span class="lbl">Status</span><span class="val green">Token Paid ✅</span></div>
+  </div>
+  <div class="footer">
+    <div class="footer-text">
+      <span class="watermark">EscaraPay (India)</span><br/>
+      MSME: UDYAM-UP-23-0036110 | support@escarapay.in<br/>
+      Funds are securely held until delivery is confirmed.<br/>
+      Track your order at: escarapay.in/track/${order.id}
+    </div>
+  </div>
+</div>
+<script>window.onload=()=>{setTimeout(()=>window.print(),400);}</script>
+</body>
+</html>`;
+  const blob = new Blob([html], { type: "text/html" });
+  const url = URL.createObjectURL(blob);
+  const win = window.open(url, "_blank");
+  if (!win) {
+    const a = document.createElement("a");
+    a.href = url; a.download = `EscaraPay-Receipt-${order.id}.html`; a.click();
+  }
+  setTimeout(() => URL.revokeObjectURL(url), 60000);
+}
+
 function Logo({ onClick }) {
   return (
     <div className="logo-wrap" onClick={onClick}>
@@ -449,7 +542,7 @@ function PayPage({ orderId, dark, onToggle, onGoHome }) {
         <div style={{width:"100%",maxWidth:460}}>
           {loading && <div className="card" style={{textAlign:"center",padding:50}}><div style={{width:44,height:44,border:"3px solid var(--gold)",borderTopColor:"transparent",borderRadius:"50%",animation:"spin .8s linear infinite",margin:"0 auto 16px"}} /><div style={{color:"var(--muted)"}}>Order load ho raha hai...</div></div>}
           {error && <div className="card" style={{textAlign:"center",padding:40}}><div style={{fontSize:40,marginBottom:12}}>❌</div><div className="syne" style={{fontWeight:800,fontSize:18,marginBottom:8}}>No Order Found</div><div style={{color:"var(--muted)",fontSize:13,marginBottom:20}}>{error}</div><button className="btn-ghost" onClick={onGoHome}>← Home</button></div>}
-          {payStep===3 && <div className="card fu" style={{textAlign:"center",padding:40}}><div style={{fontSize:60,marginBottom:16}}>🎉</div><div className="syne" style={{fontWeight:800,fontSize:24,color:"var(--green)",marginBottom:8}}>Token Secured!</div><div style={{color:"var(--muted)",fontSize:14,marginBottom:20}}>₹{order?.token_amount} protection vault mein secure ho gaya</div><div style={{background:"rgba(14,165,233,.1)",border:"1px solid rgba(14,165,233,.2)",borderRadius:12,padding:14,marginBottom:16}}><div style={{fontSize:11,color:"var(--muted)",marginBottom:4}}>Save your Order ID:</div><div style={{fontFamily:"monospace",fontWeight:700,color:"var(--gold)",fontSize:16}}>{order?.id}</div></div><button className="btn-ghost" onClick={onGoHome}>← Home pe Jao</button></div>}
+          {payStep===3 && <div className="card fu" style={{textAlign:"center",padding:40}}><div style={{fontSize:60,marginBottom:16}}>🎉</div><div className="syne" style={{fontWeight:800,fontSize:24,color:"var(--green)",marginBottom:8}}>Token Secured!</div><div style={{color:"var(--muted)",fontSize:14,marginBottom:16}}>₹{order?.token_amount} protection vault mein secure ho gaya</div><div style={{background:"rgba(14,165,233,.1)",border:"1px solid rgba(14,165,233,.2)",borderRadius:12,padding:14,marginBottom:20}}><div style={{fontSize:11,color:"var(--muted)",marginBottom:4}}>Save your Order ID:</div><div style={{fontFamily:"monospace",fontWeight:700,color:"var(--gold)",fontSize:16}}>{order?.id}</div></div><div style={{display:"flex",gap:10,justifyContent:"center",flexWrap:"wrap"}}><button className="btn-gold" style={{fontSize:13,padding:"10px 20px"}} onClick={()=>downloadReceipt(order,"buyer")}>📄 Download Receipt</button><button className="btn-ghost" onClick={onGoHome}>← Home pe Jao</button></div></div>}
           {payStep===2 && <div className="card" style={{textAlign:"center",padding:50}}><div style={{width:44,height:44,border:"3px solid var(--green)",borderTopColor:"transparent",borderRadius:"50%",animation:"spin .8s linear infinite",margin:"0 auto 16px"}} /><div className="syne" style={{fontWeight:700,fontSize:16}}>Payment Verify ho rahi hai...</div></div>}
           {payStep===1 && <div className="card" style={{textAlign:"center",padding:50}}><div style={{width:44,height:44,border:"3px solid var(--gold)",borderTopColor:"transparent",borderRadius:"50%",animation:"spin .8s linear infinite",margin:"0 auto 16px"}} /><div className="syne" style={{fontWeight:700,fontSize:16}}>Payment Gateway Load ho raha hai...</div></div>}
           {order && !loading && payStep===0 && (
@@ -596,6 +689,9 @@ function OrderModal({ order, isSeller, onClose, onDispatch, onConfirmDelivery, o
           </div>
         )}
         {msg && <div style={{padding:10,borderRadius:8,background:"var(--sf2)",fontSize:13,marginBottom:10,color:msg.startsWith("✅")?"var(--green)":"var(--red)"}}>{msg}</div>}
+        {["token_paid","dispatched","delivered"].includes(order.status) && (
+          <button className="btn-ghost" style={{width:"100%",marginBottom:8}} onClick={()=>downloadReceipt(order, isSeller?"seller":"buyer")}>📄 Download Token Receipt</button>
+        )}
         <button className="btn-ghost" style={{width:"100%"}} onClick={onClose}>Close</button>
       </div>
     </div>
@@ -1877,7 +1973,7 @@ function Auth({ type, onLogin, onBack, dark, onToggle }) {
 
   return (
     <div style={{minHeight:"100vh"}}>
-      <nav className="nav"><Logo /><div style={{display:"flex",gap:8,alignItems:"center"}}><ThemeToggle dark={dark} onToggle={onToggle} /><button className="btn-ghost" onClick={onBack}>← Back</button></div></nav>
+      <nav className="nav"><Logo onClick={onBack} /><div style={{display:"flex",gap:8,alignItems:"center"}}><ThemeToggle dark={dark} onToggle={onToggle} /><button className="btn-ghost" onClick={onBack}>← Back</button></div></nav>
       <div style={{display:"flex",alignItems:"center",justifyContent:"center",minHeight:"calc(100vh - 62px)",padding:20}}>
         <div className="modal" style={{maxWidth:410}}>
           <div style={{textAlign:"center",marginBottom:22}}>
@@ -3578,10 +3674,10 @@ function AdminPanel({ adminKey: propKey, onLogout, dark, onToggle }) {
             {loading ? <div style={{textAlign:"center",padding:30,color:"var(--muted)"}}>⏳ Loading...</div> : (
               <div className="card" style={{padding:0,overflowX:"auto"}}>
                 <table className="tbl">
-                  <thead><tr><th>Order ID</th><th>Date</th><th>Seller</th><th>Buyer</th><th>Product</th><th>Amount</th><th>Token</th><th>Commission</th><th>Status</th></tr></thead>
+                  <thead><tr><th>Order ID</th><th>Date</th><th>Seller</th><th>Buyer</th><th>Product</th><th>Amount</th><th>Token</th><th>Commission</th><th>Status</th><th>Receipt</th></tr></thead>
                   <tbody>
-                    {filteredOrders.length===0?<tr><td colSpan={9} style={{textAlign:"center",color:"var(--muted)",padding:30}}>No orders found</td></tr>:filteredOrders.map(o=>(
-                      <tr key={o.id}><td><span style={{fontFamily:"monospace",color:"var(--gold)",fontSize:11}}>{o.id}</span></td><td style={{fontSize:11,color:"var(--muted)"}}>{(o.created_at||"").split("T")[0]}</td><td style={{fontSize:12}}>{o.seller_name||"—"}</td><td style={{fontSize:12}}>{o.buyer_name||"—"}</td><td style={{fontSize:12,color:"var(--muted)"}}>{o.product_name}</td><td style={{fontWeight:600,fontSize:12}}>₹{o.order_amount}</td><td style={{color:"var(--green)",fontWeight:600,fontSize:12}}>₹{o.token_amount}</td><td style={{color:"var(--blue)",fontSize:12}}>₹{o.escara_commission||0}</td><td><Bdg status={o.status} /></td></tr>
+                    {filteredOrders.length===0?<tr><td colSpan={10} style={{textAlign:"center",color:"var(--muted)",padding:30}}>No orders found</td></tr>:filteredOrders.map(o=>(
+                      <tr key={o.id}><td><span style={{fontFamily:"monospace",color:"var(--gold)",fontSize:11}}>{o.id}</span></td><td style={{fontSize:11,color:"var(--muted)"}}>{(o.created_at||"").split("T")[0]}</td><td style={{fontSize:12}}>{o.seller_name||"—"}</td><td style={{fontSize:12}}>{o.buyer_name||"—"}</td><td style={{fontSize:12,color:"var(--muted)"}}>{o.product_name}</td><td style={{fontWeight:600,fontSize:12}}>₹{o.order_amount}</td><td style={{color:"var(--green)",fontWeight:600,fontSize:12}}>₹{o.token_amount}</td><td style={{color:"var(--blue)",fontSize:12}}>₹{o.escara_commission||0}</td><td><Bdg status={o.status} /></td><td>{["token_paid","dispatched","delivered"].includes(o.status)&&<button className="btn-ghost" style={{padding:"3px 8px",fontSize:11}} onClick={()=>downloadReceipt(o,"admin")}>📄</button>}</td></tr>
                     ))}
                   </tbody>
                 </table>
@@ -3683,7 +3779,7 @@ function AboutPage({ onBack, dark, onToggle, lang, onLangToggle }) {
   const L = (en,hi,hl) => lang==="en"?en:lang==="hi"?hi:hl;
   return (
     <div style={{minHeight:"100vh"}}>
-      <nav className="nav"><Logo /><div style={{display:"flex",gap:8,alignItems:"center"}}><LangToggle lang={lang} onToggle={onLangToggle} /><ThemeToggle dark={dark} onToggle={onToggle} /><button className="btn-ghost" onClick={onBack}>← Back</button></div></nav>
+      <nav className="nav"><Logo onClick={onBack} /><div style={{display:"flex",gap:8,alignItems:"center"}}><LangToggle lang={lang} onToggle={onLangToggle} /><ThemeToggle dark={dark} onToggle={onToggle} /><button className="btn-ghost" onClick={onBack}>← Back</button></div></nav>
       <div style={{maxWidth:820,margin:"0 auto",padding:"40px 20px"}}>
 
         {/* Hero */}
@@ -4218,7 +4314,7 @@ export default function App() {
   const [trackOrderId, setTrackOrderId] = useState(null);
   const [adminKey, setAdminKey] = useState(()=> localStorage.getItem("adminKey") || "");
 
-  useEffect(()=>{ window._goToPage=(s)=>setScreen(s); },[]);
+  useEffect(()=>{ window._goToPage=(s)=>{ const urls={about:"/about",privacy:"/privacy",terms:"/terms",refund:"/refund",dispute:"/dispute",contact:"/contact",landing:"/",track:"/track",admin:"/admin"}; window.history.pushState({},"",urls[s]||"/"+s); setScreen(s); }; },[]);
   useEffect(()=>{
     // SEO: Update page title
     document.title = "Escara Pay | India's Trusted Payment Protection Platform";
@@ -4230,12 +4326,20 @@ export default function App() {
     const tm=path.match(/^\/track\/([A-Z0-9-]+)$/i); if(tm){setTrackOrderId(tm[1].toUpperCase());setScreen("track");return;}
     if(path==="/track"){setScreen("track");return;}
     if(path==="/admin"){setScreen("admin-login");return;}
+    if(path==="/about"){setScreen("about");return;}
+    if(path==="/privacy"){setScreen("privacy");return;}
+    if(path==="/terms"){setScreen("terms");return;}
+    if(path==="/refund"){setScreen("refund");return;}
+    if(path==="/dispute"){setScreen("dispute");return;}
+    if(path==="/contact"){setScreen("contact");return;}
+    if(path==="/login"){setScreen("auth");return;}
   },[]);
 
   const props = { dark, onToggle:toggleDark, lang, onLangToggle:toggleLang };
   const handleLogin=(t,n,id,phone)=>{setUserType(t);setUserName(n);setUserId(id);setUserPhone(phone||"");setScreen("dashboard");};
   const handleLogout=()=>{setScreen("landing");setUserType(null);setUserId(null);setUserPhone("");setUserName("");};
   const goHome=()=>{window.history.pushState({},"","/");setScreen("landing");setPayOrderId(null);setDealOrderId(null);setTrackOrderId(null);};
+  const goToScreen=(s,url)=>{window.history.pushState({},"",(url||"/"));setScreen(s);};
 
   return (
     <>
@@ -4245,14 +4349,14 @@ export default function App() {
       {screen==="track"                      && <TrackPage  orderId={trackOrderId} dark={dark} onToggle={toggleDark} onGoHome={goHome} />}
       {screen==="admin-login" && <AdminLogin  onLogin={(k)=>{setAdminKey(k);setScreen("admin");}} dark={dark} onToggle={toggleDark} />}
       {screen==="admin"       && <AdminPanel  adminKey={adminKey} onLogout={()=>{localStorage.removeItem("adminKey");setScreen("landing");}} dark={dark} onToggle={toggleDark} />}
-      {screen==="about"       && <AboutPage   onBack={()=>setScreen("landing")} {...props} />}
-      {screen==="privacy"     && <PrivacyPage onBack={()=>setScreen("landing")} {...props} />}
-      {screen==="terms"       && <TermsPage   onBack={()=>setScreen("landing")} {...props} />}
-      {screen==="refund"      && <RefundPage  onBack={()=>setScreen("landing")} {...props} />}
-      {screen==="dispute"     && <DisputePage onBack={()=>setScreen("landing")} {...props} />}
-      {screen==="contact"     && <ContactPage onBack={()=>setScreen("landing")} {...props} />}
-      {screen==="landing"     && <Landing     onEnter={t=>{setUserType(t);setScreen("auth");}} onTrack={()=>{window.history.pushState({},"","/track");setScreen("track");setTrackOrderId(null);}} {...props} />}
-      {screen==="auth"        && <Auth        type={userType} onLogin={handleLogin} onBack={()=>setScreen("landing")} {...props} />}
+      {screen==="about"       && <AboutPage   onBack={goHome} {...props} />}
+      {screen==="privacy"     && <PrivacyPage onBack={goHome} {...props} />}
+      {screen==="terms"       && <TermsPage   onBack={goHome} {...props} />}
+      {screen==="refund"      && <RefundPage  onBack={goHome} {...props} />}
+      {screen==="dispute"     && <DisputePage onBack={goHome} {...props} />}
+      {screen==="contact"     && <ContactPage onBack={goHome} {...props} />}
+      {screen==="landing"     && <Landing     onEnter={t=>{setUserType(t);goToScreen("auth","/login");}} onTrack={()=>{window.history.pushState({},"","/track");setScreen("track");setTrackOrderId(null);}} {...props} />}
+      {screen==="auth"        && <Auth        type={userType} onLogin={handleLogin} onBack={goHome} {...props} />}
       {screen==="dashboard"   && userType==="seller" && <SellerDB user={userName||"Seller"} userId={userId} onLogout={handleLogout} {...props} />}
       {screen==="dashboard"   && userType==="buyer"  && <BuyerDB  user={userName||"Buyer"}  userId={userId} userPhone={userPhone} onLogout={handleLogout} {...props} />}
     </>
