@@ -1784,7 +1784,7 @@ function FieldError({ msg }) {
 
 /* ══════════ PROFILE MODAL ══════════ */
 function ProfileModal({ user, userId, userType, onClose, onUpdate }) {
-  const [form, setForm] = useState({ name: user, email: "", phone: "", password: "", newPass: "" });
+  const [form, setForm] = useState({ name: user, email: "", phone: "", currentPass: "", newPass: "" });
   const [loading, setLoading] = useState(false);
   const [msg, setMsg] = useState("");
   const [errors, setErrors] = useState({});
@@ -1795,6 +1795,7 @@ function ProfileModal({ user, userId, userType, onClose, onUpdate }) {
     if (form.email && !validateEmail(form.email)) e.email = "Enter a valid email";
     if (form.phone && !validatePhone(form.phone)) e.phone = "Phone 10 digits ka hona chahiye";
     if (form.newPass && !validatePass(form.newPass)) e.newPass = "Min 6 chars, 1 capital, 1 small, 1 number, 1 special (!@#$)";
+    if (form.newPass && !form.currentPass) e.newPass = "New password set karne ke liye current password bhi daalo";
     return e;
   };
 
@@ -1803,17 +1804,34 @@ function ProfileModal({ user, userId, userType, onClose, onUpdate }) {
     setErrors(e);
     if (Object.keys(e).length > 0) return;
     setLoading(true);
+    setMsg("");
     try {
+      // Step 1 — Profile update (name, email, phone)
       const res = await fetch(`${BACKEND_URL}/api/users/${userId}/update`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ user_id: userId, name: form.name, email: form.email || undefined, phone: form.phone || undefined, password: form.newPass || undefined }),
+        body: JSON.stringify({ user_id: userId, name: form.name, email: form.email || undefined, phone: form.phone || undefined }),
       });
       const data = await res.json();
-      setLoading(false);
-      if (data.success) { setMsg("✅ Profile updated successfully!"); onUpdate(form.name); }
-      else setMsg("❌ " + data.error);
-    } catch(e) { setLoading(false); setMsg("❌ Backend se connect nahi hua!"); }
+      if (!data.success) { setLoading(false); setMsg("❌ " + data.error); return; }
+
+      // Step 2 — Password change (only if new password entered)
+      if (form.newPass && form.currentPass) {
+        const pr = await fetch(`${BACKEND_URL}/api/auth/change-password`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ user_id: userId, current_password: form.currentPass, new_password: form.newPass }),
+        });
+        const pd = await pr.json();
+        setLoading(false);
+        if (!pd.success) { setMsg("❌ Password: " + pd.error); return; }
+        setMsg("✅ Profile aur password dono update ho gaye!");
+      } else {
+        setLoading(false);
+        setMsg("✅ Profile updated successfully!");
+      }
+      onUpdate(form.name);
+    } catch(err) { setLoading(false); setMsg("❌ Backend se connect nahi hua!"); }
   };
 
   return (
@@ -1843,9 +1861,15 @@ function ProfileModal({ user, userId, userType, onClose, onUpdate }) {
             <input className="input" placeholder="10 digit number" maxLength={10} value={form.phone} onChange={e=>{setForm({...form,phone:e.target.value.replace(/\D/g,"")});setErrors({...errors,phone:""});}} />
             <FieldError msg={errors.phone} />
           </div>
+          <div style={{height:1,background:"var(--border)",margin:"4px 0"}} />
+          <div style={{fontSize:12,fontWeight:600,color:"var(--muted)"}}>🔑 Change Password (optional)</div>
           <div>
-            <label className="label">Naya Password (optional)</label>
-            <input className="input" type="password" placeholder="••••••••" value={form.newPass} onChange={e=>{setForm({...form,newPass:e.target.value});setErrors({...errors,newPass:""});}} />
+            <label className="label">Current Password</label>
+            <input className="input" type="password" placeholder="Apna current password daalo" value={form.currentPass||""} onChange={e=>setForm({...form,currentPass:e.target.value})} />
+          </div>
+          <div>
+            <label className="label">New Password</label>
+            <input className="input" type="password" placeholder="Min 6 characters" value={form.newPass} onChange={e=>{setForm({...form,newPass:e.target.value});setErrors({...errors,newPass:""});}} />
             <FieldError msg={errors.newPass} />
             <div style={{fontSize:11,color:"var(--muted)",marginTop:3}}>Min 6 chars, 1 capital, 1 small, 1 number, 1 special</div>
           </div>
@@ -1873,6 +1897,22 @@ function Auth({ type, onLogin, onBack, dark, onToggle }) {
   const [regOtpVerified, setRegOtpVerified] = useState(false);
   const [regOtp, setRegOtp] = useState("");
   const [regOtpMsg, setRegOtpMsg] = useState("");
+  // Forgot Password states
+  const [forgotMode, setForgotMode] = useState(false); // show forgot password flow
+  const [forgotStep, setForgotStep] = useState(1);     // 1=email, 2=otp+newpass
+  const [forgotEmail, setForgotEmail] = useState("");
+  const [forgotOtp, setForgotOtp] = useState("");
+  const [forgotNewPass, setForgotNewPass] = useState("");
+  const [forgotConfirm, setForgotConfirm] = useState("");
+  const [forgotMsg, setForgotMsg] = useState("");
+  const [forgotLoading, setForgotLoading] = useState(false);
+  const [forgotTimer, setForgotTimer] = useState(0);
+
+  useEffect(() => {
+    if (forgotTimer <= 0) return;
+    const t = setTimeout(() => setForgotTimer(forgotTimer - 1), 1000);
+    return () => clearTimeout(t);
+  }, [forgotTimer]);
 
   // OTP countdown timer
   useEffect(() => {
@@ -1970,6 +2010,43 @@ function Auth({ type, onLogin, onBack, dark, onToggle }) {
   };
 
   const setField = (field, val) => { setForm({...form,[field]:val}); setErrors({...errors,[field]:""}); };
+
+  // ── Forgot Password handlers ──
+  const handleForgotSendOTP = async () => {
+    if (!forgotEmail || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(forgotEmail)) {
+      setForgotMsg("❌ Valid email daalo"); return;
+    }
+    setForgotLoading(true); setForgotMsg("");
+    try {
+      const r = await fetch(`${BACKEND_URL}/api/auth/forgot-password`, {
+        method:"POST", headers:{"Content-Type":"application/json"},
+        body: JSON.stringify({ email: forgotEmail, role: type }),
+      });
+      const d = await r.json();
+      setForgotLoading(false);
+      if (d.success) { setForgotStep(2); setForgotTimer(60); setForgotMsg("✅ OTP sent! Email check karo."); }
+      else setForgotMsg("❌ " + d.error);
+    } catch(e) { setForgotLoading(false); setForgotMsg("❌ Server se connect nahi hua"); }
+  };
+
+  const handleForgotReset = async () => {
+    if (!forgotOtp || forgotOtp.length !== 6) { setForgotMsg("❌ 6-digit OTP daalo"); return; }
+    if (!forgotNewPass || forgotNewPass.length < 6) { setForgotMsg("❌ Min 6 characters ka password daalo"); return; }
+    if (forgotNewPass !== forgotConfirm) { setForgotMsg("❌ Passwords match nahi kar rahe"); return; }
+    setForgotLoading(true); setForgotMsg("");
+    try {
+      const r = await fetch(`${BACKEND_URL}/api/auth/reset-password`, {
+        method:"POST", headers:{"Content-Type":"application/json"},
+        body: JSON.stringify({ email: forgotEmail, role: type, otp: forgotOtp, new_password: forgotNewPass }),
+      });
+      const d = await r.json();
+      setForgotLoading(false);
+      if (d.success) {
+        setForgotMsg("✅ Password reset ho gaya! Ab login karo.");
+        setTimeout(() => { setForgotMode(false); setForgotStep(1); setForgotEmail(""); setForgotOtp(""); setForgotNewPass(""); setForgotConfirm(""); setForgotMsg(""); }, 2000);
+      } else setForgotMsg("❌ " + d.error);
+    } catch(e) { setForgotLoading(false); setForgotMsg("❌ Server se connect nahi hua"); }
+  };
 
   return (
     <div style={{minHeight:"100vh"}}>
@@ -2089,6 +2166,74 @@ function Auth({ type, onLogin, onBack, dark, onToggle }) {
                   onChange={e=>setField("password",e.target.value)} />
                 <FieldError msg={errors.password} />
                 {mode==="register" && !errors.password && <div style={{fontSize:11,color:"var(--muted)",marginTop:3}}>Min 6 chars, 1 capital, 1 small, 1 number, 1 special (!@#$%)</div>}
+                {mode==="login" && loginMethod==="password" && (
+                  <div style={{textAlign:"right",marginTop:5}}>
+                    <span style={{fontSize:12,color:"var(--gold)",cursor:"pointer",textDecoration:"underline"}}
+                      onClick={()=>{ setForgotMode(true); setForgotEmail(form.email||""); setForgotStep(1); setForgotMsg(""); }}>
+                      🔑 Forgot Password?
+                    </span>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* ── Forgot Password Inline Flow ── */}
+            {forgotMode && mode==="login" && (
+              <div style={{background:"rgba(14,165,233,.06)",border:"1px solid rgba(14,165,233,.25)",borderRadius:12,padding:16}}>
+                <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:12}}>
+                  <div style={{fontWeight:700,fontSize:14,color:"var(--gold)"}}>🔑 Password Reset</div>
+                  <button className="btn-ghost" style={{padding:"2px 8px",fontSize:11}} onClick={()=>{ setForgotMode(false); setForgotStep(1); setForgotMsg(""); }}>✕</button>
+                </div>
+                {forgotStep===1 && (
+                  <div style={{display:"flex",flexDirection:"column",gap:10}}>
+                    <div style={{fontSize:12,color:"var(--muted)"}}>Registered email daalo — OTP bhejenge</div>
+                    <input className="input" type="email" placeholder="aapka@email.com"
+                      value={forgotEmail} onChange={e=>setForgotEmail(e.target.value.toLowerCase())}
+                      onKeyDown={e=>e.key==="Enter"&&handleForgotSendOTP()} />
+                    <button className="btn-gold" style={{width:"100%",padding:10,fontSize:13}} onClick={handleForgotSendOTP} disabled={forgotLoading}>
+                      {forgotLoading?"⏳ Sending...":"📧 Send Reset OTP"}
+                    </button>
+                  </div>
+                )}
+                {forgotStep===2 && (
+                  <div style={{display:"flex",flexDirection:"column",gap:10}}>
+                    <div style={{background:"rgba(5,150,105,.08)",border:"1px solid rgba(5,150,105,.3)",borderRadius:8,padding:10,fontSize:12,color:"var(--green)"}}>
+                      ✅ OTP sent to <strong>{forgotEmail}</strong>
+                    </div>
+                    <div>
+                      <label className="label">6-Digit OTP *</label>
+                      <input className="input" placeholder="123456" maxLength={6} value={forgotOtp}
+                        onChange={e=>setForgotOtp(e.target.value.replace(/\D/g,""))}
+                        style={{fontSize:20,letterSpacing:6,textAlign:"center",fontWeight:700}} />
+                    </div>
+                    <div>
+                      <label className="label">New Password *</label>
+                      <input className="input" type="password" placeholder="Min 6 characters"
+                        value={forgotNewPass} onChange={e=>setForgotNewPass(e.target.value)} />
+                    </div>
+                    <div>
+                      <label className="label">Confirm New Password *</label>
+                      <input className="input" type="password" placeholder="Same password dobara daalo"
+                        value={forgotConfirm} onChange={e=>setForgotConfirm(e.target.value)}
+                        onKeyDown={e=>e.key==="Enter"&&handleForgotReset()} />
+                    </div>
+                    <button className="btn-gold" style={{width:"100%",padding:10,fontSize:13}} onClick={handleForgotReset} disabled={forgotLoading}>
+                      {forgotLoading?"⏳ Resetting...":"✅ Reset Password"}
+                    </button>
+                    <div style={{textAlign:"center",fontSize:12}}>
+                      {forgotTimer>0
+                        ? <span style={{color:"var(--muted)"}}>⏰ Resend in {forgotTimer}s</span>
+                        : <span style={{color:"var(--gold)",cursor:"pointer",textDecoration:"underline"}} onClick={()=>{ setForgotStep(1); setForgotMsg(""); }}>🔄 New OTP Request Karo</span>
+                      }
+                    </div>
+                  </div>
+                )}
+                {forgotMsg && (
+                  <div style={{marginTop:8,padding:"8px 12px",borderRadius:8,background:"var(--sf2)",fontSize:12,
+                    color:forgotMsg.startsWith("✅")?"var(--green)":"var(--red)",fontWeight:500}}>
+                    {forgotMsg}
+                  </div>
+                )}
               </div>
             )}
 
