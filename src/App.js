@@ -1807,7 +1807,7 @@ function ProfileModal({ user, userId, userType, onClose, onUpdate }) {
       const res = await fetch(`${BACKEND_URL}/api/users/${userId}/update`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name: form.name, email: form.email || undefined, phone: form.phone || undefined, password: form.newPass || undefined }),
+        body: JSON.stringify({ user_id: userId, name: form.name, email: form.email || undefined, phone: form.phone || undefined, password: form.newPass || undefined }),
       });
       const data = await res.json();
       setLoading(false);
@@ -2196,7 +2196,7 @@ function SellerSettings({ userId, userName, BACKEND_URL }) {
     try {
       const r = await fetch(`${BACKEND_URL}/api/users/${userId}/update-profile`, {
         method:"POST", headers:{"Content-Type":"application/json"},
-        body: JSON.stringify(form),
+        body: JSON.stringify({ ...form, user_id: userId }),
       });
       const d = await r.json();
       setSaving(false);
@@ -3360,7 +3360,6 @@ function UserDetailModal({ user, adminKey, onClose, onUpdate }) {
               ["Email", user.email, undefined],
               ["Phone", user.phone, undefined],
               ["Role", user.role, undefined],
-              ["Password", user.password||"—", "var(--red)"],
               ["PAN", user.pan_number||"—", user.pan_number?"var(--green)":undefined],
               ["GST", user.gst_number||"—", user.gst_number?"var(--green)":undefined],
               ["Shop", user.shop_name||"—", undefined],
@@ -3371,7 +3370,7 @@ function UserDetailModal({ user, adminKey, onClose, onUpdate }) {
             ].map(([label,val,color])=>(
               <div key={label} style={{display:"flex",justifyContent:"space-between",padding:"9px 12px",background:"var(--sf2)",borderRadius:8}}>
                 <span style={{fontSize:12,color:"var(--muted)",fontWeight:500}}>{label}</span>
-                <span style={{fontSize:12,fontWeight:600,fontFamily:label==="Password"||label==="PAN"||label==="GST"?"monospace":"inherit",color:color||"var(--text)"}}>{val}</span>
+                <span style={{fontSize:12,fontWeight:600,fontFamily:label==="PAN"||label==="GST"?"monospace":"inherit",color:color||"var(--text)"}}>{val}</span>
               </div>
             ))}
           </div>
@@ -3598,13 +3597,6 @@ function AdminPanel({ adminKey: propKey, onLogout, dark, onToggle }) {
 
   const load = async (p) => {
     setLoading(true);
-    // First ping to check auth
-    const ping = await safeFetch(`${ADMIN_URL}/api/admin/ping`);
-    if (ping && !ping.keyMatch) {
-      setAuthError(`Key mismatch! Server pe key alag hai. Logout karke dobara admin123 se login karo.`);
-      setLoading(false);
-      return;
-    }
     if (p==="dashboard") { const d=await safeFetch(`${ADMIN_URL}/api/admin/stats`); if(d?.success) setStats(d.stats); }
     if (p==="orders")    { const d=await safeFetch(`${ADMIN_URL}/api/admin/orders`); if(d?.success) setOrders(d.orders||[]); }
     if (p==="users")     { const d=await safeFetch(`${ADMIN_URL}/api/admin/users`);  if(d?.success) setUsers(d.users||[]); }
@@ -3691,14 +3683,13 @@ function AdminPanel({ adminKey: propKey, onLogout, dark, onToggle }) {
             {loading?<div style={{textAlign:"center",padding:30,color:"var(--muted)"}}>⏳ Loading...</div>:(
               <div className="card" style={{padding:0,overflowX:"auto"}}>
                 <table className="tbl">
-                  <thead><tr><th>ID</th><th>Name</th><th>Email</th><th>Phone</th><th>Password</th><th>Role</th><th>PAN</th><th>GST</th><th>Status</th><th>Joined</th><th>Action</th></tr></thead>
+                  <thead><tr><th>ID</th><th>Name</th><th>Email</th><th>Phone</th><th>Role</th><th>PAN</th><th>GST</th><th>Status</th><th>Joined</th><th>Action</th></tr></thead>
                   <tbody>{users.map(u=>(
                     <tr key={u.id} style={{cursor:"pointer"}} onClick={()=>setSelectedUser(u)}>
                       <td style={{color:"var(--muted)",fontSize:12}}>{u.id}</td>
                       <td style={{fontWeight:600,fontSize:13}}>{u.name}{u.warning_count>0&&<span className="badge borange" style={{fontSize:10,marginLeft:4}}>⚠️ {u.warning_count}</span>}</td>
                       <td style={{fontSize:12,color:"var(--muted)"}}>{u.email}</td>
                       <td style={{fontSize:12}}>{u.phone}</td>
-                      <td style={{fontFamily:"monospace",fontSize:11,color:"var(--red)"}}>{u.password||"—"}</td>
                       <td><span className={`badge ${u.role==="seller"?"bg":"bo"}`} style={{fontSize:11}}>{u.role}</span></td>
                       <td style={{fontFamily:"monospace",fontSize:11,color:u.pan_number?"var(--green)":"var(--muted)"}}>{u.pan_number||"—"}</td>
                       <td style={{fontFamily:"monospace",fontSize:11,color:u.gst_number?"var(--green)":"var(--muted)"}}>{u.gst_number||"—"}</td>
