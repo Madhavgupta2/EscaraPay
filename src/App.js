@@ -540,9 +540,9 @@ function PayPage({ orderId, dark, onToggle, onGoHome }) {
       </nav>
       <div style={{display:"flex",alignItems:"center",justifyContent:"center",minHeight:"calc(100vh - 62px)",padding:20}}>
         <div style={{width:"100%",maxWidth:460}}>
-          {loading && <div className="card" style={{textAlign:"center",padding:50}}><div style={{width:44,height:44,border:"3px solid var(--gold)",borderTopColor:"transparent",borderRadius:"50%",animation:"spin .8s linear infinite",margin:"0 auto 16px"}} /><div style={{color:"var(--muted)"}}>Order load ho raha hai...</div></div>}
+          {loading && <div className="card" style={{textAlign:"center",padding:50}}><div style={{width:44,height:44,border:"3px solid var(--gold)",borderTopColor:"transparent",borderRadius:"50%",animation:"spin .8s linear infinite",margin:"0 auto 16px"}} /><div style={{color:"var(--muted)"}}>Loading order...</div></div>}
           {error && <div className="card" style={{textAlign:"center",padding:40}}><div style={{fontSize:40,marginBottom:12}}>❌</div><div className="syne" style={{fontWeight:800,fontSize:18,marginBottom:8}}>No Order Found</div><div style={{color:"var(--muted)",fontSize:13,marginBottom:20}}>{error}</div><button className="btn-ghost" onClick={onGoHome}>← Home</button></div>}
-          {payStep===3 && <div className="card fu" style={{textAlign:"center",padding:40}}><div style={{fontSize:60,marginBottom:16}}>🎉</div><div className="syne" style={{fontWeight:800,fontSize:24,color:"var(--green)",marginBottom:8}}>Token Secured!</div><div style={{color:"var(--muted)",fontSize:14,marginBottom:16}}>₹{order?.token_amount} protection vault mein secure ho gaya</div><div style={{background:"rgba(14,165,233,.1)",border:"1px solid rgba(14,165,233,.2)",borderRadius:12,padding:14,marginBottom:20}}><div style={{fontSize:11,color:"var(--muted)",marginBottom:4}}>Save your Order ID:</div><div style={{fontFamily:"monospace",fontWeight:700,color:"var(--gold)",fontSize:16}}>{order?.id}</div></div><div style={{display:"flex",gap:10,justifyContent:"center",flexWrap:"wrap"}}><button className="btn-gold" style={{fontSize:13,padding:"10px 20px"}} onClick={()=>downloadReceipt(order,"buyer")}>📄 Download Receipt</button><button className="btn-ghost" onClick={onGoHome}>← Home pe Jao</button></div></div>}
+          {payStep===3 && <div className="card fu" style={{textAlign:"center",padding:40}}><div style={{fontSize:60,marginBottom:16}}>🎉</div><div className="syne" style={{fontWeight:800,fontSize:24,color:"var(--green)",marginBottom:8}}>Token Secured!</div><div style={{color:"var(--muted)",fontSize:14,marginBottom:16}}>₹{order?.token_amount} secured in the protection vault</div><div style={{background:"rgba(14,165,233,.1)",border:"1px solid rgba(14,165,233,.2)",borderRadius:12,padding:14,marginBottom:20}}><div style={{fontSize:11,color:"var(--muted)",marginBottom:4}}>Save your Order ID:</div><div style={{fontFamily:"monospace",fontWeight:700,color:"var(--gold)",fontSize:16}}>{order?.id}</div></div><div style={{display:"flex",gap:10,justifyContent:"center",flexWrap:"wrap"}}><button className="btn-gold" style={{fontSize:13,padding:"10px 20px"}} onClick={()=>downloadReceipt(order,"buyer")}>📄 Download Receipt</button><button className="btn-ghost" onClick={onGoHome}>← Go to Home</button></div></div>}
           {payStep===2 && <div className="card" style={{textAlign:"center",padding:50}}><div style={{width:44,height:44,border:"3px solid var(--green)",borderTopColor:"transparent",borderRadius:"50%",animation:"spin .8s linear infinite",margin:"0 auto 16px"}} /><div className="syne" style={{fontWeight:700,fontSize:16}}>Payment Verify ho rahi hai...</div></div>}
           {payStep===1 && <div className="card" style={{textAlign:"center",padding:50}}><div style={{width:44,height:44,border:"3px solid var(--gold)",borderTopColor:"transparent",borderRadius:"50%",animation:"spin .8s linear infinite",margin:"0 auto 16px"}} /><div className="syne" style={{fontWeight:700,fontSize:16}}>Payment Gateway Load ho raha hai...</div></div>}
           {order && !loading && payStep===0 && (
@@ -661,11 +661,11 @@ function OrderModal({ order, isSeller, onClose, onDispatch, onConfirmDelivery, o
             {trackingUrl && <a href={trackingUrl} target="_blank" rel="noreferrer" style={{background:"var(--blue)",color:"#fff",padding:"6px 12px",borderRadius:8,fontSize:12,fontWeight:600,textDecoration:"none"}}>Track →</a>}
           </div>
         )}
-        {order.status==="dispatched" && <div className="hold-box" style={{marginBottom:12}}><div style={{fontSize:12,color:"#a78bfa",fontWeight:700}}>⏰ Token Hold: {daysLeft>0?`${daysLeft} din aur`:"Release ready!"}</div></div>}
+        {order.status==="dispatched" && <div className="hold-box" style={{marginBottom:12}}><div style={{fontSize:12,color:"#a78bfa",fontWeight:700}}>⏰ Token Hold: {daysLeft>0?`${daysLeft} more day${daysLeft===1?"":"s"}`:"Ready to release!"}</div></div>}
         {isSeller && order.status==="token_paid" && (
           <div style={{marginBottom:12}}>
             <label className="label">Courier Tracking Number *</label>
-            <input className="input" placeholder="DTDC123456 / BLUEDART789" value={tracking} onChange={e=>setTracking(e.target.value)} style={{marginBottom:8}} />
+            <input className="input" placeholder="Courier tracking number (e.g. DTDC123456)" value={tracking} onChange={e=>setTracking(e.target.value)} style={{marginBottom:8}} />
             <button className="btn-gold" style={{width:"100%"}} onClick={async()=>{ if(!tracking){setMsg("❌ Please enter a tracking number!"); return;} setLoading(true); const r=await dispatchOrder(order.id,tracking); setLoading(false); if(r.success){onDispatch(order.id,tracking);setMsg("✅ Dispatched!");}else setMsg("❌ "+r.error); }} disabled={loading}>{loading?"⏳...":"📦 Mark as Dispatched"}</button>
           </div>
         )}
@@ -1793,9 +1793,9 @@ function ProfileModal({ user, userId, userType, onClose, onUpdate }) {
     const e = {};
     if (!form.name.trim()) e.name = "Name is required";
     if (form.email && !validateEmail(form.email)) e.email = "Enter a valid email";
-    if (form.phone && !validatePhone(form.phone)) e.phone = "Phone 10 digits ka hona chahiye";
+    if (form.phone && !validatePhone(form.phone)) e.phone = "Please enter a valid 10-digit phone number";
     if (form.newPass && !validatePass(form.newPass)) e.newPass = "Min 6 chars, 1 capital, 1 small, 1 number, 1 special (!@#$)";
-    if (form.newPass && !form.currentPass) e.newPass = "New password set karne ke liye current password bhi daalo";
+    if (form.newPass && !form.currentPass) e.newPass = "Enter your current password to set a new one";
     return e;
   };
 
@@ -1825,13 +1825,13 @@ function ProfileModal({ user, userId, userType, onClose, onUpdate }) {
         const pd = await pr.json();
         setLoading(false);
         if (!pd.success) { setMsg("❌ Password: " + pd.error); return; }
-        setMsg("✅ Profile aur password dono update ho gaye!");
+        setMsg("✅ Profile and password updated successfully!");
       } else {
         setLoading(false);
         setMsg("✅ Profile updated successfully!");
       }
       onUpdate(form.name);
-    } catch(err) { setLoading(false); setMsg("❌ Backend se connect nahi hua!"); }
+    } catch(err) { setLoading(false); setMsg("❌ Could not connect to server. Please try again."); }
   };
 
   return (
@@ -1853,7 +1853,7 @@ function ProfileModal({ user, userId, userType, onClose, onUpdate }) {
           </div>
           <div>
             <label className="label">Email Address</label>
-            <input className="input" placeholder="naya@email.com" value={form.email} onChange={e=>{setForm({...form,email:e.target.value});setErrors({...errors,email:""});}} />
+            <input className="input" placeholder="new@email.com" value={form.email} onChange={e=>{setForm({...form,email:e.target.value});setErrors({...errors,email:""});}} />
             <FieldError msg={errors.email} />
           </div>
           <div>
@@ -1862,10 +1862,10 @@ function ProfileModal({ user, userId, userType, onClose, onUpdate }) {
             <FieldError msg={errors.phone} />
           </div>
           <div style={{height:1,background:"var(--border)",margin:"4px 0"}} />
-          <div style={{fontSize:12,fontWeight:600,color:"var(--muted)"}}>🔑 Change Password (optional)</div>
+          <div style={{fontSize:12,fontWeight:600,color:"var(--muted)"}}>🔑 Change Password <span style={{fontWeight:400}}>(optional — leave blank to keep current)</span></div>
           <div>
             <label className="label">Current Password</label>
-            <input className="input" type="password" placeholder="Apna current password daalo" value={form.currentPass||""} onChange={e=>setForm({...form,currentPass:e.target.value})} />
+            <input className="input" type="password" placeholder="Enter your current password" value={form.currentPass||""} onChange={e=>setForm({...form,currentPass:e.target.value})} />
           </div>
           <div>
             <label className="label">New Password</label>
@@ -2014,7 +2014,7 @@ function Auth({ type, onLogin, onBack, dark, onToggle }) {
   // ── Forgot Password handlers ──
   const handleForgotSendOTP = async () => {
     if (!forgotEmail || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(forgotEmail)) {
-      setForgotMsg("❌ Valid email daalo"); return;
+      setForgotMsg("❌ Please enter a valid email address"); return;
     }
     setForgotLoading(true); setForgotMsg("");
     try {
@@ -2024,15 +2024,15 @@ function Auth({ type, onLogin, onBack, dark, onToggle }) {
       });
       const d = await r.json();
       setForgotLoading(false);
-      if (d.success) { setForgotStep(2); setForgotTimer(60); setForgotMsg("✅ OTP sent! Email check karo."); }
+      if (d.success) { setForgotStep(2); setForgotTimer(60); setForgotMsg("✅ OTP sent! Please check your email inbox."); }
       else setForgotMsg("❌ " + d.error);
-    } catch(e) { setForgotLoading(false); setForgotMsg("❌ Server se connect nahi hua"); }
+    } catch(e) { setForgotLoading(false); setForgotMsg("❌ Could not connect to server. Please try again."); }
   };
 
   const handleForgotReset = async () => {
-    if (!forgotOtp || forgotOtp.length !== 6) { setForgotMsg("❌ 6-digit OTP daalo"); return; }
-    if (!forgotNewPass || forgotNewPass.length < 6) { setForgotMsg("❌ Min 6 characters ka password daalo"); return; }
-    if (forgotNewPass !== forgotConfirm) { setForgotMsg("❌ Passwords match nahi kar rahe"); return; }
+    if (!forgotOtp || forgotOtp.length !== 6) { setForgotMsg("❌ Please enter the 6-digit OTP"); return; }
+    if (!forgotNewPass || forgotNewPass.length < 6) { setForgotMsg("❌ Password must be at least 6 characters"); return; }
+    if (forgotNewPass !== forgotConfirm) { setForgotMsg("❌ Passwords do not match"); return; }
     setForgotLoading(true); setForgotMsg("");
     try {
       const r = await fetch(`${BACKEND_URL}/api/auth/reset-password`, {
@@ -2042,10 +2042,10 @@ function Auth({ type, onLogin, onBack, dark, onToggle }) {
       const d = await r.json();
       setForgotLoading(false);
       if (d.success) {
-        setForgotMsg("✅ Password reset ho gaya! Ab login karo.");
+        setForgotMsg("✅ Password reset successful! You can now log in.");
         setTimeout(() => { setForgotMode(false); setForgotStep(1); setForgotEmail(""); setForgotOtp(""); setForgotNewPass(""); setForgotConfirm(""); setForgotMsg(""); }, 2000);
       } else setForgotMsg("❌ " + d.error);
-    } catch(e) { setForgotLoading(false); setForgotMsg("❌ Server se connect nahi hua"); }
+    } catch(e) { setForgotLoading(false); setForgotMsg("❌ Could not connect to server. Please try again."); }
   };
 
   return (
@@ -2186,8 +2186,8 @@ function Auth({ type, onLogin, onBack, dark, onToggle }) {
                 </div>
                 {forgotStep===1 && (
                   <div style={{display:"flex",flexDirection:"column",gap:10}}>
-                    <div style={{fontSize:12,color:"var(--muted)"}}>Registered email daalo — OTP bhejenge</div>
-                    <input className="input" type="email" placeholder="aapka@email.com"
+                    <div style={{fontSize:12,color:"var(--muted)"}}>Enter your registered email — we'll send a reset OTP</div>
+                    <input className="input" type="email" placeholder="your@email.com"
                       value={forgotEmail} onChange={e=>setForgotEmail(e.target.value.toLowerCase())}
                       onKeyDown={e=>e.key==="Enter"&&handleForgotSendOTP()} />
                     <button className="btn-gold" style={{width:"100%",padding:10,fontSize:13}} onClick={handleForgotSendOTP} disabled={forgotLoading}>
@@ -2213,7 +2213,7 @@ function Auth({ type, onLogin, onBack, dark, onToggle }) {
                     </div>
                     <div>
                       <label className="label">Confirm New Password *</label>
-                      <input className="input" type="password" placeholder="Same password dobara daalo"
+                      <input className="input" type="password" placeholder="Confirm your new password"
                         value={forgotConfirm} onChange={e=>setForgotConfirm(e.target.value)}
                         onKeyDown={e=>e.key==="Enter"&&handleForgotReset()} />
                     </div>
@@ -2223,7 +2223,7 @@ function Auth({ type, onLogin, onBack, dark, onToggle }) {
                     <div style={{textAlign:"center",fontSize:12}}>
                       {forgotTimer>0
                         ? <span style={{color:"var(--muted)"}}>⏰ Resend in {forgotTimer}s</span>
-                        : <span style={{color:"var(--gold)",cursor:"pointer",textDecoration:"underline"}} onClick={()=>{ setForgotStep(1); setForgotMsg(""); }}>🔄 New OTP Request Karo</span>
+                        : <span style={{color:"var(--gold)",cursor:"pointer",textDecoration:"underline"}} onClick={()=>{ setForgotStep(1); setForgotMsg(""); }}>🔄 Request New OTP</span>
                       }
                     </div>
                   </div>
@@ -2801,7 +2801,7 @@ function SellerDB({ user, userId, onLogout, dark, onToggle }) {
             {orders.filter(o=>["delivered","cancelled_buyer"].includes(o.status)).length===0 && (
               <div style={{textAlign:"center",padding:24,color:"var(--muted)",background:"var(--sf2)",borderRadius:12}}>
                 <div style={{fontSize:36,marginBottom:8}}>💸</div>
-                <div style={{fontSize:13}}>Abhi koi completed order nahi. Deliver orders to receive payment!</div>
+                <div style={{fontSize:13}}>No completed orders yet. Deliver orders to receive payment.</div>
               </div>
             )}
             <div style={{background:"rgba(14,165,233,.08)",border:"1px solid rgba(14,165,233,.2)",borderRadius:12,padding:14,marginTop:4}}>
@@ -2938,7 +2938,7 @@ function BuyerDB({ user, userId, userPhone, onLogout, dark, onToggle }) {
       setDealCreating(false);
       if (data.success) { setDealLink(data.dealLink); setDealForm({product:"",amount:"",token_pct:"10",seller_name:"",seller_phone:""}); }
       else alert("❌ "+data.error);
-    } catch(e) { setDealCreating(false); alert("❌ Backend se connect nahi hua!"); }
+    } catch(e) { setDealCreating(false); alert("❌ Could not connect to server. Please try again."); }
   };
 
   const tokenPreview2 = dealForm.amount ? calcToken(dealForm.amount, dealForm.token_pct) : 0;
@@ -3343,7 +3343,7 @@ function DealPage({ orderId, dark, onToggle, onGoHome }) {
       setConfirming(false);
       if (data.success) { setConfirmed(true); setPaymentLink(data.paymentLink); }
       else setError(data.error||"Confirmation failed");
-    } catch(e) { setConfirming(false); setError("Backend se connect nahi hua!"); }
+    } catch(e) { setConfirming(false); setError("Could not connect to server. Please try again."); }
   };
 
   return (
@@ -3438,10 +3438,10 @@ function UserDetailModal({ user, adminKey, onClose, onUpdate }) {
   };
 
   const doManualPayout = async () => {
-    if (!payoutOrder) { setPayoutMsg("❌ Pehle order select karo"); return; }
-    if (!payoutForm.payout_ref) { setPayoutMsg("❌ Transaction reference/UTR zaroori hai"); return; }
-    if (payoutForm.payout_method === "upi" && !payoutForm.payout_upi) { setPayoutMsg("❌ UPI ID daalo"); return; }
-    if (payoutForm.payout_method === "bank" && !payoutForm.payout_bank) { setPayoutMsg("❌ Bank details daalo"); return; }
+    if (!payoutOrder) { setPayoutMsg("❌ Please select an order first"); return; }
+    if (!payoutForm.payout_ref) { setPayoutMsg("❌ Transaction reference / UTR is required"); return; }
+    if (payoutForm.payout_method === "upi" && !payoutForm.payout_upi) { setPayoutMsg("❌ Please enter UPI ID"); return; }
+    if (payoutForm.payout_method === "bank" && !payoutForm.payout_bank) { setPayoutMsg("❌ Please enter bank details"); return; }
     setPayoutLoading(true); setPayoutMsg("");
     try {
       const r = await fetch(`${ADMIN_URL}/api/admin/orders/${payoutOrder.id}/manual-payout`, {
@@ -3793,7 +3793,7 @@ function AdminPanel({ adminKey: propKey, onLogout, dark, onToggle }) {
                     <div key={s.label} className="stat-card"><div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start"}}><div><div style={{fontSize:11,color:"var(--muted)",marginBottom:6}}>{s.label}</div><div className="syne" style={{fontSize:22,fontWeight:800,color:s.color}}>{s.value}</div></div><span style={{fontSize:20}}>{s.icon}</span></div></div>
                   ))}
                 </div>
-                {stats.pendingDisputes>0 && <div style={{background:"rgba(239,68,68,.1)",border:"1px solid rgba(239,68,68,.3)",borderRadius:12,padding:16,display:"flex",justifyContent:"space-between",alignItems:"center"}}><div><div style={{fontWeight:700,color:"var(--red)",marginBottom:4}}>⚠️ {stats.pendingDisputes} Pending Dispute(s)</div><div style={{fontSize:12,color:"var(--muted)"}}>24 ghante mein resolve karo</div></div><button className="btn-red" style={{padding:"8px 16px",fontSize:13}} onClick={()=>setPage("disputes")}>Resolve →</button></div>}
+                {stats.pendingDisputes>0 && <div style={{background:"rgba(239,68,68,.1)",border:"1px solid rgba(239,68,68,.3)",borderRadius:12,padding:16,display:"flex",justifyContent:"space-between",alignItems:"center"}}><div><div style={{fontWeight:700,color:"var(--red)",marginBottom:4}}>⚠️ {stats.pendingDisputes} Pending Dispute(s)</div><div style={{fontSize:12,color:"var(--muted)"}}>Resolve within 24 hours</div></div><button className="btn-red" style={{padding:"8px 16px",fontSize:13}} onClick={()=>setPage("disputes")}>Resolve →</button></div>}
               </>
             )}
           </div>
@@ -3804,7 +3804,7 @@ function AdminPanel({ adminKey: propKey, onLogout, dark, onToggle }) {
               <h1 className="syne" style={{fontWeight:800,fontSize:"clamp(18px,3vw,26px)"}}>All Orders ({orders.length})</h1>
               <input className="input" style={{maxWidth:220,padding:"8px 12px"}} placeholder="🔍 Search..." value={search} onChange={e=>setSearch(e.target.value)} />
             </div>
-            {orders.length===0&&!loading&&<div style={{background:"rgba(14,165,233,.1)",border:"1px solid rgba(14,165,233,.3)",borderRadius:10,padding:14,marginBottom:16,fontSize:13}}>ℹ️ Railway pe naya database hai — seller ko Railway backend se register karke order banana hoga.</div>}
+            {orders.length===0&&!loading&&<div style={{background:"rgba(14,165,233,.1)",border:"1px solid rgba(14,165,233,.3)",borderRadius:10,padding:14,marginBottom:16,fontSize:13}}>ℹ️ No orders found. Sellers need to register and create orders to appear here.</div>}
             <div style={{display:"flex",gap:8,flexWrap:"wrap",marginBottom:14}}>
               {["all","pending","token_paid","dispatched","delivered","disputed"].map(s=>(<div key={s} className={`chip ${filterStatus===s?"active":""}`} onClick={()=>setFilter(s)} style={{fontSize:11}}>{s==="all"?`All (${orders.length})`:s.replace("_"," ")}</div>))}
             </div>
@@ -3893,7 +3893,7 @@ function AdminLogin({ onLogin, dark, onToggle }) {
       const data=await res.json(); setLoading(false);
       if(data.success){localStorage.setItem("adminKey",password);onLogin(password);}
       else setError("❌ Wrong password!");
-    } catch(e) { setLoading(false); setError("❌ Backend se connect nahi hua!"); }
+    } catch(e) { setLoading(false); setError("❌ Could not connect to server. Please try again."); }
   };
 
   return (
