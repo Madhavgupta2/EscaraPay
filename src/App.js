@@ -547,12 +547,90 @@ function PayPage({ orderId, dark, onToggle, onGoHome }) {
           {payStep===1 && <div className="card" style={{textAlign:"center",padding:50}}><div style={{width:44,height:44,border:"3px solid var(--gold)",borderTopColor:"transparent",borderRadius:"50%",animation:"spin .8s linear infinite",margin:"0 auto 16px"}} /><div className="syne" style={{fontWeight:700,fontSize:16}}>Payment Gateway Load ho raha hai...</div></div>}
           {order && !loading && payStep===0 && (
             order.status !== "pending" ? (
-              <div className="card" style={{textAlign:"center",padding:40}}>
-                <div style={{fontSize:44,marginBottom:12}}>{order.status==="token_paid"?"🔐":"✅"}</div>
-                <div className="syne" style={{fontWeight:800,fontSize:20,marginBottom:10}}>{order.status==="token_paid"?"Token Already Paid!":"Order Processed"}</div>
-                <Bdg status={order.status} />
-                <div style={{color:"var(--muted)",fontSize:13,marginTop:14,marginBottom:20}}>Payment has already been completed for this order.</div>
-                <button className="btn-ghost" onClick={onGoHome}>← Home</button>
+              <div className="fu">
+                {/* Status header */}
+                <div style={{textAlign:"center",marginBottom:20}}>
+                  <div style={{fontSize:52,marginBottom:8}}>
+                    {order.status==="token_paid"?"🔐":order.status==="dispatched"?"📦":order.status==="delivered"?"✅":"📋"}
+                  </div>
+                  <div className="syne" style={{fontWeight:800,fontSize:22,marginBottom:8}}>
+                    {order.status==="token_paid"?"Token Payment Secured":order.status==="dispatched"?"Order Dispatched":order.status==="delivered"?"Order Delivered":"Order Processed"}
+                  </div>
+                  <Bdg status={order.status} />
+                </div>
+
+                {/* Order details card */}
+                <div className="card" style={{marginBottom:14,background:"rgba(14,165,233,.05)",borderColor:"rgba(14,165,233,.25)"}}>
+                  <div style={{fontSize:11,color:"var(--muted)",marginBottom:3}}>Order ID</div>
+                  <div style={{fontFamily:"monospace",fontWeight:700,color:"var(--gold)",fontSize:14,marginBottom:12}}>{order.id}</div>
+
+                  <div className="g2" style={{marginBottom:12}}>
+                    <div style={{background:"var(--sf2)",borderRadius:10,padding:12}}>
+                      <div style={{fontSize:11,color:"var(--muted)",marginBottom:3}}>Product</div>
+                      <div style={{fontWeight:700,fontSize:14}}>{order.product_name}</div>
+                    </div>
+                    <div style={{background:"var(--sf2)",borderRadius:10,padding:12}}>
+                      <div style={{fontSize:11,color:"var(--muted)",marginBottom:3}}>Seller</div>
+                      <div style={{fontWeight:700,fontSize:14}}>{order.seller_name||"—"}</div>
+                    </div>
+                  </div>
+
+                  {order.buyer_name && (
+                    <div style={{background:"var(--sf2)",borderRadius:10,padding:12,marginBottom:12}}>
+                      <div style={{fontSize:11,color:"var(--muted)",marginBottom:3}}>Buyer</div>
+                      <div style={{fontWeight:700,fontSize:14}}>{order.buyer_name}</div>
+                    </div>
+                  )}
+
+                  {/* Payment breakdown */}
+                  <div style={{background:"var(--sf2)",borderRadius:10,padding:12,fontSize:13}}>
+                    <div style={{fontWeight:600,marginBottom:8,color:"var(--muted)"}}>💰 Payment Breakdown</div>
+                    <div style={{display:"flex",justifyContent:"space-between",marginBottom:6}}>
+                      <span style={{color:"var(--muted)"}}>Order Value</span>
+                      <span style={{fontWeight:600}}>₹{order.order_amount}</span>
+                    </div>
+                    <div style={{display:"flex",justifyContent:"space-between",marginBottom:6}}>
+                      <span style={{color:"var(--muted)"}}>Token ({order.token_pct||10}% protected)</span>
+                      <span style={{fontWeight:600}}>₹{order.token_amount}</span>
+                    </div>
+                    <div style={{display:"flex",justifyContent:"space-between",marginBottom:6}}>
+                      <span style={{color:"var(--muted)"}}>Gateway Fee (2%)</span>
+                      <span style={{color:"var(--muted)"}}>₹{order.gateway_fee}</span>
+                    </div>
+                    <div style={{height:1,background:"var(--border)",margin:"8px 0"}}/>
+                    <div style={{display:"flex",justifyContent:"space-between",fontWeight:700}}>
+                      <span>Total Paid</span>
+                      <span style={{color:"var(--gold)",fontSize:15}}>₹{order.buyer_pays||order.token_amount}</span>
+                    </div>
+                  </div>
+
+                  {/* Tracking if dispatched */}
+                  {order.tracking_number && (
+                    <div style={{marginTop:12,background:"rgba(59,130,246,.08)",border:"1px solid rgba(59,130,246,.2)",borderRadius:8,padding:"10px 12px",fontSize:12}}>
+                      <span style={{color:"var(--blue)",fontWeight:600}}>📦 Tracking: </span>
+                      <span style={{fontFamily:"monospace",fontWeight:700}}>{order.tracking_number}</span>
+                    </div>
+                  )}
+                </div>
+
+                {/* Status info */}
+                <div style={{background:"rgba(5,150,105,.08)",border:"1px solid rgba(5,150,105,.2)",borderRadius:10,padding:12,marginBottom:16,fontSize:12}}>
+                  {order.status==="token_paid" && <><div style={{fontWeight:700,color:"var(--green)",marginBottom:4}}>🔐 Your token is secured</div><div style={{color:"var(--muted)"}}>Funds are held safely until you confirm delivery. Track your order at escarapay.in/track/{order.id}</div></>}
+                  {order.status==="dispatched" && <><div style={{fontWeight:700,color:"var(--blue)",marginBottom:4}}>📦 Order is on its way</div><div style={{color:"var(--muted)"}}>Seller has dispatched your order. Confirm delivery once received.</div></>}
+                  {order.status==="delivered" && <><div style={{fontWeight:700,color:"var(--green)",marginBottom:4}}>✅ Order completed</div><div style={{color:"var(--muted)"}}>Delivery has been confirmed. Thank you for using EscaraPay!</div></>}
+                </div>
+
+                {/* Action buttons */}
+                <div style={{display:"flex",gap:10,flexWrap:"wrap"}}>
+                  <button className="btn-gold" style={{flex:1,padding:"11px",fontSize:13}}
+                    onClick={()=>downloadReceipt(order,"buyer")}>
+                    📄 Download Receipt
+                  </button>
+                  <button className="btn-ghost" style={{flex:1,padding:"11px"}} onClick={onGoHome}>← Home</button>
+                </div>
+                <div style={{textAlign:"center",marginTop:10,fontSize:11,color:"var(--muted)"}}>
+                  Receipt includes order details, payment breakdown, and date/time.
+                </div>
               </div>
             ) : (
               <div className="fu">
