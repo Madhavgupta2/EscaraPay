@@ -662,11 +662,40 @@ function OrderModal({ order, isSeller, onClose, onDispatch, onConfirmDelivery, o
           </div>
         )}
         {order.status==="dispatched" && <div className="hold-box" style={{marginBottom:12}}><div style={{fontSize:12,color:"#a78bfa",fontWeight:700}}>⏰ Token Hold: {daysLeft>0?`${daysLeft} more day${daysLeft===1?"":"s"}`:"Ready to release!"}</div></div>}
+        {order.status==="dispatched" && order.confirm_token && (
+          <div style={{background:"rgba(5,150,105,.08)",border:"1px solid rgba(5,150,105,.25)",borderRadius:10,padding:12,marginBottom:12}}>
+            <div style={{fontSize:12,fontWeight:700,color:"var(--green)",marginBottom:6}}>🔗 Buyer Confirmation Link</div>
+            <div style={{fontSize:11,color:"var(--muted)",marginBottom:8}}>Share with buyer — one tap to confirm, no login needed:</div>
+            <div style={{display:"flex",gap:6,marginBottom:8}}>
+              <code style={{fontSize:10,color:"var(--gold)",flex:1,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap",background:"var(--sf2)",padding:"6px 8px",borderRadius:6}}>
+                {`escarapay.in/confirm/${order.confirm_token.slice(0,16)}...`}
+              </code>
+              <button className="btn-ghost" style={{padding:"5px 10px",fontSize:11,flexShrink:0}}
+                onClick={()=>navigator.clipboard?.writeText(`https://escarapay.in/confirm/${order.confirm_token}`)}>
+                📋 Copy
+              </button>
+            </div>
+            <a href={`https://wa.me/${(order.buyer_phone||"").replace(/\D/g,"")}?text=${encodeURIComponent(`Hi! Your order "${order.product_name}" has been dispatched 📦\n\nPlease confirm delivery here — no login needed, just one tap:\n\n✅ https://escarapay.in/confirm/${order.confirm_token}\n\nHave an issue? Use the same link to report it.\n\n— via EscaraPay 🛡️`)}`}
+              target="_blank" rel="noreferrer"
+              style={{display:"flex",alignItems:"center",justifyContent:"center",gap:8,background:"#25D366",color:"#fff",padding:"10px",borderRadius:8,textDecoration:"none",fontWeight:700,fontSize:13,width:"100%"}}>
+              <span style={{fontSize:18}}>💬</span> Send via WhatsApp
+            </a>
+          </div>
+        )}
         {isSeller && order.status==="token_paid" && (
           <div style={{marginBottom:12}}>
             <label className="label">Courier Tracking Number *</label>
             <input className="input" placeholder="Courier tracking number (e.g. DTDC123456)" value={tracking} onChange={e=>setTracking(e.target.value)} style={{marginBottom:8}} />
-            <button className="btn-gold" style={{width:"100%"}} onClick={async()=>{ if(!tracking){setMsg("❌ Please enter a tracking number!"); return;} setLoading(true); const r=await dispatchOrder(order.id,tracking); setLoading(false); if(r.success){onDispatch(order.id,tracking);setMsg("✅ Dispatched!");}else setMsg("❌ "+r.error); }} disabled={loading}>{loading?"⏳...":"📦 Mark as Dispatched"}</button>
+            <button className="btn-gold" style={{width:"100%"}} onClick={async()=>{
+              if(!tracking){setMsg("❌ Please enter a tracking number!"); return;}
+              setLoading(true);
+              const r = await dispatchOrder(order.id, tracking);
+              setLoading(false);
+              if(r.success){
+                onDispatch(order.id, tracking, r.data?.confirmUrl);
+                setMsg("✅ Dispatched! Confirmation link sent to buyer via SMS/email.");
+              } else setMsg("❌ "+r.error);
+            }} disabled={loading}>{loading?"⏳...":"📦 Mark as Dispatched"}</button>
           </div>
         )}
         {!isSeller && order.status==="dispatched" && (
@@ -2852,7 +2881,7 @@ function SellerDB({ user, userId, onLogout, dark, onToggle }) {
           </div>
         </div>
       )}
-      {showOrder && <OrderModal order={showOrder} isSeller onClose={()=>setShowOrder(null)} onDispatch={(id,tx)=>{ setOrders(orders.map(o=>o.id===id?{...o,status:"dispatched",tracking_number:tx}:o)); setShowOrder(null); }} onConfirmDelivery={(id)=>setOrders(orders.map(o=>o.id===id?{...o,status:"delivered"}:o))} onDispute={(id)=>setOrders(orders.map(o=>o.id===id?{...o,status:"disputed"}:o))} />}
+      {showOrder && <OrderModal order={showOrder} isSeller onClose={()=>setShowOrder(null)} onDispatch={(id,tx,confirmUrl)=>{ setOrders(orders.map(o=>o.id===id?{...o,status:"dispatched",tracking_number:tx,confirm_token:confirmUrl?confirmUrl.split("/confirm/")[1]:o.confirm_token}:o)); setShowOrder(null); }} onConfirmDelivery={(id)=>setOrders(orders.map(o=>o.id===id?{...o,status:"delivered"}:o))} onDispute={(id)=>setOrders(orders.map(o=>o.id===id?{...o,status:"disputed"}:o))} />}
     </div>
   );
 }
@@ -3409,6 +3438,18 @@ function UserDetailModal({ user, adminKey, onClose, onUpdate }) {
   const [payoutLoading, setPayoutLoading] = useState(false);
   const [payoutMsg, setPayoutMsg] = useState("");
 
+  // Auto-fill UPI from seller's saved profile when order selected
+  const selectPayoutOrder = (o) => {
+    setPayoutOrder(o);
+    setPayoutMsg("");
+    setPayoutForm(prev => ({
+      ...prev,
+      payout_amount: o.seller_receives || "",
+      payout_to: "seller",
+      payout_upi: user.upi_id || prev.payout_upi || "",
+    }));
+  };
+
   const hdrs = { "Content-Type":"application/json", "x-admin-key": adminKey };
 
   useEffect(()=>{
@@ -3565,7 +3606,7 @@ function UserDetailModal({ user, adminKey, onClose, onUpdate }) {
                 ? <div style={{textAlign:"center",padding:16,color:"var(--muted)",fontSize:13,background:"var(--sf2)",borderRadius:10}}>✅ Sab payouts complete!</div>
                 : pendingPayouts.map(o => (
                   <div key={o.id} style={{background: payoutOrder?.id===o.id?"rgba(14,165,233,.1)":"var(--sf2)",border:`1px solid ${payoutOrder?.id===o.id?"rgba(14,165,233,.4)":"var(--border)"}`,borderRadius:10,padding:12,marginBottom:8,cursor:"pointer"}}
-                    onClick={()=>{ setPayoutOrder(o); setPayoutForm(prev=>({...prev, payout_amount: o.seller_receives, payout_to: "seller"})); }}>
+                    onClick={()=>selectPayoutOrder(o)}>
                     <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}>
                       <div>
                         <div style={{fontFamily:"monospace",color:"var(--gold)",fontSize:11}}>{o.id}</div>
@@ -3607,8 +3648,11 @@ function UserDetailModal({ user, adminKey, onClose, onUpdate }) {
 
                 {payoutForm.payout_method === "upi" && (
                   <div style={{marginBottom:10}}>
-                    <label className="label">UPI ID *</label>
-                    <input className="input" placeholder="seller@upi" value={payoutForm.payout_upi} onChange={e=>setPayoutForm({...payoutForm,payout_upi:e.target.value})} />
+                    <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:4}}>
+                      <label className="label" style={{marginBottom:0}}>UPI ID *</label>
+                      {user.upi_id && <span style={{fontSize:11,color:"var(--green)",cursor:"pointer",fontWeight:600}} onClick={()=>setPayoutForm({...payoutForm,payout_upi:user.upi_id})}>✅ Use saved: {user.upi_id}</span>}
+                    </div>
+                    <input className="input" placeholder={user.upi_id || "seller@upi"} value={payoutForm.payout_upi} onChange={e=>setPayoutForm({...payoutForm,payout_upi:e.target.value})} />
                   </div>
                 )}
                 {payoutForm.payout_method === "bank" && (
@@ -4434,6 +4478,139 @@ function ContactPage({ onBack, dark, onToggle }) {
   );
 }
 
+/* ══════════ BUYER ONE-CLICK CONFIRM PAGE ══════════ */
+function ConfirmPage({ token, dark, onToggle, onGoHome }) {
+  const [order, setOrder]         = useState(null);
+  const [step, setStep]           = useState("loading"); // loading|confirm|issue|done|error|already_done|already_disputed
+  const [issueText, setIssueText] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+  const [msg, setMsg]             = useState("");
+
+  useEffect(() => {
+    fetch(`${BACKEND_URL}/api/confirm/${token}`)
+      .then(r => r.json())
+      .then(d => {
+        if (d.success) {
+          setOrder(d.order);
+          if (d.order.status === "delivered")  setStep("already_done");
+          else if (d.order.status === "disputed") setStep("already_disputed");
+          else setStep("confirm");
+        } else setStep("error");
+      })
+      .catch(() => setStep("error"));
+  }, [token]);
+
+  const handleReceived = async () => {
+    setSubmitting(true);
+    const r = await fetch(`${BACKEND_URL}/api/confirm/${token}/received`, { method:"POST", headers:{"Content-Type":"application/json"} });
+    const d = await r.json();
+    setSubmitting(false);
+    if (d.success) { setStep("done"); setMsg("✅ Thank you! Token has been released to the seller."); }
+    else setMsg("❌ " + d.error);
+  };
+
+  const handleIssue = async () => {
+    if (!issueText.trim()) { setMsg("❌ Please describe the issue"); return; }
+    setSubmitting(true);
+    const r = await fetch(`${BACKEND_URL}/api/confirm/${token}/issue`, {
+      method:"POST", headers:{"Content-Type":"application/json"},
+      body: JSON.stringify({ reason: issueText }),
+    });
+    const d = await r.json();
+    setSubmitting(false);
+    if (d.success) { setStep("done"); setMsg("⚠️ Issue reported. Our team will review within 24 hours."); }
+    else setMsg("❌ " + d.error);
+  };
+
+  return (
+    <div style={{minHeight:"100vh"}}>
+      <nav className="nav">
+        <Logo onClick={onGoHome} />
+        <ThemeToggle dark={dark} onToggle={onToggle} />
+      </nav>
+      <div style={{display:"flex",alignItems:"center",justifyContent:"center",minHeight:"calc(100vh - 64px)",padding:20}}>
+        <div style={{width:"100%",maxWidth:420}}>
+
+          {step==="loading" && <div className="card" style={{textAlign:"center",padding:50}}><div style={{width:44,height:44,border:"3px solid var(--gold)",borderTopColor:"transparent",borderRadius:"50%",animation:"spin .8s linear infinite",margin:"0 auto 16px"}}/><div style={{color:"var(--muted)"}}>Loading order details...</div></div>}
+
+          {step==="error" && <div className="card" style={{textAlign:"center",padding:40}}><div style={{fontSize:52,marginBottom:12}}>❌</div><div className="syne" style={{fontWeight:800,fontSize:20,marginBottom:8}}>Invalid Link</div><div style={{color:"var(--muted)",fontSize:13,marginBottom:20}}>This confirmation link is invalid or has expired.</div><button className="btn-ghost" onClick={onGoHome}>← Go Home</button></div>}
+
+          {step==="already_done" && <div className="card" style={{textAlign:"center",padding:40}}><div style={{fontSize:52,marginBottom:12}}>✅</div><div className="syne" style={{fontWeight:800,fontSize:20,marginBottom:8}}>Already Confirmed</div><div style={{color:"var(--muted)",fontSize:13}}>This delivery was already confirmed. Thank you!</div></div>}
+
+          {step==="already_disputed" && <div className="card" style={{textAlign:"center",padding:40}}><div style={{fontSize:52,marginBottom:12}}>⚠️</div><div className="syne" style={{fontWeight:800,fontSize:20,marginBottom:8}}>Dispute In Progress</div><div style={{color:"var(--muted)",fontSize:13}}>A dispute has been raised for this order. Our team is reviewing it.</div></div>}
+
+          {step==="confirm" && order && (
+            <div className="fu">
+              <div style={{textAlign:"center",marginBottom:20}}>
+                <div style={{fontSize:48,marginBottom:8}}>📦</div>
+                <h2 className="syne" style={{fontWeight:800,fontSize:22}}>Did you receive your order?</h2>
+                <p style={{color:"var(--muted)",fontSize:13,marginTop:6}}>No account needed — just tap the button below</p>
+              </div>
+              <div className="card" style={{marginBottom:16,background:"rgba(14,165,233,.05)",borderColor:"rgba(14,165,233,.25)"}}>
+                <div style={{fontSize:11,color:"var(--muted)",marginBottom:3}}>Order ID: <span style={{fontFamily:"monospace",color:"var(--gold)"}}>{order.id}</span></div>
+                <div className="syne" style={{fontWeight:800,fontSize:20,marginBottom:4}}>{order.product_name}</div>
+                <div style={{fontSize:13,color:"var(--muted)"}}>Seller: <strong style={{color:"var(--text)"}}>{order.seller_name||"—"}</strong></div>
+                <div style={{fontSize:13,color:"var(--muted)",marginTop:2}}>Token Amount: <strong style={{color:"var(--gold)"}}>₹{order.token_amount}</strong></div>
+                {order.tracking_number && <div style={{marginTop:8,background:"var(--sf2)",borderRadius:8,padding:"8px 10px",fontSize:12}}>📦 Tracking: <strong style={{fontFamily:"monospace"}}>{order.tracking_number}</strong></div>}
+              </div>
+              {msg && <div style={{padding:10,borderRadius:8,background:"var(--sf2)",fontSize:13,marginBottom:12,color:msg.startsWith("✅")?"var(--green)":"var(--red)"}}>{msg}</div>}
+              <button className="btn-green" style={{width:"100%",padding:14,fontSize:15,borderRadius:12,marginBottom:10}} onClick={handleReceived} disabled={submitting}>
+                {submitting?"⏳ Processing...":"✅ Yes, I Received My Order"}
+              </button>
+              <button className="btn-ghost" style={{width:"100%",padding:12,color:"var(--red)",borderColor:"rgba(239,68,68,.3)"}} onClick={()=>setStep("issue")}>
+                ❌ No — I Have an Issue
+              </button>
+              <div style={{textAlign:"center",marginTop:12,fontSize:11,color:"var(--muted)"}}>🔒 Secured by EscaraPay · Funds held safely until you confirm</div>
+            </div>
+          )}
+
+          {step==="issue" && order && (
+            <div className="fu">
+              <div style={{textAlign:"center",marginBottom:20}}>
+                <div style={{fontSize:48,marginBottom:8}}>⚠️</div>
+                <h2 className="syne" style={{fontWeight:800,fontSize:20}}>Report an Issue</h2>
+                <p style={{color:"var(--muted)",fontSize:13,marginTop:6}}>Our team will review within 24 hours</p>
+              </div>
+              <div className="card" style={{marginBottom:14}}>
+                <div style={{fontSize:13,fontWeight:600,marginBottom:10}}>What is the issue?</div>
+                {["Item not received","Wrong item received","Item received damaged","Item does not match description"].map(opt=>(
+                  <div key={opt} style={{display:"flex",alignItems:"center",gap:10,padding:"9px 0",borderBottom:"1px solid var(--border)",cursor:"pointer"}} onClick={()=>setIssueText(opt)}>
+                    <div style={{width:16,height:16,borderRadius:"50%",border:`2px solid ${issueText===opt?"var(--gold)":"var(--border)"}`,background:issueText===opt?"var(--gold)":"transparent",flexShrink:0}}/>
+                    <span style={{fontSize:13}}>{opt}</span>
+                  </div>
+                ))}
+                <div style={{marginTop:10}}>
+                  <label className="label">Additional details (optional)</label>
+                  <textarea className="input" rows={3} placeholder="Describe the issue in detail..."
+                    value={["Item not received","Wrong item received","Item received damaged","Item does not match description"].includes(issueText)?"":issueText}
+                    onChange={e=>setIssueText(e.target.value)} style={{resize:"none"}}/>
+                </div>
+              </div>
+              <div style={{background:"rgba(14,165,233,.08)",border:"1px solid rgba(14,165,233,.2)",borderRadius:10,padding:12,marginBottom:14,fontSize:12,color:"var(--muted)"}}>
+                ℹ️ Your token of <strong style={{color:"var(--gold)"}}>₹{order?.token_amount}</strong> remains held until the dispute is resolved.
+              </div>
+              {msg && <div style={{padding:10,borderRadius:8,background:"var(--sf2)",fontSize:13,marginBottom:12,color:"var(--red)"}}>{msg}</div>}
+              <button className="btn-red" style={{width:"100%",padding:12,marginBottom:8}} onClick={handleIssue} disabled={submitting||!issueText.trim()}>
+                {submitting?"⏳ Submitting...":"⚠️ Submit Issue Report"}
+              </button>
+              <button className="btn-ghost" style={{width:"100%"}} onClick={()=>{setStep("confirm");setMsg("");}}>← Back</button>
+            </div>
+          )}
+
+          {step==="done" && (
+            <div className="card fu" style={{textAlign:"center",padding:40}}>
+              <div style={{fontSize:60,marginBottom:16}}>{msg.startsWith("✅")?"🎉":"⚠️"}</div>
+              <div className="syne" style={{fontWeight:800,fontSize:22,marginBottom:12}}>{msg.startsWith("✅")?"Thank You!":"Issue Reported"}</div>
+              <div style={{color:"var(--muted)",fontSize:14,marginBottom:16}}>{msg}</div>
+              <div style={{fontSize:12,color:"var(--muted)"}}>{msg.startsWith("✅")?"The seller will be notified and payment will be processed shortly.":"Our team will review all evidence within 24 hours and contact both parties via email."}</div>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 /* ══════════ MAIN APP ══════════ */
 export default function App() {
   const [screen, setScreen] = useState("landing");
@@ -4445,21 +4622,22 @@ export default function App() {
   const toggleDark = () => { const nd=!dark; setDark(nd); localStorage.setItem("escara_dark",nd); };
   const [lang, setLang] = useState(()=> localStorage.getItem("escara_lang")||"hl");
   const toggleLang = (l) => { setLang(l); localStorage.setItem("escara_lang",l); };
-  const [payOrderId, setPayOrderId] = useState(null);
-  const [dealOrderId, setDealOrderId] = useState(null);
+  const [payOrderId, setPayOrderId]     = useState(null);
+  const [dealOrderId, setDealOrderId]   = useState(null);
   const [trackOrderId, setTrackOrderId] = useState(null);
+  const [confirmToken, setConfirmToken] = useState(null);
   const [adminKey, setAdminKey] = useState(()=> localStorage.getItem("adminKey") || "");
 
   useEffect(()=>{ window._goToPage=(s)=>{ const urls={about:"/about",privacy:"/privacy",terms:"/terms",refund:"/refund",dispute:"/dispute",contact:"/contact",landing:"/",track:"/track",admin:"/admin"}; window.history.pushState({},"",urls[s]||"/"+s); setScreen(s); }; },[]);
   useEffect(()=>{
-    // SEO: Update page title
     document.title = "Escara Pay | India's Trusted Payment Protection Platform";
   },[]);
   useEffect(()=>{
     const path=window.location.pathname;
-    const pm=path.match(/^\/pay\/([A-Z0-9]+)$/); if(pm){setPayOrderId(pm[1]);setScreen("pay");return;}
-    const dm=path.match(/^\/deal\/([A-Z0-9]+)$/); if(dm){setDealOrderId(dm[1]);setScreen("deal");return;}
-    const tm=path.match(/^\/track\/([A-Z0-9-]+)$/i); if(tm){setTrackOrderId(tm[1].toUpperCase());setScreen("track");return;}
+    const pm=path.match(/^\/pay\/([A-Z0-9]+)$/);      if(pm){setPayOrderId(pm[1]);setScreen("pay");return;}
+    const dm=path.match(/^\/deal\/([A-Z0-9]+)$/);     if(dm){setDealOrderId(dm[1]);setScreen("deal");return;}
+    const tm=path.match(/^\/track\/([A-Z0-9-]+)$/i);  if(tm){setTrackOrderId(tm[1].toUpperCase());setScreen("track");return;}
+    const cm=path.match(/^\/confirm\/([a-f0-9]{48})$/i); if(cm){setConfirmToken(cm[1]);setScreen("confirm");return;}
     if(path==="/track"){setScreen("track");return;}
     if(path==="/admin"){setScreen("admin-login");return;}
     if(path==="/about"){setScreen("about");return;}
@@ -4474,15 +4652,16 @@ export default function App() {
   const props = { dark, onToggle:toggleDark, lang, onLangToggle:toggleLang };
   const handleLogin=(t,n,id,phone)=>{setUserType(t);setUserName(n);setUserId(id);setUserPhone(phone||"");setScreen("dashboard");};
   const handleLogout=()=>{setScreen("landing");setUserType(null);setUserId(null);setUserPhone("");setUserName("");};
-  const goHome=()=>{window.history.pushState({},"","/");setScreen("landing");setPayOrderId(null);setDealOrderId(null);setTrackOrderId(null);};
+  const goHome=()=>{window.history.pushState({},"","/");setScreen("landing");setPayOrderId(null);setDealOrderId(null);setTrackOrderId(null);setConfirmToken(null);};
   const goToScreen=(s,url)=>{window.history.pushState({},"",(url||"/"));setScreen(s);};
 
   return (
     <>
       <style>{getStyle(dark)}</style>
-      {screen==="pay"         && payOrderId  && <PayPage    orderId={payOrderId}  dark={dark} onToggle={toggleDark} onGoHome={goHome} />}
-      {screen==="deal"        && dealOrderId && <DealPage   orderId={dealOrderId} dark={dark} onToggle={toggleDark} onGoHome={goHome} />}
-      {screen==="track"                      && <TrackPage  orderId={trackOrderId} dark={dark} onToggle={toggleDark} onGoHome={goHome} />}
+      {screen==="pay"         && payOrderId   && <PayPage     orderId={payOrderId}   dark={dark} onToggle={toggleDark} onGoHome={goHome} />}
+      {screen==="deal"        && dealOrderId  && <DealPage    orderId={dealOrderId}  dark={dark} onToggle={toggleDark} onGoHome={goHome} />}
+      {screen==="track"                       && <TrackPage   orderId={trackOrderId} dark={dark} onToggle={toggleDark} onGoHome={goHome} />}
+      {screen==="confirm"     && confirmToken && <ConfirmPage token={confirmToken}   dark={dark} onToggle={toggleDark} onGoHome={goHome} />}
       {screen==="admin-login" && <AdminLogin  onLogin={(k)=>{setAdminKey(k);setScreen("admin");}} dark={dark} onToggle={toggleDark} />}
       {screen==="admin"       && <AdminPanel  adminKey={adminKey} onLogout={()=>{localStorage.removeItem("adminKey");setScreen("landing");}} dark={dark} onToggle={toggleDark} />}
       {screen==="about"       && <AboutPage   onBack={goHome} {...props} />}
