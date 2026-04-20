@@ -1,10 +1,25 @@
+# robots.txt — Escara Pay (www.escarapay.in)
+# Generated: April 2026
+
 User-agent: *
 Allow: /
 
-# Block admin panel from indexing
+# Block non-public pages from being crawled
 Disallow: /admin
 Disallow: /pay/
 Disallow: /deal/
+Disallow: /confirm/
+
+# Allow landing, legal, and info pages
+Allow: /
+Allow: /about
+Allow: /contact
+Allow: /track
+Allow: /terms
+Allow: /privacy
+Allow: /refund
+Allow: /dispute
+Allow: /login
 
 # Sitemap location
 Sitemap: https://www.escarapay.in/sitemap.xml
