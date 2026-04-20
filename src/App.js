@@ -3515,6 +3515,17 @@ function UserDetailModal({ user, adminKey, onClose, onUpdate }) {
   const [payoutForm, setPayoutForm] = useState({ payout_to:"seller", payout_method:"upi", payout_ref:"", payout_upi:"", payout_bank:"", payout_amount:"", payout_note:"" });
   const [payoutLoading, setPayoutLoading] = useState(false);
   const [payoutMsg, setPayoutMsg] = useState("");
+  // Bulk payout
+  const [selectedOrders, setSelectedOrders] = useState([]); // array of order ids
+  const [bulkForm, setBulkForm] = useState({ payout_method:"upi", payout_ref:"", payout_upi:"", payout_bank:"", payout_note:"" });
+  const [bulkLoading, setBulkLoading] = useState(false);
+  const [bulkMsg, setBulkMsg] = useState("");
+
+  const toggleOrder = (id) => setSelectedOrders(prev => prev.includes(id) ? prev.filter(x=>x!==id) : [...prev, id]);
+  const selectAll   = () => setSelectedOrders(pendingPayouts.map(o=>o.id));
+  const clearAll    = () => setSelectedOrders([]);
+
+  const selectedTotal = pendingPayouts.filter(o=>selectedOrders.includes(o.id)).reduce((a,o)=>a+(Number(o.seller_receives)||0),0);
 
   // Auto-fill UPI from seller's saved profile when order selected
   const selectPayoutOrder = (o) => {
@@ -3526,6 +3537,31 @@ function UserDetailModal({ user, adminKey, onClose, onUpdate }) {
       payout_to: "seller",
       payout_upi: user.upi_id || prev.payout_upi || "",
     }));
+  };
+
+  const doBulkPayout = async () => {
+    if (!selectedOrders.length) { setBulkMsg("❌ Please select at least one order"); return; }
+    if (!bulkForm.payout_ref)   { setBulkMsg("❌ Transaction reference / UTR is required"); return; }
+    if (bulkForm.payout_method === "upi"  && !bulkForm.payout_upi)  { setBulkMsg("❌ Please enter UPI ID"); return; }
+    if (bulkForm.payout_method === "bank" && !bulkForm.payout_bank) { setBulkMsg("❌ Please enter bank details"); return; }
+    setBulkLoading(true); setBulkMsg("");
+    try {
+      const r = await fetch(`${ADMIN_URL}/api/admin/bulk-payout`, {
+        method:"POST", headers: hdrs,
+        body: JSON.stringify({ ...bulkForm, order_ids: selectedOrders, admin_name:"Admin" }),
+      });
+      const d = await r.json();
+      setBulkLoading(false);
+      if (d.success) {
+        setBulkMsg("✅ " + d.message);
+        setUserOrders(prev => prev.map(o => selectedOrders.includes(o.id)
+          ? { ...o, payout_status:"paid", payout_ref: bulkForm.payout_ref, payout_method: bulkForm.payout_method, payout_upi: bulkForm.payout_upi, payout_amount: o.seller_receives }
+          : o
+        ));
+        setSelectedOrders([]);
+        setBulkForm({ payout_method:"upi", payout_ref:"", payout_upi:"", payout_bank:"", payout_note:"" });
+      } else setBulkMsg("❌ " + d.error);
+    } catch(e) { setBulkLoading(false); setBulkMsg("❌ Could not connect to server. Please try again."); }
   };
 
   const hdrs = { "Content-Type":"application/json", "x-admin-key": adminKey };
@@ -3677,91 +3713,116 @@ function UserDetailModal({ user, adminKey, onClose, onUpdate }) {
         {tab==="payouts" && (
           <div style={{display:"flex",flexDirection:"column",gap:12}}>
 
-            {/* Pending Payouts */}
+            {/* Pending Payouts — multi-select */}
             <div>
-              <div style={{fontSize:12,fontWeight:700,color:"var(--muted)",marginBottom:8,textTransform:"uppercase",letterSpacing:"1px"}}>⏳ Pending Payouts ({pendingPayouts.length})</div>
+              <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:8}}>
+                <div style={{fontSize:12,fontWeight:700,color:"var(--muted)",textTransform:"uppercase",letterSpacing:"1px"}}>
+                  ⏳ Pending ({pendingPayouts.length})
+                </div>
+                {pendingPayouts.length > 0 && (
+                  <div style={{display:"flex",gap:6}}>
+                    <button className="btn-ghost" style={{padding:"3px 10px",fontSize:11}} onClick={selectAll}>Select All</button>
+                    {selectedOrders.length > 0 && <button className="btn-ghost" style={{padding:"3px 10px",fontSize:11}} onClick={clearAll}>Clear</button>}
+                  </div>
+                )}
+              </div>
+
               {pendingPayouts.length === 0
-                ? <div style={{textAlign:"center",padding:16,color:"var(--muted)",fontSize:13,background:"var(--sf2)",borderRadius:10}}>✅ Sab payouts complete!</div>
-                : pendingPayouts.map(o => (
-                  <div key={o.id} style={{background: payoutOrder?.id===o.id?"rgba(14,165,233,.1)":"var(--sf2)",border:`1px solid ${payoutOrder?.id===o.id?"rgba(14,165,233,.4)":"var(--border)"}`,borderRadius:10,padding:12,marginBottom:8,cursor:"pointer"}}
-                    onClick={()=>selectPayoutOrder(o)}>
-                    <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}>
-                      <div>
-                        <div style={{fontFamily:"monospace",color:"var(--gold)",fontSize:11}}>{o.id}</div>
-                        <div style={{fontWeight:600,fontSize:13}}>{o.product_name}</div>
-                        <div style={{fontSize:12,color:"var(--muted)"}}>Token: ₹{o.token_amount} | <span style={{color:"var(--green)",fontWeight:700}}>Pay: ₹{o.seller_receives}</span></div>
-                      </div>
-                      <div style={{textAlign:"right"}}>
-                        <Bdg status={o.status} />
-                        {payoutOrder?.id===o.id && <div style={{fontSize:11,color:"var(--gold)",marginTop:4}}>✏️ Selected</div>}
+                ? <div style={{textAlign:"center",padding:16,color:"var(--muted)",fontSize:13,background:"var(--sf2)",borderRadius:10}}>✅ All payouts complete!</div>
+                : pendingPayouts.map(o => {
+                  const isSelected = selectedOrders.includes(o.id);
+                  return (
+                    <div key={o.id}
+                      style={{background:isSelected?"rgba(14,165,233,.1)":"var(--sf2)",border:`1.5px solid ${isSelected?"rgba(14,165,233,.5)":"var(--border)"}`,borderRadius:10,padding:12,marginBottom:8,cursor:"pointer",transition:"all .15s"}}
+                      onClick={()=>toggleOrder(o.id)}>
+                      <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+                        <div style={{display:"flex",alignItems:"center",gap:10}}>
+                          {/* Checkbox */}
+                          <div style={{width:18,height:18,borderRadius:4,border:`2px solid ${isSelected?"var(--gold)":"var(--border)"}`,background:isSelected?"var(--gold)":"transparent",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0,transition:"all .15s"}}>
+                            {isSelected && <span style={{color:"#fff",fontSize:11,fontWeight:900}}>✓</span>}
+                          </div>
+                          <div>
+                            <div style={{fontFamily:"monospace",color:"var(--gold)",fontSize:11}}>{o.id}</div>
+                            <div style={{fontWeight:600,fontSize:13}}>{o.product_name}</div>
+                            <div style={{fontSize:12,color:"var(--muted)"}}>Token: ₹{o.token_amount}</div>
+                          </div>
+                        </div>
+                        <div style={{textAlign:"right"}}>
+                          <div className="syne" style={{fontWeight:800,fontSize:16,color:"var(--green)"}}>₹{o.seller_receives}</div>
+                          <Bdg status={o.status} />
+                        </div>
                       </div>
                     </div>
-                  </div>
-                ))
+                  );
+                })
               }
             </div>
 
-            {/* Payout Form */}
-            {payoutOrder && (
-              <div style={{background:"rgba(14,165,233,.06)",border:"1px solid rgba(14,165,233,.25)",borderRadius:12,padding:14}}>
-                <div style={{fontWeight:700,fontSize:14,color:"var(--gold)",marginBottom:12}}>💸 Manual Payout — {payoutOrder.id}</div>
-
-                <div style={{display:"flex",gap:8,marginBottom:10}}>
-                  <div style={{flex:1}}>
-                    <label className="label">Payout To *</label>
-                    <select className="select" value={payoutForm.payout_to} onChange={e=>setPayoutForm({...payoutForm,payout_to:e.target.value})}>
-                      <option value="seller">Seller (95%)</option>
-                      <option value="buyer">Buyer (Refund)</option>
-                    </select>
+            {/* Bulk Payout Form — shows when 1+ selected */}
+            {selectedOrders.length > 0 && (
+              <div style={{background:"rgba(14,165,233,.06)",border:"1px solid rgba(14,165,233,.3)",borderRadius:12,padding:16}}>
+                {/* Summary */}
+                <div style={{background:"rgba(14,165,233,.1)",borderRadius:10,padding:12,marginBottom:14,textAlign:"center"}}>
+                  <div style={{fontSize:12,color:"var(--muted)",marginBottom:4}}>
+                    {selectedOrders.length} order{selectedOrders.length>1?"s":""} selected
                   </div>
-                  <div style={{flex:1}}>
-                    <label className="label">Method *</label>
-                    <select className="select" value={payoutForm.payout_method} onChange={e=>setPayoutForm({...payoutForm,payout_method:e.target.value})}>
-                      <option value="upi">UPI</option>
-                      <option value="bank">Bank Transfer</option>
-                      <option value="cash">Cash</option>
-                    </select>
+                  <div className="syne" style={{fontWeight:900,fontSize:26,color:"var(--gold)"}}>₹{selectedTotal.toFixed(2)}</div>
+                  <div style={{fontSize:11,color:"var(--muted)"}}>Total to transfer</div>
+                  {/* Selected order IDs */}
+                  <div style={{marginTop:8,display:"flex",flexWrap:"wrap",gap:4,justifyContent:"center"}}>
+                    {pendingPayouts.filter(o=>selectedOrders.includes(o.id)).map(o=>(
+                      <span key={o.id} style={{fontSize:10,fontFamily:"monospace",background:"var(--sf2)",padding:"2px 6px",borderRadius:4,color:"var(--gold)"}}>{o.id}</span>
+                    ))}
                   </div>
                 </div>
 
-                {payoutForm.payout_method === "upi" && (
+                <div style={{fontWeight:700,fontSize:13,color:"var(--gold)",marginBottom:12}}>💸 Bulk Payout Details</div>
+
+                {/* Method */}
+                <div style={{marginBottom:10}}>
+                  <label className="label">Payment Method *</label>
+                  <select className="select" value={bulkForm.payout_method} onChange={e=>setBulkForm({...bulkForm,payout_method:e.target.value})}>
+                    <option value="upi">UPI</option>
+                    <option value="bank">Bank Transfer</option>
+                    <option value="cash">Cash</option>
+                  </select>
+                </div>
+
+                {/* UPI */}
+                {bulkForm.payout_method === "upi" && (
                   <div style={{marginBottom:10}}>
                     <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:4}}>
                       <label className="label" style={{marginBottom:0}}>UPI ID *</label>
-                      {user.upi_id && <span style={{fontSize:11,color:"var(--green)",cursor:"pointer",fontWeight:600}} onClick={()=>setPayoutForm({...payoutForm,payout_upi:user.upi_id})}>✅ Use saved: {user.upi_id}</span>}
+                      {user.upi_id && <span style={{fontSize:11,color:"var(--green)",cursor:"pointer",fontWeight:600}} onClick={()=>setBulkForm({...bulkForm,payout_upi:user.upi_id})}>✅ Use saved: {user.upi_id}</span>}
                     </div>
-                    <input className="input" placeholder={user.upi_id || "seller@upi"} value={payoutForm.payout_upi} onChange={e=>setPayoutForm({...payoutForm,payout_upi:e.target.value})} />
+                    <input className="input" placeholder={user.upi_id||"seller@upi"} value={bulkForm.payout_upi} onChange={e=>setBulkForm({...bulkForm,payout_upi:e.target.value})} />
                   </div>
                 )}
-                {payoutForm.payout_method === "bank" && (
+                {bulkForm.payout_method === "bank" && (
                   <div style={{marginBottom:10}}>
                     <label className="label">Bank Details (Acc No / IFSC) *</label>
-                    <input className="input" placeholder="50100XXXXXX / HDFC0001234" value={payoutForm.payout_bank} onChange={e=>setPayoutForm({...payoutForm,payout_bank:e.target.value})} />
+                    <input className="input" placeholder="50100XXXXXX / HDFC0001234" value={bulkForm.payout_bank} onChange={e=>setBulkForm({...bulkForm,payout_bank:e.target.value})} />
                   </div>
                 )}
 
-                <div style={{display:"flex",gap:8,marginBottom:10}}>
-                  <div style={{flex:1}}>
-                    <label className="label">Amount (₹) *</label>
-                    <input className="input" type="number" placeholder={payoutOrder.seller_receives} value={payoutForm.payout_amount} onChange={e=>setPayoutForm({...payoutForm,payout_amount:e.target.value})} />
-                  </div>
-                  <div style={{flex:1}}>
-                    <label className="label">UTR / Ref No *</label>
-                    <input className="input" placeholder="UTR123456789" value={payoutForm.payout_ref} onChange={e=>setPayoutForm({...payoutForm,payout_ref:e.target.value})} />
-                  </div>
-                </div>
-
+                {/* UTR */}
                 <div style={{marginBottom:10}}>
-                  <label className="label">Note (optional)</label>
-                  <input className="input" placeholder="e.g. HDFC se bheja" value={payoutForm.payout_note} onChange={e=>setPayoutForm({...payoutForm,payout_note:e.target.value})} />
+                  <label className="label">UTR / Ref No *</label>
+                  <input className="input" placeholder="UTR123456789" value={bulkForm.payout_ref} onChange={e=>setBulkForm({...bulkForm,payout_ref:e.target.value})} />
                 </div>
 
-                {payoutMsg && <div style={{padding:10,borderRadius:8,background:"var(--sf2)",fontSize:13,marginBottom:8,color:payoutMsg.startsWith("✅")?"var(--green)":"var(--red)"}}>{payoutMsg}</div>}
+                {/* Note */}
+                <div style={{marginBottom:12}}>
+                  <label className="label">Note (optional)</label>
+                  <input className="input" placeholder="e.g. Sent via HDFC" value={bulkForm.payout_note} onChange={e=>setBulkForm({...bulkForm,payout_note:e.target.value})} />
+                </div>
+
+                {bulkMsg && <div style={{padding:10,borderRadius:8,background:"var(--sf2)",fontSize:13,marginBottom:10,color:bulkMsg.startsWith("✅")?"var(--green)":"var(--red)"}}>{bulkMsg}</div>}
 
                 <div style={{display:"flex",gap:8}}>
-                  <button className="btn-ghost" style={{flex:1}} onClick={()=>{setPayoutOrder(null);setPayoutMsg("");}}>Cancel</button>
-                  <button className="btn-green" style={{flex:2}} onClick={doManualPayout} disabled={payoutLoading}>
-                    {payoutLoading?"⏳ Marking...":"✅ Mark as Paid & Notify"}
+                  <button className="btn-ghost" style={{flex:1}} onClick={clearAll}>Cancel</button>
+                  <button className="btn-green" style={{flex:2,padding:"11px"}} onClick={doBulkPayout} disabled={bulkLoading}>
+                    {bulkLoading ? "⏳ Processing..." : `💸 Pay ₹${selectedTotal.toFixed(2)} — ${selectedOrders.length} Order${selectedOrders.length>1?"s":""}`}
                   </button>
                 </div>
               </div>
