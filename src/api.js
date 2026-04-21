@@ -1,5 +1,4 @@
-const BASE_URL = "https://escarapay-backend-production.up.railway.app";
-
+const BASE_URL = "https://escarapay-backend.onrender.com";
 /* ── Auth ── */
 export const registerUser = async (name, email, phone, role, password, shopName = "", pan = "", gst = "") => {
   try {
