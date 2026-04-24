@@ -22,7 +22,7 @@ import LOGO_SRC from "./escarapay-logo.jpg";
   document.head.appendChild(link);
 })();
 
-const BACKEND_URL = "https://escarapay-backend-production.up.railway.app";
+const BACKEND_URL = "https://escarapay-backend.onrender.com";
 
 // Language translations
 const T = {
