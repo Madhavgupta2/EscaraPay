@@ -1210,7 +1210,7 @@ function Landing({ onEnter, onTrack, dark, onToggle, lang, onLangToggle }) {
       </div>
 
       {/* ── HOW IT WORKS ── */}
-      <div style={{padding:"80px clamp(16px,5vw,40px)",background:"var(--surface)"}}>
+      <div id="how-it-works" style={{padding:"80px clamp(16px,5vw,40px)",background:"var(--surface)"}}>
         <div className="reveal" style={{textAlign:"center",marginBottom:52}}>
           <span style={{
             display:"inline-block",background:"rgba(14,165,233,.1)",
@@ -1821,11 +1821,16 @@ function Landing({ onEnter, onTrack, dark, onToggle, lang, onLangToggle }) {
             </div>
             <div>
               <div style={{fontSize:11,fontWeight:700,color:"rgba(255,255,255,.4)",textTransform:"uppercase",letterSpacing:1.2,marginBottom:14}}>Company</div>
-              {[["About Us","about"],["Contact Us","contact"],["How It Works","landing"]].map(([l,s])=>(
+              {[["About Us","about"],["Contact Us","contact"],["How It Works","how"]].map(([l,s])=>(
                 <div key={l} style={{fontSize:13,color:"rgba(255,255,255,.65)",marginBottom:9,cursor:"pointer",transition:"color .2s"}}
                   onMouseEnter={e=>e.target.style.color="#fff"}
                   onMouseLeave={e=>e.target.style.color="rgba(255,255,255,.65)"}
-                  onClick={()=>window._goToPage(s)}>{l}</div>
+                  onClick={()=>{
+                    if(s==="how"){
+                      const el=document.getElementById("how-it-works");
+                      if(el){ el.scrollIntoView({behavior:"smooth"}); }
+                    } else window._goToPage(s);
+                  }}>{l}</div>
               ))}
             </div>
             <div>
@@ -3619,9 +3624,6 @@ function UserDetailModal({ user, adminKey, onClose, onUpdate }) {
 
   const isBanned = user.user_status === "banned";
   const warnCount = user.warning_count || 0;
-  const deliveredOrders = userOrders.filter(o => ["delivered","cancelled_buyer"].includes(o.status));
-  const pendingPayouts = deliveredOrders.filter(o => !o.payout_status || o.payout_status === "pending");
-  const donePayouts = deliveredOrders.filter(o => o.payout_status === "paid");
 
   return (
     <div className="overlay" onClick={onClose}>
@@ -4099,10 +4101,11 @@ function AdminLogin({ onLogin, dark, onToggle }) {
 /* ══════════ PRIVACY / TERMS / CONTACT ══════════ */
 function AboutPage({ onBack, dark, onToggle, lang, onLangToggle }) {
   const L = (en,hi,hl) => lang==="en"?en:lang==="hi"?hi:hl;
+  useEffect(()=>{ window.scrollTo({top:0,behavior:"instant"}); },[]);
   return (
     <div style={{minHeight:"100vh"}}>
       <nav className="nav"><Logo onClick={onBack} /><div style={{display:"flex",gap:8,alignItems:"center"}}><LangToggle lang={lang} onToggle={onLangToggle} /><ThemeToggle dark={dark} onToggle={onToggle} /><button className="btn-ghost" onClick={onBack}>← Back</button></div></nav>
-      <div style={{maxWidth:820,margin:"0 auto",padding:"40px 20px"}}>
+      <div style={{maxWidth:820,margin:"0 auto",padding:"40px 20px 20px"}}>
 
         {/* Hero */}
         <div style={{textAlign:"center",marginBottom:48}}>
@@ -4255,12 +4258,65 @@ function AboutPage({ onBack, dark, onToggle, lang, onLangToggle }) {
           <button className="btn-ghost" onClick={onBack}>← {L("Back to Home","होम पर वापस","Back to Home")}</button>
         </div>
       </div>
+      <LegalFooter onNav={s=>window._goToPage(s)} />
     </div>
   );
 }
 
 /* ══════════ LEGAL NAV ══════════ */
+function LegalFooter({ onNav }) {
+  return (
+    <footer style={{background:"var(--sf2)",borderTop:"1px solid var(--border)",marginTop:60,padding:"40px 20px 28px"}}>
+      <div style={{maxWidth:900,margin:"0 auto"}}>
+        <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(160px,1fr))",gap:32,marginBottom:32}}>
+          <div>
+            <div className="syne" style={{fontWeight:800,fontSize:18,color:"var(--gold)",marginBottom:8}}>EscaraPay</div>
+            <div style={{fontSize:12,color:"var(--muted)",lineHeight:1.8}}>India's Trusted Payment<br/>Protection Platform</div>
+            <div style={{fontSize:11,color:"var(--muted)",marginTop:8}}>MSME: UDYAM-UP-23-0036110</div>
+          </div>
+          <div>
+            <div style={{fontWeight:700,fontSize:12,textTransform:"uppercase",letterSpacing:"1px",color:"var(--muted)",marginBottom:10}}>Platform</div>
+            {[["landing","How It Works"],["landing","For Sellers"],["landing","For Buyers"],["about","About Us"]].map(([s,l])=>(
+              <div key={l} style={{marginBottom:6}}>
+                <span style={{fontSize:13,color:"var(--text)",cursor:"pointer",opacity:.8}} onClick={()=>{
+                  if(l==="How It Works"){
+                    onNav("landing");
+                    setTimeout(()=>{
+                      const el=document.getElementById("how-it-works");
+                      if(el) el.scrollIntoView({behavior:"smooth"});
+                    },400);
+                  } else onNav(s);
+                }}>{l}</span>
+              </div>
+            ))}
+          </div>
+          <div>
+            <div style={{fontWeight:700,fontSize:12,textTransform:"uppercase",letterSpacing:"1px",color:"var(--muted)",marginBottom:10}}>Legal</div>
+            {[["terms","Terms of Service"],["privacy","Privacy Policy"],["refund","Refund Policy"],["dispute","Dispute Resolution"]].map(([s,l])=>(
+              <div key={l} style={{marginBottom:6}}><span style={{fontSize:13,color:"var(--text)",cursor:"pointer",opacity:.8}} onClick={()=>onNav(s)}>{l}</span></div>
+            ))}
+          </div>
+          <div>
+            <div style={{fontWeight:700,fontSize:12,textTransform:"uppercase",letterSpacing:"1px",color:"var(--muted)",marginBottom:10}}>Support</div>
+            {[["contact","Contact Us"]].map(([s,l])=>(
+              <div key={l} style={{marginBottom:6}}><span style={{fontSize:13,color:"var(--text)",cursor:"pointer",opacity:.8}} onClick={()=>onNav(s)}>{l}</span></div>
+            ))}
+            <div style={{marginTop:8}}>
+              <a href="mailto:support@escarapay.in" style={{fontSize:13,color:"var(--gold)",textDecoration:"none"}}>support@escarapay.in</a>
+            </div>
+          </div>
+        </div>
+        <div style={{borderTop:"1px solid var(--border)",paddingTop:20,display:"flex",justifyContent:"space-between",alignItems:"center",flexWrap:"wrap",gap:10}}>
+          <div style={{fontSize:11,color:"var(--muted)"}}>© 2026 EscaraPay (India). All rights reserved.</div>
+          <div style={{fontSize:11,color:"var(--muted)"}}>Built with ❤️ for India's social commerce sellers</div>
+        </div>
+      </div>
+    </footer>
+  );
+}
+
 function LegalNav({ active, onNav, dark, onToggle }) {
+  useEffect(()=>{ window.scrollTo({top:0,behavior:"instant"}); },[]);
   const links = [
     ["home","🏠 Home"],
     ["about","About"],
@@ -4295,7 +4351,7 @@ function RefundPage({ onBack, dark, onToggle }) {
   return (
     <div style={{minHeight:"100vh"}}>
       <LegalNav active="refund" onNav={nav} dark={dark} onToggle={onToggle} />
-      <div style={{maxWidth:760,margin:"0 auto",padding:"40px 20px"}}>
+      <div style={{maxWidth:760,margin:"0 auto",padding:"40px 20px 20px"}}>
         <div style={{textAlign:"center",marginBottom:40}}>
           <div style={{fontSize:48,marginBottom:12}}>↩️</div>
           <h1 className="syne" style={{fontWeight:800,fontSize:"clamp(24px,4vw,36px)",marginBottom:8}}>Refund Policy</h1>
@@ -4355,6 +4411,7 @@ function RefundPage({ onBack, dark, onToggle }) {
         </div>
         <div style={{textAlign:"center"}}><button className="btn-ghost" onClick={onBack}>← Back to Home</button></div>
       </div>
+      <LegalFooter onNav={s=>window._goToPage(s)} />
     </div>
   );
 }
@@ -4365,7 +4422,7 @@ function DisputePage({ onBack, dark, onToggle }) {
   return (
     <div style={{minHeight:"100vh"}}>
       <LegalNav active="dispute" onNav={nav} dark={dark} onToggle={onToggle} />
-      <div style={{maxWidth:760,margin:"0 auto",padding:"40px 20px"}}>
+      <div style={{maxWidth:760,margin:"0 auto",padding:"40px 20px 20px"}}>
         <div style={{textAlign:"center",marginBottom:40}}>
           <div style={{fontSize:48,marginBottom:12}}>⚖️</div>
           <h1 className="syne" style={{fontWeight:800,fontSize:"clamp(24px,4vw,36px)",marginBottom:8}}>Dispute Resolution Policy</h1>
@@ -4417,6 +4474,7 @@ function DisputePage({ onBack, dark, onToggle }) {
         </div>
         <div style={{textAlign:"center"}}><button className="btn-ghost" onClick={onBack}>← Back to Home</button></div>
       </div>
+      <LegalFooter onNav={s=>window._goToPage(s)} />
     </div>
   );
 }
@@ -4426,7 +4484,7 @@ function PrivacyPage({ onBack, dark, onToggle }) {
   return (
     <div style={{minHeight:"100vh"}}>
       <LegalNav active="privacy" onNav={nav} dark={dark} onToggle={onToggle} />
-      <div style={{maxWidth:760,margin:"0 auto",padding:"40px 20px"}}>
+      <div style={{maxWidth:760,margin:"0 auto",padding:"40px 20px 20px"}}>
         <div style={{textAlign:"center",marginBottom:40}}>
           <div style={{fontSize:48,marginBottom:12}}>🔒</div>
           <h1 className="syne" style={{fontWeight:800,fontSize:"clamp(24px,4vw,36px)",marginBottom:8}}>Privacy Policy</h1>
@@ -4451,6 +4509,7 @@ function PrivacyPage({ onBack, dark, onToggle }) {
         ))}
         <div style={{textAlign:"center",marginTop:24}}><button className="btn-ghost" onClick={onBack}>← Back to Home</button></div>
       </div>
+      <LegalFooter onNav={s=>window._goToPage(s)} />
     </div>
   );
 }
@@ -4460,7 +4519,7 @@ function TermsPage({ onBack, dark, onToggle }) {
   return (
     <div style={{minHeight:"100vh"}}>
       <LegalNav active="terms" onNav={nav} dark={dark} onToggle={onToggle} />
-      <div style={{maxWidth:760,margin:"0 auto",padding:"40px 20px"}}>
+      <div style={{maxWidth:760,margin:"0 auto",padding:"40px 20px 20px"}}>
         <div style={{textAlign:"center",marginBottom:40}}>
           <div style={{fontSize:48,marginBottom:12}}>📋</div>
           <h1 className="syne" style={{fontWeight:800,fontSize:"clamp(24px,4vw,36px)",marginBottom:8}}>Terms & Conditions</h1>
@@ -4514,6 +4573,7 @@ function TermsPage({ onBack, dark, onToggle }) {
         ))}
         <div style={{textAlign:"center",marginTop:24}}><button className="btn-ghost" onClick={onBack}>← Back to Home</button></div>
       </div>
+      <LegalFooter onNav={s=>window._goToPage(s)} />
     </div>
   );
 }
@@ -4616,11 +4676,10 @@ function ContactPage({ onBack, dark, onToggle }) {
         )}
         <div style={{textAlign:"center",marginTop:24}}><button className="btn-ghost" onClick={onBack}>← Back to Home</button></div>
       </div>
+      <LegalFooter onNav={s=>window._goToPage(s)} />
     </div>
   );
 }
-
-/* ══════════ BUYER ONE-CLICK CONFIRM PAGE ══════════ */
 function ConfirmPage({ token, dark, onToggle, onGoHome }) {
   const [order, setOrder]         = useState(null);
   const [step, setStep]           = useState("loading"); // loading|confirm|issue|done|error|already_done|already_disputed
