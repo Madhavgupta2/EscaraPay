@@ -22,7 +22,7 @@ import LOGO_SRC from "./escarapay-logo.jpg";
   document.head.appendChild(link);
 })();
 
-const BACKEND_URL = "https://escarapay-backend.onrender.com";
+const BACKEND_URL = "https://escarapay-backend-production.up.railway.app";
 
 // Language translations
 const T = {
@@ -2354,7 +2354,7 @@ function Auth({ type, onLogin, onBack, dark, onToggle }) {
                     onChange={e=>setField("pan",e.target.value.replace(/[^A-Z0-9]/g,"").toUpperCase())} style={{marginBottom:4}} />
                   <FieldError msg={errors.pan} />
                 </div>
-                <div style={{textAlign:"center",fontSize:12,color:"var(--muted)",margin:"8px 0"}}>— ya —</div>
+                <div style={{textAlign:"center",fontSize:12,color:"var(--muted)",margin:"8px 0"}}>— or —</div>
                 <div>
                   <label className="label">GST Number (15 chars)</label>
                   <input className="input" placeholder="27ABCDE1234F1Z5" value={form.gst} maxLength={15}
@@ -3516,18 +3516,23 @@ function UserDetailModal({ user, adminKey, onClose, onUpdate }) {
   const [payoutLoading, setPayoutLoading] = useState(false);
   const [payoutMsg, setPayoutMsg] = useState("");
   // Bulk payout
-  const [selectedOrders, setSelectedOrders] = useState([]); // array of order ids
+  const [selectedOrders, setSelectedOrders] = useState([]);
   const [bulkForm, setBulkForm] = useState({ payout_method:"upi", payout_ref:"", payout_upi:"", payout_bank:"", payout_note:"" });
   const [bulkLoading, setBulkLoading] = useState(false);
   const [bulkMsg, setBulkMsg] = useState("");
 
+  // ✅ hdrs defined FIRST before any function that uses it
+  const hdrs = { "Content-Type":"application/json", "x-admin-key": adminKey };
+
+  // Computed from userOrders
+  const pendingPayouts = userOrders.filter(o => ["delivered","cancelled_buyer"].includes(o.status) && o.payout_status !== "paid");
+  const donePayouts    = userOrders.filter(o => o.payout_status === "paid");
+
   const toggleOrder = (id) => setSelectedOrders(prev => prev.includes(id) ? prev.filter(x=>x!==id) : [...prev, id]);
   const selectAll   = () => setSelectedOrders(pendingPayouts.map(o=>o.id));
   const clearAll    = () => setSelectedOrders([]);
-
   const selectedTotal = pendingPayouts.filter(o=>selectedOrders.includes(o.id)).reduce((a,o)=>a+(Number(o.seller_receives)||0),0);
 
-  // Auto-fill UPI from seller's saved profile when order selected
   const selectPayoutOrder = (o) => {
     setPayoutOrder(o);
     setPayoutMsg("");
@@ -3563,8 +3568,6 @@ function UserDetailModal({ user, adminKey, onClose, onUpdate }) {
       } else setBulkMsg("❌ " + d.error);
     } catch(e) { setBulkLoading(false); setBulkMsg("❌ Could not connect to server. Please try again."); }
   };
-
-  const hdrs = { "Content-Type":"application/json", "x-admin-key": adminKey };
 
   useEffect(()=>{
     const fetchOrders = async () => {
@@ -4528,7 +4531,7 @@ function ContactPage({ onBack, dark, onToggle }) {
     }
     setSending(true); setSendError("");
     try {
-      const res = await fetch("https://escarapay-backend-production.up.railway.app/api/contact", {
+      const res = await fetch(`${BACKEND_URL}/api/contact`, {
         method:"POST", headers:{"Content-Type":"application/json"},
         body: JSON.stringify(form),
       });
