@@ -24,6 +24,238 @@ import LOGO_SRC from "./escarapay-logo.jpg";
 
 const BACKEND_URL = "https://escarapay-backend.onrender.com";
 
+// ── SEO Meta Tags updater ──
+const updateMeta = ({ title, description, url, image }) => {
+  document.title = title || "EscaraPay | India's Trusted Payment Protection Platform";
+  const setMeta = (name, content, prop=false) => {
+    let el = prop
+      ? document.querySelector(`meta[property="${name}"]`)
+      : document.querySelector(`meta[name="${name}"]`);
+    if (!el) { el = document.createElement("meta"); prop ? el.setAttribute("property", name) : el.setAttribute("name", name); document.head.appendChild(el); }
+    el.setAttribute("content", content);
+  };
+  if (description) {
+    setMeta("description", description);
+    setMeta("og:description", description, true);
+    setMeta("twitter:description", description);
+  }
+  if (title) { setMeta("og:title", title, true); setMeta("twitter:title", title); }
+  if (url) setMeta("og:url", url, true);
+  if (image) { setMeta("og:image", image, true); setMeta("twitter:image", image); }
+  setMeta("og:type", "website", true);
+  setMeta("twitter:card", "summary_large_image");
+};
+
+// ── Blog Posts Data ──
+const BLOG_POSTS = [
+  {
+    slug: "how-to-protect-yourself-from-fraud-in-whatsapp-selling",
+    title: "How to Protect Yourself from Fraud in WhatsApp & Instagram Selling",
+    subtitle: "Real stories, real risks — and how EscaraPay keeps your money safe",
+    date: "April 15, 2026",
+    readTime: "5 min read",
+    category: "Seller Safety",
+    categoryColor: "#ef4444",
+    coverImage: "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=1200&q=80",
+    excerpt: "Every day, thousands of WhatsApp and Instagram sellers lose money to buyers who disappear after receiving products. Here's how to stop it.",
+    content: [
+      {
+        type: "intro",
+        text: "In India's booming social commerce space, millions of sellers use WhatsApp and Instagram to run their businesses. But with opportunity comes risk — fraud, fake payments, and disputes are at an all-time high. This guide will help you understand the threats and protect yourself.",
+      },
+      {
+        type: "image",
+        src: "https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?w=900&q=80",
+        caption: "Social commerce sellers face unique fraud risks",
+      },
+      {
+        type: "heading",
+        text: "🚨 The 5 Most Common Scams",
+      },
+      {
+        type: "list",
+        items: [
+          { title: "Fake Payment Screenshots", desc: "Buyers send edited UPI/NEFT screenshots claiming they've paid. The money never arrives." },
+          { title: "Chargeback Fraud", desc: "After receiving the product, buyers dispute the payment with their bank, getting a refund while keeping the goods." },
+          { title: "Return Fraud", desc: "Buyer claims the item is defective, returns a different/damaged item, and demands a full refund." },
+          { title: "Disappearing Buyers", desc: "After negotiating and agreeing on a deal, the buyer simply stops responding once they get the product." },
+          { title: "Fake Seller Scam", desc: "Sellers collect advance payments from multiple buyers and disappear without shipping." },
+        ],
+      },
+      {
+        type: "image",
+        src: "https://images.unsplash.com/photo-1563013544-824ae1b704d3?w=900&q=80",
+        caption: "Token-based payment protection ensures both parties are safe",
+      },
+      {
+        type: "heading",
+        text: "✅ How EscaraPay Solves This",
+      },
+      {
+        type: "text",
+        text: "EscaraPay uses a token-based payment protection system. Here's how it works: The buyer pays a token (10-30% of the order value) through our secure Cashfree-powered gateway. The funds are held safely — neither the buyer nor seller can access them. After the seller dispatches and the buyer confirms receipt, the payment is released. If there's a dispute, our team reviews evidence from both parties and makes a fair decision.",
+      },
+      {
+        type: "callout",
+        text: "💡 Pro Tip: Always use EscaraPay for orders above ₹500. For smaller amounts, the peace of mind is worth every rupee.",
+      },
+      {
+        type: "heading",
+        text: "📋 Checklist for Safe Selling",
+      },
+      {
+        type: "checklist",
+        items: [
+          "Always use a verified payment protection platform",
+          "Never accept payment screenshots as proof of payment",
+          "Keep delivery tracking numbers for all shipments",
+          "Document the product condition before shipping",
+          "Use EscaraPay's one-click buyer confirmation link",
+        ],
+      },
+    ],
+  },
+  {
+    slug: "why-token-payments-are-future-of-social-commerce-india",
+    title: "Why Token-Based Payments Are the Future of Social Commerce in India",
+    subtitle: "How a small upfront deposit changes everything for buyers and sellers",
+    date: "April 10, 2026",
+    readTime: "4 min read",
+    category: "Industry Insights",
+    categoryColor: "#0ea5e9",
+    coverImage: "https://images.unsplash.com/photo-1556742031-c6961e8560b0?w=1200&q=80",
+    excerpt: "India has 200M+ social commerce users. But trust remains the #1 problem. Token payments are changing the game — here's why.",
+    content: [
+      {
+        type: "intro",
+        text: "India's social commerce market is expected to reach $70 billion by 2030. But one thing holds it back — trust. Buyers don't trust sellers, sellers don't trust buyers, and everyone loses. Token-based payment protection is the solution the market has been waiting for.",
+      },
+      {
+        type: "image",
+        src: "https://images.unsplash.com/photo-1620714223084-8fcacc2dfd4d?w=900&q=80",
+        caption: "India's social commerce market is booming — but trust remains a challenge",
+      },
+      {
+        type: "heading",
+        text: "📊 The Trust Problem in Numbers",
+      },
+      {
+        type: "list",
+        items: [
+          { title: "67% of buyers", desc: "have been cheated by online sellers at least once" },
+          { title: "45% of sellers", desc: "have experienced payment fraud or non-payment" },
+          { title: "₹3,200 Cr+", desc: "lost to online fraud in India in 2023 alone" },
+          { title: "80% of disputes", desc: "could be prevented with proper payment protection" },
+        ],
+      },
+      {
+        type: "image",
+        src: "https://images.unsplash.com/photo-1556742393-d75f468bfcb0?w=900&q=80",
+        caption: "Secure payment gateways build trust in digital transactions",
+      },
+      {
+        type: "heading",
+        text: "🔐 How Token Payments Work",
+      },
+      {
+        type: "text",
+        text: "A token payment is a small percentage (usually 10-30%) paid upfront by the buyer before the seller ships. This token is held securely — the seller knows the buyer is serious, and the buyer knows their money is protected. Once delivery is confirmed, the token is released. It's a simple concept that builds trust instantly.",
+      },
+      {
+        type: "callout",
+        text: "🏆 EscaraPay processes tokens via Cashfree's RBI-authorized payment gateway — your money is always regulated and safe.",
+      },
+      {
+        type: "heading",
+        text: "🚀 Why This Is the Future",
+      },
+      {
+        type: "text",
+        text: "As social commerce grows in Tier 2 and Tier 3 cities, the need for simple, mobile-first payment protection becomes critical. EscaraPay is built specifically for this — no complex onboarding, no bank accounts required for buyers, and WhatsApp-native sharing for sellers. The future of India's social commerce depends on trust, and token payments deliver exactly that.",
+      },
+    ],
+  },
+  {
+    slug: "instagram-seller-guide-grow-business-safely-2026",
+    title: "The Complete Instagram Seller Guide: Grow Your Business Safely in 2026",
+    subtitle: "From building trust to getting paid — everything an Instagram seller needs to know",
+    date: "April 5, 2026",
+    readTime: "6 min read",
+    category: "Seller Guide",
+    categoryColor: "#8b5cf6",
+    coverImage: "https://images.unsplash.com/photo-1611162617474-5b21e879e113?w=1200&q=80",
+    excerpt: "Instagram has 500M+ active users in India. Here's how to build a profitable, secure selling business on the platform in 2026.",
+    content: [
+      {
+        type: "intro",
+        text: "Instagram has become India's #1 social selling platform. From handmade jewellery to ethnic wear, electronics to home decor — millions of sellers are building profitable businesses. But without proper systems, it can quickly become chaotic and risky. This guide covers everything you need.",
+      },
+      {
+        type: "image",
+        src: "https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?w=900&q=80",
+        caption: "Instagram has become India's premier social commerce platform",
+      },
+      {
+        type: "heading",
+        text: "📱 Setting Up Your Instagram Store",
+      },
+      {
+        type: "list",
+        items: [
+          { title: "Switch to a Business Account", desc: "Get access to analytics, contact buttons, and Instagram Shopping features." },
+          { title: "Perfect Your Bio", desc: "Include what you sell, your location, delivery info, and your EscaraPay link." },
+          { title: "Use Story Highlights", desc: "Create highlights for Products, Reviews, How to Order, and FAQs." },
+          { title: "Post Consistently", desc: "3-4 posts per week minimum. Use Reels for maximum organic reach." },
+        ],
+      },
+      {
+        type: "image",
+        src: "https://images.unsplash.com/photo-1523474253046-8cd2748b5fd2?w=900&q=80",
+        caption: "Professional product photography dramatically increases sales",
+      },
+      {
+        type: "heading",
+        text: "💰 Getting Paid Safely",
+      },
+      {
+        type: "text",
+        text: "The biggest mistake Instagram sellers make is accepting direct UPI payments without any protection. This leaves both buyer and seller vulnerable. EscaraPay solves this — create an order in 2 minutes, share the payment link on WhatsApp or Instagram DM, and the buyer pays a protected token. You dispatch once the token is secured. Simple, safe, professional.",
+      },
+      {
+        type: "callout",
+        text: "⭐ Top sellers on Instagram report 40% fewer payment disputes after switching to EscaraPay's payment protection system.",
+      },
+      {
+        type: "heading",
+        text: "📦 Delivery Best Practices",
+      },
+      {
+        type: "checklist",
+        items: [
+          "Always get a tracking number — use Delhivery, Shiprocket, or DTDC",
+          "Pack products with visible invoice and your business name",
+          "Send the EscaraPay confirmation link along with the tracking number",
+          "Photograph the packed product before shipping",
+          "Follow up with the buyer once the courier marks delivery",
+        ],
+      },
+      {
+        type: "image",
+        src: "https://images.unsplash.com/photo-1566576912321-d58ddd7a6088?w=900&q=80",
+        caption: "Professional packaging builds buyer trust and reduces return rates",
+      },
+      {
+        type: "heading",
+        text: "📈 Scaling Your Business",
+      },
+      {
+        type: "text",
+        text: "Once you have consistent orders, focus on reviews. Ask every happy buyer to send a review screenshot for your Story Highlights. Use EscaraPay's order history to track your GMV and commission data. Set targets — 10 orders/month, then 50, then 100. With proper payment protection, you can confidently take orders from strangers nationwide.",
+      },
+    ],
+  },
+];
+
 // Language translations
 const T = {
   en: {
@@ -264,8 +496,8 @@ function getStyle(dark) {
   .tbl tr:last-child td{border-bottom:none;}
 
   /* ── Overlays & Modals ── */
-  .overlay{position:fixed;inset:0;background:rgba(0,0,0,.72);backdrop-filter:blur(6px);z-index:9999;display:flex;align-items:center;justify-content:center;padding:14px;}
-  .modal{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:28px;width:100%;max-width:470px;animation:fadeUp .3s cubic-bezier(.22,.68,0,1.2);max-height:88vh;overflow-y:auto;position:relative;z-index:10000;box-shadow:0 24px 60px rgba(0,0,0,.25);}
+  .overlay{position:fixed;inset:0;background:rgba(0,0,0,.72);backdrop-filter:blur(6px);z-index:9999;display:flex;align-items:flex-start;justify-content:center;padding:14px;padding-top:max(14px,env(safe-area-inset-top));}
+  .modal{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:20px;width:100%;max-width:470px;animation:fadeUp .3s cubic-bezier(.22,.68,0,1.2);max-height:calc(100vh - 28px);overflow-y:auto;position:relative;z-index:10000;box-shadow:0 24px 60px rgba(0,0,0,.25);margin-top:0;}
 
   /* ── Timeline ── */
   .tl{display:flex;gap:12px;padding-bottom:20px;position:relative;}
@@ -684,7 +916,7 @@ function PayPage({ orderId, dark, onToggle, onGoHome }) {
 }
 
 /* ══════════ ORDER MODAL ══════════ */
-function OrderModal({ order, isSeller, onClose, onDispatch, onConfirmDelivery, onDispute }) {
+function OrderModal({ order, isSeller, sellerId, onClose, onDispatch, onConfirmDelivery, onDispute }) {
   const [tracking, setTracking] = useState(order.tracking_number||"");
   const [disputeReason, setDisputeReason] = useState("");
   const [showDisputeForm, setShowDisputeForm] = useState(false);
@@ -767,7 +999,7 @@ function OrderModal({ order, isSeller, onClose, onDispatch, onConfirmDelivery, o
             <button className="btn-gold" style={{width:"100%"}} onClick={async()=>{
               if(!tracking){setMsg("❌ Please enter a tracking number!"); return;}
               setLoading(true);
-              const r = await dispatchOrder(order.id, tracking);
+              const r = await dispatchOrder(order.id, tracking, sellerId);
               setLoading(false);
               if(r.success){
                 onDispatch(order.id, tracking, r.data?.confirmUrl);
@@ -2964,7 +3196,7 @@ function SellerDB({ user, userId, onLogout, dark, onToggle }) {
           </div>
         </div>
       )}
-      {showOrder && <OrderModal order={showOrder} isSeller onClose={()=>setShowOrder(null)} onDispatch={(id,tx,confirmUrl)=>{ setOrders(orders.map(o=>o.id===id?{...o,status:"dispatched",tracking_number:tx,confirm_token:confirmUrl?confirmUrl.split("/confirm/")[1]:o.confirm_token}:o)); setShowOrder(null); }} onConfirmDelivery={(id)=>setOrders(orders.map(o=>o.id===id?{...o,status:"delivered"}:o))} onDispute={(id)=>setOrders(orders.map(o=>o.id===id?{...o,status:"disputed"}:o))} />}
+      {showOrder && <OrderModal order={showOrder} isSeller sellerId={userId} onClose={()=>setShowOrder(null)} onDispatch={(id,tx,confirmUrl)=>{ setOrders(orders.map(o=>o.id===id?{...o,status:"dispatched",tracking_number:tx,confirm_token:confirmUrl?confirmUrl.split("/confirm/")[1]:o.confirm_token}:o)); setShowOrder(null); }} onConfirmDelivery={(id)=>setOrders(orders.map(o=>o.id===id?{...o,status:"delivered"}:o))} onDispute={(id)=>setOrders(orders.map(o=>o.id===id?{...o,status:"disputed"}:o))} />}
     </div>
   );
 }
@@ -3629,33 +3861,37 @@ function UserDetailModal({ user, adminKey, onClose, onUpdate }) {
     <div className="overlay" onClick={onClose}>
       <div className="modal" style={{maxWidth:560}} onClick={e=>e.stopPropagation()}>
 
+        {/* Sticky Header + Tabs */}
+        <div style={{position:"sticky",top:-20,background:"var(--surface)",zIndex:10,paddingTop:20,paddingBottom:12,marginTop:-20,marginLeft:-20,marginRight:-20,paddingLeft:20,paddingRight:20,borderBottom:"1px solid var(--border)",marginBottom:16}}>
+
         {/* Header */}
-        <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:16}}>
-          <div style={{display:"flex",alignItems:"center",gap:12}}>
-            <div className="avatar" style={{width:44,height:44,fontSize:18,background:isBanned?"var(--red)":"linear-gradient(135deg,var(--gold),var(--accent))"}}>{user.name[0]}</div>
+        <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:12}}>
+          <div style={{display:"flex",alignItems:"center",gap:10}}>
+            <div className="avatar" style={{width:40,height:40,fontSize:16,flexShrink:0,background:isBanned?"var(--red)":"linear-gradient(135deg,var(--gold),var(--accent))"}}>{user.name[0]}</div>
             <div>
-              <div className="syne" style={{fontWeight:800,fontSize:17}}>{user.name}</div>
-              <div style={{fontSize:12,color:"var(--muted)"}}>{user.role} • ID: {user.id}</div>
+              <div className="syne" style={{fontWeight:800,fontSize:15}}>{user.name}</div>
+              <div style={{fontSize:11,color:"var(--muted)"}}>{user.role} • ID: {user.id}</div>
             </div>
           </div>
-          <div style={{display:"flex",gap:8,alignItems:"center"}}>
-            <span className={`badge ${isBanned?"br":warnCount>0?"borange":"bg"}`}>
-              {isBanned?"🚫 Banned":warnCount>0?`⚠️ ${warnCount} Warning`:"✅ Active"}
+          <div style={{display:"flex",gap:6,alignItems:"center",flexShrink:0}}>
+            <span className={`badge ${isBanned?"br":warnCount>0?"borange":"bg"}`} style={{fontSize:10}}>
+              {isBanned?"🚫 Banned":warnCount>0?`⚠️ ${warnCount}w`:"✅ Active"}
             </span>
-            {pendingPayouts.length > 0 && <span className="badge borange">💸 {pendingPayouts.length} Payout Pending</span>}
+            {pendingPayouts.length > 0 && <span className="badge borange" style={{fontSize:10}}>💸 {pendingPayouts.length}</span>}
             <button className="btn-ghost" style={{padding:"4px 10px",fontSize:12}} onClick={onClose}>✕</button>
           </div>
         </div>
 
         {/* Tabs */}
-        <div style={{display:"flex",gap:4,marginBottom:16,background:"var(--sf2)",padding:4,borderRadius:10}}>
+        <div style={{display:"flex",gap:4,background:"var(--sf2)",padding:4,borderRadius:10}}>
           {[["details","👤 Details"],["orders","📦 Orders"],["payouts","💸 Payouts"],["actions","⚙️ Actions"]].map(([id,label])=>(
-            <button key={id} onClick={()=>setTab(id)} style={{flex:1,padding:"7px",border:"none",borderRadius:8,cursor:"pointer",background:tab===id?"var(--gold)":"transparent",color:tab===id?"#fff":"var(--muted)",fontFamily:"'Outfit',sans-serif",fontWeight:600,fontSize:11,transition:"all .2s",position:"relative"}}>
+            <button key={id} onClick={()=>setTab(id)} style={{flex:1,padding:"7px 4px",border:"none",borderRadius:8,cursor:"pointer",background:tab===id?"var(--gold)":"transparent",color:tab===id?"#fff":"var(--muted)",fontFamily:"'Outfit',sans-serif",fontWeight:600,fontSize:11,transition:"all .2s",position:"relative"}}>
               {label}
               {id==="payouts" && pendingPayouts.length>0 && <span style={{position:"absolute",top:-4,right:-2,background:"var(--red)",color:"#fff",borderRadius:"50%",width:14,height:14,fontSize:9,display:"flex",alignItems:"center",justifyContent:"center",fontWeight:700}}>{pendingPayouts.length}</span>}
             </button>
           ))}
         </div>
+        </div>{/* end sticky */}
 
         {/* Details Tab */}
         {tab==="details" && (

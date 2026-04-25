@@ -1,4 +1,5 @@
 const BASE_URL = "https://escarapay-backend.onrender.com";
+
 /* ── Auth ── */
 export const registerUser = async (name, email, phone, role, password, shopName = "", pan = "", gst = "") => {
   try {
@@ -9,7 +10,7 @@ export const registerUser = async (name, email, phone, role, password, shopName 
     const data = await res.json();
     if (!res.ok) return { success: false, error: data.error || "Register failed" };
     return { success: true, data };
-  } catch (err) { return { success: false, error: "Backend se connect nahi hua. Backend on hai?" }; }
+  } catch (err) { return { success: false, error: "Could not connect to server. Please try again." }; }
 };
 
 export const loginUser = async (email, password, role) => {
@@ -21,7 +22,7 @@ export const loginUser = async (email, password, role) => {
     const data = await res.json();
     if (!res.ok) return { success: false, error: data.error || "Login failed" };
     return { success: true, data };
-  } catch (err) { return { success: false, error: "Backend se connect nahi hua. Backend on hai?" }; }
+  } catch (err) { return { success: false, error: "Could not connect to server. Please try again." }; }
 };
 
 /* ── Orders ── */
@@ -32,59 +33,61 @@ export const createOrder = async (sellerId, productName, orderAmount, tokenPct, 
       body: JSON.stringify({ seller_id: sellerId, product_name: productName, order_amount: orderAmount, token_pct: tokenPct, buyer_name: buyerName, buyer_phone: buyerPhone }),
     });
     const data = await res.json();
-    if (!res.ok) return { success: false, error: data.error || "Order create nahi hua" };
+    if (!res.ok) return { success: false, error: data.error || "Order could not be created" };
     return { success: true, data };
-  } catch (err) { return { success: false, error: "Backend se connect nahi hua." }; }
+  } catch (err) { return { success: false, error: "Could not connect to server." }; }
 };
 
 export const getSellerOrders = async (sellerId) => {
   try {
     const res = await fetch(`${BASE_URL}/api/orders/seller/${sellerId}`);
     const data = await res.json();
-    if (!res.ok) return { success: false, error: data.error || "Orders load nahi hue" };
+    if (!res.ok) return { success: false, error: data.error || "Orders could not be loaded" };
     return { success: true, data };
-  } catch (err) { return { success: false, error: "Backend se connect nahi hua." }; }
+  } catch (err) { return { success: false, error: "Could not connect to server." }; }
 };
 
 export const getBuyerOrders = async (buyerPhone) => {
   try {
     const res = await fetch(`${BASE_URL}/api/orders/buyer/${buyerPhone}`);
     const data = await res.json();
-    if (!res.ok) return { success: false, error: data.error || "Orders load nahi hue" };
+    if (!res.ok) return { success: false, error: data.error || "Orders could not be loaded" };
     return { success: true, data };
-  } catch (err) { return { success: false, error: "Backend se connect nahi hua." }; }
+  } catch (err) { return { success: false, error: "Could not connect to server." }; }
 };
 
 export const getOrderById = async (orderId) => {
   try {
     const res = await fetch(`${BASE_URL}/api/orders/${orderId}`);
     const data = await res.json();
-    if (!res.ok) return { success: false, error: data.error || "Order nahi mila" };
+    if (!res.ok) return { success: false, error: data.error || "Order not found" };
     return { success: true, data };
-  } catch (err) { return { success: false, error: "Backend se connect nahi hua." }; }
+  } catch (err) { return { success: false, error: "Could not connect to server." }; }
 };
 
-export const dispatchOrder = async (orderId, trackingNumber) => {
+// ✅ Fixed — seller_id now sent to verify ownership
+export const dispatchOrder = async (orderId, trackingNumber, sellerId) => {
   try {
     const res = await fetch(`${BASE_URL}/api/orders/${orderId}/dispatch`, {
       method: "POST", headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ tracking_number: trackingNumber }),
+      body: JSON.stringify({ tracking_number: trackingNumber, seller_id: sellerId }),
     });
     const data = await res.json();
     if (!res.ok) return { success: false, error: data.error || "Dispatch failed" };
     return { success: true, data };
-  } catch (err) { return { success: false, error: "Backend se connect nahi hua." }; }
+  } catch (err) { return { success: false, error: "Could not connect to server." }; }
 };
 
-export const confirmDelivery = async (orderId) => {
+export const confirmDelivery = async (orderId, buyerPhone) => {
   try {
     const res = await fetch(`${BASE_URL}/api/orders/${orderId}/confirm-delivery`, {
       method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ buyer_phone: buyerPhone }),
     });
     const data = await res.json();
-    if (!res.ok) return { success: false, error: data.error || "Delivery confirm failed" };
+    if (!res.ok) return { success: false, error: data.error || "Delivery confirmation failed" };
     return { success: true, data };
-  } catch (err) { return { success: false, error: "Backend se connect nahi hua." }; }
+  } catch (err) { return { success: false, error: "Could not connect to server." }; }
 };
 
 export const raiseDispute = async (orderId, reason, raisedBy = "buyer") => {
@@ -94,31 +97,33 @@ export const raiseDispute = async (orderId, reason, raisedBy = "buyer") => {
       body: JSON.stringify({ reason, raised_by: raisedBy }),
     });
     const data = await res.json();
-    if (!res.ok) return { success: false, error: data.error || "Dispute raise nahi hua" };
+    if (!res.ok) return { success: false, error: data.error || "Dispute could not be raised" };
     return { success: true, data };
-  } catch (err) { return { success: false, error: "Backend se connect nahi hua." }; }
+  } catch (err) { return { success: false, error: "Could not connect to server." }; }
 };
 
-export const buyerCancel = async (orderId) => {
+export const buyerCancel = async (orderId, buyerPhone) => {
   try {
     const res = await fetch(`${BASE_URL}/api/orders/${orderId}/buyer-cancel`, {
       method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ buyer_phone: buyerPhone }),
     });
     const data = await res.json();
     if (!res.ok) return { success: false, error: data.error || "Cancel failed" };
     return { success: true, data };
-  } catch (err) { return { success: false, error: "Backend se connect nahi hua." }; }
+  } catch (err) { return { success: false, error: "Could not connect to server." }; }
 };
 
-export const sellerCancel = async (orderId) => {
+export const sellerCancel = async (orderId, sellerId) => {
   try {
     const res = await fetch(`${BASE_URL}/api/orders/${orderId}/seller-cancel`, {
       method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ seller_id: sellerId }),
     });
     const data = await res.json();
     if (!res.ok) return { success: false, error: data.error || "Cancel failed" };
     return { success: true, data };
-  } catch (err) { return { success: false, error: "Backend se connect nahi hua." }; }
+  } catch (err) { return { success: false, error: "Could not connect to server." }; }
 };
 
 /* ── Payments ── */
@@ -129,9 +134,9 @@ export const createPaymentOrder = async (orderId) => {
       body: JSON.stringify({ orderId }),
     });
     const data = await res.json();
-    if (!res.ok) return { success: false, error: data.error || "Payment order create failed" };
+    if (!res.ok) return { success: false, error: data.error || "Payment order creation failed" };
     return { success: true, data };
-  } catch (err) { return { success: false, error: "Backend se connect nahi hua." }; }
+  } catch (err) { return { success: false, error: "Could not connect to server." }; }
 };
 
 export const verifyPayment = async (rzpOrderId, rzpPaymentId, rzpSignature, escaraOrderId) => {
@@ -141,18 +146,18 @@ export const verifyPayment = async (rzpOrderId, rzpPaymentId, rzpSignature, esca
       body: JSON.stringify({ orderId: escaraOrderId }),
     });
     const data = await res.json();
-    if (!res.ok) return { success: false, error: data.error || "Payment verify failed" };
+    if (!res.ok) return { success: false, error: data.error || "Payment verification failed" };
     return { success: true, data };
-  } catch (err) { return { success: false, error: "Backend se connect nahi hua." }; }
+  } catch (err) { return { success: false, error: "Could not connect to server." }; }
 };
 
 export const getSellerAnalytics = async (sellerId) => {
   try {
     const res = await fetch(`${BASE_URL}/api/analytics/seller/${sellerId}`);
     const data = await res.json();
-    if (!res.ok) return { success: false, error: data.error || "Analytics load failed" };
+    if (!res.ok) return { success: false, error: data.error || "Analytics could not be loaded" };
     return { success: true, data };
-  } catch (err) { return { success: false, error: "Backend se connect nahi hua." }; }
+  } catch (err) { return { success: false, error: "Could not connect to server." }; }
 };
 
 export const sendOTP = async (email, role) => {
@@ -162,9 +167,9 @@ export const sendOTP = async (email, role) => {
       body: JSON.stringify({ email, role }),
     });
     const data = await res.json();
-    if (!res.ok) return { success: false, error: data.error || "OTP send nahi hua" };
+    if (!res.ok) return { success: false, error: data.error || "OTP could not be sent" };
     return { success: true, message: data.message };
-  } catch (err) { return { success: false, error: "Backend se connect nahi hua." }; }
+  } catch (err) { return { success: false, error: "Could not connect to server." }; }
 };
 
 export const verifyOTP = async (email, role, otp) => {
@@ -174,9 +179,9 @@ export const verifyOTP = async (email, role, otp) => {
       body: JSON.stringify({ email, role, otp }),
     });
     const data = await res.json();
-    if (!res.ok) return { success: false, error: data.error || "OTP verify nahi hua" };
+    if (!res.ok) return { success: false, error: data.error || "OTP verification failed" };
     return { success: true, data };
-  } catch (err) { return { success: false, error: "Backend se connect nahi hua." }; }
+  } catch (err) { return { success: false, error: "Could not connect to server." }; }
 };
 
 export const sendRegisterOTP = async (email, name) => {
@@ -186,9 +191,9 @@ export const sendRegisterOTP = async (email, name) => {
       body: JSON.stringify({ email, name }),
     });
     const data = await res.json();
-    if (!res.ok) return { success: false, error: data.error || "OTP send nahi hua" };
+    if (!res.ok) return { success: false, error: data.error || "OTP could not be sent" };
     return { success: true, message: data.message };
-  } catch (err) { return { success: false, error: "Backend se connect nahi hua." }; }
+  } catch (err) { return { success: false, error: "Could not connect to server." }; }
 };
 
 export const verifyRegisterOTP = async (email, otp) => {
@@ -198,7 +203,7 @@ export const verifyRegisterOTP = async (email, otp) => {
       body: JSON.stringify({ email, otp }),
     });
     const data = await res.json();
-    if (!res.ok) return { success: false, error: data.error || "OTP verify nahi hua" };
+    if (!res.ok) return { success: false, error: data.error || "OTP verification failed" };
     return { success: true };
-  } catch (err) { return { success: false, error: "Backend se connect nahi hua." }; }
+  } catch (err) { return { success: false, error: "Could not connect to server." }; }
 };
