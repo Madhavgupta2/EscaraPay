@@ -1127,6 +1127,211 @@ function TypeWriter({ words, dark }) {
   );
 }
 
+/* ══════════ RTO LOSS CALCULATOR ══════════ */
+function RTOCalculator({ onEnter }) {
+  const [orders, setOrders]     = useState(50);
+  const [avgValue, setAvgValue] = useState(800);
+  const [rtoRate, setRtoRate]   = useState(25);
+  const [tokenPct, setTokenPct] = useState(20);
+  const [category, setCategory] = useState("clothing");
+  const [shown, setShown]       = useState(false);
+
+  const categoryRTO = { clothing:28, electronics:18, footwear:32, accessories:22, beauty:15, other:25 };
+
+  // Auto-set RTO rate when category changes
+  const handleCategory = (c) => { setCategory(c); setRtoRate(categoryRTO[c]); };
+
+  // Calculations
+  const rtoOrders       = Math.round(orders * rtoRate / 100);
+  const shippingCost    = 80; // avg ₹80 per RTO
+  const returnShipping  = 60;
+  const handlingCost    = 30;
+  const lossPerRTO      = shippingCost + returnShipping + handlingCost;
+  const monthlyLoss     = rtoOrders * lossPerRTO;
+  const yearlyLoss      = monthlyLoss * 12;
+
+  // With EscaraPay
+  const tokenAmount     = Math.round(avgValue * tokenPct / 100);
+  const tokenCollected  = rtoOrders * tokenAmount;
+  const netSaving       = Math.max(0, tokenCollected - (rtoOrders * shippingCost));
+  const yearlySaving    = netSaving * 12;
+  const roi             = monthlyLoss > 0 ? Math.round((netSaving / monthlyLoss) * 100) : 0;
+
+  const fmt = (n) => n >= 100000 ? `₹${(n/100000).toFixed(1)}L` : n >= 1000 ? `₹${(n/1000).toFixed(1)}K` : `₹${n}`;
+
+  return (
+    <div style={{padding:"80px clamp(16px,5vw,40px)",background:"var(--bg)"}}>
+      <div style={{maxWidth:860,margin:"0 auto"}}>
+
+        {/* Header */}
+        <div className="reveal" style={{textAlign:"center",marginBottom:44}}>
+          <span style={{display:"inline-block",background:"rgba(239,68,68,.1)",border:"1px solid rgba(239,68,68,.2)",borderRadius:100,padding:"4px 16px",fontSize:11,fontWeight:700,color:"#ef4444",letterSpacing:"1.5px",textTransform:"uppercase",marginBottom:12}}>
+            FREE TOOL
+          </span>
+          <h2 className="syne" style={{fontWeight:900,fontSize:"clamp(24px,4vw,38px)",marginBottom:10}}>
+            Calculate Your RTO Losses 🧮
+          </h2>
+          <p style={{color:"var(--muted)",fontSize:15,maxWidth:520,margin:"0 auto"}}>
+            See exactly how much money you're losing to returns — and how much EscaraPay can save you.
+          </p>
+        </div>
+
+        <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:20}}>
+
+          {/* INPUT SIDE */}
+          <div style={{background:"var(--surface)",border:"1px solid var(--border)",borderRadius:20,padding:"28px 24px"}}>
+            <div style={{fontWeight:700,fontSize:14,color:"var(--muted)",textTransform:"uppercase",letterSpacing:"1px",marginBottom:20}}>Your Business</div>
+
+            {/* Category */}
+            <div style={{marginBottom:18}}>
+              <label style={{fontSize:12,fontWeight:600,color:"var(--muted)",display:"block",marginBottom:8}}>Product Category</label>
+              <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:6}}>
+                {[["clothing","👗 Clothing"],["electronics","📱 Electronics"],["footwear","👟 Footwear"],["accessories","💍 Accessories"],["beauty","💄 Beauty"],["other","📦 Other"]].map(([val,label])=>(
+                  <button key={val} onClick={()=>handleCategory(val)}
+                    style={{padding:"7px 4px",borderRadius:8,border:`1.5px solid ${category===val?"var(--gold)":"var(--border)"}`,background:category===val?"rgba(250,189,0,.1)":"transparent",color:category===val?"var(--gold)":"var(--muted)",fontSize:11,fontWeight:600,cursor:"pointer",transition:"all .15s"}}>
+                    {label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Monthly Orders */}
+            <div style={{marginBottom:18}}>
+              <div style={{display:"flex",justifyContent:"space-between",marginBottom:8}}>
+                <label style={{fontSize:12,fontWeight:600,color:"var(--muted)"}}>Monthly Orders</label>
+                <span style={{fontSize:14,fontWeight:800,color:"var(--gold)"}}>{orders}</span>
+              </div>
+              <input type="range" min={10} max={500} step={5} value={orders}
+                onChange={e=>setOrders(Number(e.target.value))}
+                style={{width:"100%",accentColor:"var(--gold)"}} />
+              <div style={{display:"flex",justifyContent:"space-between",fontSize:10,color:"var(--muted)",marginTop:3}}>
+                <span>10</span><span>500</span>
+              </div>
+            </div>
+
+            {/* Avg Order Value */}
+            <div style={{marginBottom:18}}>
+              <div style={{display:"flex",justifyContent:"space-between",marginBottom:8}}>
+                <label style={{fontSize:12,fontWeight:600,color:"var(--muted)"}}>Avg Order Value</label>
+                <span style={{fontSize:14,fontWeight:800,color:"var(--gold)"}}>₹{avgValue}</span>
+              </div>
+              <input type="range" min={200} max={5000} step={50} value={avgValue}
+                onChange={e=>setAvgValue(Number(e.target.value))}
+                style={{width:"100%",accentColor:"var(--gold)"}} />
+              <div style={{display:"flex",justifyContent:"space-between",fontSize:10,color:"var(--muted)",marginTop:3}}>
+                <span>₹200</span><span>₹5,000</span>
+              </div>
+            </div>
+
+            {/* RTO Rate */}
+            <div style={{marginBottom:18}}>
+              <div style={{display:"flex",justifyContent:"space-between",marginBottom:8}}>
+                <label style={{fontSize:12,fontWeight:600,color:"var(--muted)"}}>RTO Rate</label>
+                <span style={{fontSize:14,fontWeight:800,color:"#ef4444"}}>{rtoRate}%</span>
+              </div>
+              <input type="range" min={5} max={60} step={1} value={rtoRate}
+                onChange={e=>setRtoRate(Number(e.target.value))}
+                style={{width:"100%",accentColor:"#ef4444"}} />
+              <div style={{display:"flex",justifyContent:"space-between",fontSize:10,color:"var(--muted)",marginTop:3}}>
+                <span>5%</span><span>60%</span>
+              </div>
+            </div>
+
+            {/* Token % */}
+            <div>
+              <div style={{display:"flex",justifyContent:"space-between",marginBottom:8}}>
+                <label style={{fontSize:12,fontWeight:600,color:"var(--muted)"}}>EscaraPay Token %</label>
+                <span style={{fontSize:14,fontWeight:800,color:"var(--green)"}}>{tokenPct}%</span>
+              </div>
+              <input type="range" min={10} max={50} step={5} value={tokenPct}
+                onChange={e=>setTokenPct(Number(e.target.value))}
+                style={{width:"100%",accentColor:"#10b981"}} />
+              <div style={{display:"flex",justifyContent:"space-between",fontSize:10,color:"var(--muted)",marginTop:3}}>
+                <span>10%</span><span>50%</span>
+              </div>
+            </div>
+          </div>
+
+          {/* RESULTS SIDE */}
+          <div style={{display:"flex",flexDirection:"column",gap:12}}>
+
+            {/* Without EscaraPay */}
+            <div style={{background:"rgba(239,68,68,.06)",border:"1px solid rgba(239,68,68,.2)",borderRadius:16,padding:"20px 22px",flex:1}}>
+              <div style={{fontSize:12,fontWeight:700,color:"#ef4444",textTransform:"uppercase",letterSpacing:"1px",marginBottom:14}}>😢 Without EscaraPay</div>
+              <div style={{display:"flex",flexDirection:"column",gap:10}}>
+                <div style={{display:"flex",justifyContent:"space-between",fontSize:13}}>
+                  <span style={{color:"var(--muted)"}}>RTO Orders/month</span>
+                  <strong style={{color:"#ef4444"}}>{rtoOrders} orders</strong>
+                </div>
+                <div style={{display:"flex",justifyContent:"space-between",fontSize:13}}>
+                  <span style={{color:"var(--muted)"}}>Loss per RTO</span>
+                  <strong style={{color:"#ef4444"}}>₹{lossPerRTO}</strong>
+                </div>
+                <div style={{height:1,background:"rgba(239,68,68,.15)"}}/>
+                <div style={{display:"flex",justifyContent:"space-between"}}>
+                  <span style={{fontSize:13,color:"var(--muted)"}}>Monthly Loss</span>
+                  <strong style={{fontSize:18,color:"#ef4444"}}>{fmt(monthlyLoss)}</strong>
+                </div>
+                <div style={{display:"flex",justifyContent:"space-between"}}>
+                  <span style={{fontSize:13,color:"var(--muted)"}}>Yearly Loss</span>
+                  <strong style={{fontSize:22,color:"#ef4444",fontFamily:"'Syne',sans-serif"}}>{fmt(yearlyLoss)}</strong>
+                </div>
+              </div>
+            </div>
+
+            {/* With EscaraPay */}
+            <div style={{background:"rgba(16,185,129,.06)",border:"1px solid rgba(16,185,129,.25)",borderRadius:16,padding:"20px 22px",flex:1}}>
+              <div style={{fontSize:12,fontWeight:700,color:"var(--green)",textTransform:"uppercase",letterSpacing:"1px",marginBottom:14}}>✅ With EscaraPay</div>
+              <div style={{display:"flex",flexDirection:"column",gap:10}}>
+                <div style={{display:"flex",justifyContent:"space-between",fontSize:13}}>
+                  <span style={{color:"var(--muted)"}}>Token per RTO order</span>
+                  <strong style={{color:"var(--green)"}}>₹{tokenAmount} collected</strong>
+                </div>
+                <div style={{display:"flex",justifyContent:"space-between",fontSize:13}}>
+                  <span style={{color:"var(--muted)"}}>Tokens collected</span>
+                  <strong style={{color:"var(--green)"}}>{fmt(tokenCollected)}</strong>
+                </div>
+                <div style={{height:1,background:"rgba(16,185,129,.2)"}}/>
+                <div style={{display:"flex",justifyContent:"space-between"}}>
+                  <span style={{fontSize:13,color:"var(--muted)"}}>Monthly Saving</span>
+                  <strong style={{fontSize:18,color:"var(--green)"}}>{fmt(netSaving)}</strong>
+                </div>
+                <div style={{display:"flex",justifyContent:"space-between"}}>
+                  <span style={{fontSize:13,color:"var(--muted)"}}>Yearly Saving</span>
+                  <strong style={{fontSize:22,color:"var(--green)",fontFamily:"'Syne',sans-serif"}}>{fmt(yearlySaving)}</strong>
+                </div>
+              </div>
+            </div>
+
+            {/* ROI Badge */}
+            <div style={{background:"linear-gradient(135deg,var(--gold),#f59e0b)",borderRadius:14,padding:"16px 20px",textAlign:"center"}}>
+              <div style={{fontSize:11,fontWeight:700,color:"rgba(0,0,0,.6)",letterSpacing:"1px",marginBottom:4}}>YOUR ROI WITH ESCARAPAY</div>
+              <div className="syne" style={{fontSize:36,fontWeight:900,color:"#000"}}>{roi}%</div>
+              <div style={{fontSize:12,color:"rgba(0,0,0,.7)",marginTop:2}}>return on every token collected</div>
+            </div>
+
+          </div>
+        </div>
+
+        {/* CTA */}
+        <div style={{marginTop:32,textAlign:"center",padding:"28px 20px",background:"var(--surface)",borderRadius:18,border:"1px solid var(--border)"}}>
+          <div className="syne" style={{fontWeight:800,fontSize:20,marginBottom:8}}>
+            Stop losing {fmt(monthlyLoss)} every month 🛑
+          </div>
+          <p style={{color:"var(--muted)",fontSize:14,marginBottom:20}}>
+            Start collecting tokens today — free to set up, takes 2 minutes.
+          </p>
+          <button className="btn-gold" style={{padding:"13px 36px",fontSize:15,borderRadius:12}}
+            onClick={()=>onEnter("seller")}>
+            Start Protecting My Sales →
+          </button>
+        </div>
+
+      </div>
+    </div>
+  );
+}
+
 function Landing({ onEnter, onTrack, dark, onToggle, lang, onLangToggle }) {
   const t = T[lang] || T.hl;
   const [statsStarted, setStatsStarted] = useState(false);
@@ -1440,6 +1645,9 @@ function Landing({ onEnter, onTrack, dark, onToggle, lang, onLangToggle }) {
           ))}
         </div>
       </div>
+
+      {/* ── RTO LOSS CALCULATOR ── */}
+      <RTOCalculator onEnter={onEnter} />
 
       {/* ── HOW IT WORKS ── */}
       <div id="how-it-works" style={{padding:"80px clamp(16px,5vw,40px)",background:"var(--surface)"}}>
@@ -2053,7 +2261,7 @@ function Landing({ onEnter, onTrack, dark, onToggle, lang, onLangToggle }) {
             </div>
             <div>
               <div style={{fontSize:11,fontWeight:700,color:"rgba(255,255,255,.4)",textTransform:"uppercase",letterSpacing:1.2,marginBottom:14}}>Company</div>
-              {[["About Us","about"],["Contact Us","contact"],["How It Works","how"]].map(([l,s])=>(
+              {[["About Us","about"],["Contact Us","contact"],["Blog","blogs"],["How It Works","how"]].map(([l,s])=>(
                 <div key={l} style={{fontSize:13,color:"rgba(255,255,255,.65)",marginBottom:9,cursor:"pointer",transition:"color .2s"}}
                   onMouseEnter={e=>e.target.style.color="#fff"}
                   onMouseLeave={e=>e.target.style.color="rgba(255,255,255,.65)"}
@@ -4512,7 +4720,7 @@ function LegalFooter({ onNav }) {
           </div>
           <div>
             <div style={{fontWeight:700,fontSize:12,textTransform:"uppercase",letterSpacing:"1px",color:"var(--muted)",marginBottom:10}}>Platform</div>
-            {[["landing","How It Works"],["landing","For Sellers"],["landing","For Buyers"],["about","About Us"]].map(([s,l])=>(
+            {[["landing","How It Works"],["landing","For Sellers"],["landing","For Buyers"],["about","About Us"],["blogs","Blog"]].map(([s,l])=>(
               <div key={l} style={{marginBottom:6}}>
                 <span style={{fontSize:13,color:"var(--text)",cursor:"pointer",opacity:.8}} onClick={()=>{
                   if(l==="How It Works"){
@@ -4916,6 +5124,123 @@ function ContactPage({ onBack, dark, onToggle }) {
     </div>
   );
 }
+
+/* ══════════ BLOG LIST PAGE ══════════ */
+function BlogListPage({ dark, onToggle, onGoHome, onReadPost }) {
+  useEffect(()=>{
+    window.scrollTo({top:0,behavior:"instant"});
+    updateMeta({title:"EscaraPay Blog | Payment Protection Tips for Indian Sellers",description:"Learn how to protect yourself from fraud, grow your WhatsApp/Instagram business safely.",url:"https://escarapay.in/blogs"});
+  },[]);
+  return (
+    <div style={{minHeight:"100vh"}}>
+      <nav className="nav"><Logo onClick={onGoHome}/><div style={{display:"flex",gap:8}}><ThemeToggle dark={dark} onToggle={onToggle}/><button className="btn-ghost" onClick={onGoHome}>← Home</button></div></nav>
+      <div style={{maxWidth:900,margin:"0 auto",padding:"48px 20px 20px"}}>
+        <div style={{textAlign:"center",marginBottom:48}}>
+          <span style={{background:"rgba(14,165,233,.1)",border:"1px solid rgba(14,165,233,.25)",borderRadius:100,padding:"4px 16px",fontSize:11,fontWeight:700,color:"var(--gold)",letterSpacing:1,textTransform:"uppercase"}}>BLOG</span>
+          <h1 className="syne" style={{fontWeight:900,fontSize:"clamp(26px,5vw,40px)",marginTop:12,marginBottom:10}}>Payment Protection Insights</h1>
+          <p style={{color:"var(--muted)",fontSize:15,maxWidth:500,margin:"0 auto"}}>Tips, guides and industry insights for India's WhatsApp & Instagram sellers.</p>
+        </div>
+        <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(280px,1fr))",gap:24}}>
+          {BLOG_POSTS.map(post=>(
+            <div key={post.slug} style={{background:"var(--surface)",border:"1px solid var(--border)",borderRadius:18,overflow:"hidden",cursor:"pointer",transition:"transform .2s,box-shadow .2s"}}
+              onMouseEnter={e=>{e.currentTarget.style.transform="translateY(-4px)";e.currentTarget.style.boxShadow="0 12px 40px rgba(0,0,0,.15)";}}
+              onMouseLeave={e=>{e.currentTarget.style.transform="";e.currentTarget.style.boxShadow="";}}
+              onClick={()=>onReadPost(post.slug)}>
+              <img src={post.coverImage} alt={post.title} style={{width:"100%",height:190,objectFit:"cover"}} loading="lazy"/>
+              <div style={{padding:"18px 20px 22px"}}>
+                <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:10}}>
+                  <span style={{background:post.categoryColor+"22",color:post.categoryColor,fontSize:11,fontWeight:700,padding:"3px 10px",borderRadius:20}}>{post.category}</span>
+                  <span style={{fontSize:11,color:"var(--muted)"}}>{post.readTime}</span>
+                </div>
+                <h2 className="syne" style={{fontWeight:800,fontSize:16,lineHeight:1.35,marginBottom:8}}>{post.title}</h2>
+                <p style={{fontSize:13,color:"var(--muted)",lineHeight:1.6,marginBottom:14}}>{post.excerpt}</p>
+                <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+                  <span style={{fontSize:11,color:"var(--muted)"}}>{post.date}</span>
+                  <span style={{fontSize:13,color:"var(--gold)",fontWeight:600}}>Read →</span>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+      <LegalFooter onNav={s=>{ if(s==="landing") onGoHome(); else window._goToPage(s); }}/>
+    </div>
+  );
+}
+
+/* ══════════ BLOG POST PAGE ══════════ */
+function BlogPostPage({ slug, dark, onToggle, onGoHome, onBlogList }) {
+  const post = BLOG_POSTS.find(p=>p.slug===slug);
+  useEffect(()=>{
+    window.scrollTo({top:0,behavior:"instant"});
+    if(post) updateMeta({title:`${post.title} | EscaraPay Blog`,description:post.excerpt,url:`https://escarapay.in/blogs/${post.slug}`,image:post.coverImage});
+  },[post]);
+  if(!post) return (
+    <div style={{minHeight:"100vh"}}>
+      <nav className="nav"><Logo onClick={onGoHome}/><ThemeToggle dark={dark} onToggle={onToggle}/></nav>
+      <div style={{textAlign:"center",padding:80}}><div style={{fontSize:52}}>📭</div><h2 className="syne" style={{marginTop:16}}>Blog post not found</h2><button className="btn-ghost" style={{marginTop:16}} onClick={onBlogList}>← Back to Blog</button></div>
+    </div>
+  );
+  return (
+    <div style={{minHeight:"100vh"}}>
+      <nav className="nav"><Logo onClick={onGoHome}/><div style={{display:"flex",gap:8}}><ThemeToggle dark={dark} onToggle={onToggle}/><button className="btn-ghost" onClick={onBlogList}>← Blog</button></div></nav>
+      <div style={{width:"100%",maxHeight:420,overflow:"hidden",position:"relative"}}>
+        <img src={post.coverImage} alt={post.title} style={{width:"100%",height:420,objectFit:"cover"}}/>
+        <div style={{position:"absolute",inset:0,background:"linear-gradient(to bottom,transparent 40%,rgba(0,0,0,.75))"}}/>
+        <div style={{position:"absolute",bottom:0,left:0,right:0,padding:"24px clamp(16px,5vw,48px)"}}>
+          <span style={{background:post.categoryColor,color:"#fff",fontSize:11,fontWeight:700,padding:"4px 12px",borderRadius:20,marginBottom:12,display:"inline-block"}}>{post.category}</span>
+          <h1 className="syne" style={{fontWeight:900,fontSize:"clamp(18px,4vw,34px)",color:"#fff",lineHeight:1.25,marginBottom:10}}>{post.title}</h1>
+          <div style={{display:"flex",gap:16,color:"rgba(255,255,255,.75)",fontSize:13}}><span>📅 {post.date}</span><span>⏱ {post.readTime}</span></div>
+        </div>
+      </div>
+      <div style={{maxWidth:720,margin:"0 auto",padding:"40px 20px 20px"}}>
+        {post.content.map((block,i)=>{
+          if(block.type==="intro") return <p key={i} style={{fontSize:17,lineHeight:1.85,marginBottom:28,fontWeight:500,borderLeft:"3px solid var(--gold)",paddingLeft:16}}>{block.text}</p>;
+          if(block.type==="text") return <p key={i} style={{fontSize:15,lineHeight:1.85,marginBottom:24}}>{block.text}</p>;
+          if(block.type==="heading") return <h2 key={i} className="syne" style={{fontWeight:800,fontSize:22,marginTop:36,marginBottom:14}}>{block.text}</h2>;
+          if(block.type==="image") return (
+            <div key={i} style={{marginBottom:28,borderRadius:14,overflow:"hidden",border:"1px solid var(--border)"}}>
+              <img src={block.src} alt={block.caption} style={{width:"100%",height:260,objectFit:"cover"}} loading="lazy"/>
+              {block.caption&&<div style={{background:"var(--sf2)",padding:"10px 16px",fontSize:12,color:"var(--muted)",textAlign:"center"}}>{block.caption}</div>}
+            </div>
+          );
+          if(block.type==="list") return (
+            <div key={i} style={{marginBottom:28,display:"flex",flexDirection:"column",gap:10}}>
+              {block.items.map((item,j)=>(
+                <div key={j} style={{background:"var(--sf2)",borderRadius:12,padding:"14px 18px",borderLeft:"3px solid var(--gold)"}}>
+                  <div style={{fontWeight:700,fontSize:14,marginBottom:3}}>{item.title}</div>
+                  <div style={{fontSize:13,color:"var(--muted)",lineHeight:1.6}}>{item.desc}</div>
+                </div>
+              ))}
+            </div>
+          );
+          if(block.type==="callout") return <div key={i} style={{background:"rgba(14,165,233,.08)",border:"1px solid rgba(14,165,233,.25)",borderRadius:14,padding:"16px 20px",marginBottom:28,fontSize:15,lineHeight:1.7,fontWeight:500}}>{block.text}</div>;
+          if(block.type==="checklist") return (
+            <div key={i} style={{marginBottom:28,display:"flex",flexDirection:"column",gap:10}}>
+              {block.items.map((item,j)=>(
+                <div key={j} style={{display:"flex",gap:12,alignItems:"flex-start",fontSize:14,lineHeight:1.6}}>
+                  <span style={{color:"var(--green)",fontSize:16,flexShrink:0,marginTop:1}}>✅</span><span>{item}</span>
+                </div>
+              ))}
+            </div>
+          );
+          return null;
+        })}
+        <div style={{background:"linear-gradient(135deg,rgba(14,165,233,.1),rgba(99,102,241,.1))",border:"1px solid rgba(14,165,233,.2)",borderRadius:18,padding:"28px 24px",textAlign:"center",marginTop:40,marginBottom:20}}>
+          <div style={{fontSize:32,marginBottom:10}}>🛡️</div>
+          <h3 className="syne" style={{fontWeight:800,fontSize:20,marginBottom:8}}>Start Selling Safely Today</h3>
+          <p style={{color:"var(--muted)",fontSize:14,marginBottom:20}}>Join thousands of Indian sellers who trust EscaraPay for secure payments.</p>
+          <div style={{display:"flex",gap:10,justifyContent:"center",flexWrap:"wrap"}}>
+            <button className="btn-gold" style={{padding:"11px 24px"}} onClick={onGoHome}>Create Free Account →</button>
+            <button className="btn-ghost" onClick={onBlogList}>← More Articles</button>
+          </div>
+        </div>
+      </div>
+      <LegalFooter onNav={s=>{ if(s==="landing") onGoHome(); else window._goToPage(s); }}/>
+    </div>
+  );
+}
+
 function ConfirmPage({ token, dark, onToggle, onGoHome }) {
   const [order, setOrder]         = useState(null);
   const [step, setStep]           = useState("loading"); // loading|confirm|issue|done|error|already_done|already_disputed
@@ -5063,9 +5388,10 @@ export default function App() {
   const [dealOrderId, setDealOrderId]   = useState(null);
   const [trackOrderId, setTrackOrderId] = useState(null);
   const [confirmToken, setConfirmToken] = useState(null);
+  const [blogSlug, setBlogSlug] = useState(null);
   const [adminKey, setAdminKey] = useState(()=> localStorage.getItem("adminKey") || "");
 
-  useEffect(()=>{ window._goToPage=(s)=>{ const urls={about:"/about",privacy:"/privacy",terms:"/terms",refund:"/refund",dispute:"/dispute",contact:"/contact",landing:"/",track:"/track",admin:"/admin"}; window.history.pushState({},"",urls[s]||"/"+s); setScreen(s); }; },[]);
+  useEffect(()=>{ window._goToPage=(s)=>{ const urls={about:"/about",privacy:"/privacy",terms:"/terms",refund:"/refund",dispute:"/dispute",contact:"/contact",landing:"/",track:"/track",admin:"/admin",blogs:"/blogs"}; window.history.pushState({},"",urls[s]||"/"+s); setScreen(s); }; },[]);
   useEffect(()=>{
     document.title = "Escara Pay | India's Trusted Payment Protection Platform";
   },[]);
@@ -5075,7 +5401,8 @@ export default function App() {
     const dm=path.match(/^\/deal\/([A-Z0-9]+)$/);     if(dm){setDealOrderId(dm[1]);setScreen("deal");return;}
     const tm=path.match(/^\/track\/([A-Z0-9-]+)$/i);  if(tm){setTrackOrderId(tm[1].toUpperCase());setScreen("track");return;}
     const cm=path.match(/^\/confirm\/([a-f0-9]{48})$/i); if(cm){setConfirmToken(cm[1]);setScreen("confirm");return;}
-    if(path==="/track"){setScreen("track");return;}
+    const bm=path.match(/^\/blogs\/([a-z0-9-]+)$/); if(bm){setBlogSlug(bm[1]);setScreen("blog-post");return;}
+    if(path==="/blogs"){setScreen("blog-list");return;}
     if(path==="/admin"){setScreen("admin-login");return;}
     if(path==="/about"){setScreen("about");return;}
     if(path==="/privacy"){setScreen("privacy");return;}
@@ -5089,7 +5416,7 @@ export default function App() {
   const props = { dark, onToggle:toggleDark, lang, onLangToggle:toggleLang };
   const handleLogin=(t,n,id,phone)=>{setUserType(t);setUserName(n);setUserId(id);setUserPhone(phone||"");setScreen("dashboard");};
   const handleLogout=()=>{setScreen("landing");setUserType(null);setUserId(null);setUserPhone("");setUserName("");};
-  const goHome=()=>{window.history.pushState({},"","/");setScreen("landing");setPayOrderId(null);setDealOrderId(null);setTrackOrderId(null);setConfirmToken(null);};
+  const goHome=()=>{window.history.pushState({},"","/");setScreen("landing");setPayOrderId(null);setDealOrderId(null);setTrackOrderId(null);setConfirmToken(null);setBlogSlug(null);};
   const goToScreen=(s,url)=>{window.history.pushState({},"",(url||"/"));setScreen(s);};
 
   return (
@@ -5099,6 +5426,8 @@ export default function App() {
       {screen==="deal"        && dealOrderId  && <DealPage    orderId={dealOrderId}  dark={dark} onToggle={toggleDark} onGoHome={goHome} />}
       {screen==="track"                       && <TrackPage   orderId={trackOrderId} dark={dark} onToggle={toggleDark} onGoHome={goHome} />}
       {screen==="confirm"     && confirmToken && <ConfirmPage token={confirmToken}   dark={dark} onToggle={toggleDark} onGoHome={goHome} />}
+      {screen==="blog-list"   && <BlogListPage dark={dark} onToggle={toggleDark} onGoHome={goHome} onReadPost={(slug)=>{ window.history.pushState({},"",`/blogs/${slug}`); setBlogSlug(slug); setScreen("blog-post"); }} />}
+      {screen==="blog-post"   && blogSlug && <BlogPostPage slug={blogSlug} dark={dark} onToggle={toggleDark} onGoHome={goHome} onBlogList={()=>{ window.history.pushState({},"","/blogs"); setScreen("blog-list"); }} />}
       {screen==="admin-login" && <AdminLogin  onLogin={(k)=>{setAdminKey(k);setScreen("admin");}} dark={dark} onToggle={toggleDark} />}
       {screen==="admin"       && <AdminPanel  adminKey={adminKey} onLogout={()=>{localStorage.removeItem("adminKey");setScreen("landing");}} dark={dark} onToggle={toggleDark} />}
       {screen==="about"       && <AboutPage   onBack={goHome} {...props} />}
