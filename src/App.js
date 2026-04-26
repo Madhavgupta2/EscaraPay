@@ -1176,7 +1176,7 @@ function RTOCalculator({ onEnter }) {
           </p>
         </div>
 
-        <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:20}}>
+        <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(300px,1fr))",gap:20}}>
 
           {/* INPUT SIDE */}
           <div style={{background:"var(--surface)",border:"1px solid var(--border)",borderRadius:20,padding:"28px 24px"}}>
@@ -5391,7 +5391,7 @@ export default function App() {
   const [blogSlug, setBlogSlug] = useState(null);
   const [adminKey, setAdminKey] = useState(()=> localStorage.getItem("adminKey") || "");
 
-  useEffect(()=>{ window._goToPage=(s)=>{ const urls={about:"/about",privacy:"/privacy",terms:"/terms",refund:"/refund",dispute:"/dispute",contact:"/contact",landing:"/",track:"/track",admin:"/admin",blogs:"/blogs"}; window.history.pushState({},"",urls[s]||"/"+s); setScreen(s); }; },[]);
+  useEffect(()=>{ window._goToPage=(s)=>{ const urls={about:"/about",privacy:"/privacy",terms:"/terms",refund:"/refund",dispute:"/dispute",contact:"/contact",landing:"/",track:"/track",admin:"/admin",blogs:"/blogs","blog-list":"/blogs"}; window.history.pushState({},"",urls[s]||"/"+s); setScreen(s==="blogs"?"blog-list":s); }; },[]);
   useEffect(()=>{
     document.title = "Escara Pay | India's Trusted Payment Protection Platform";
   },[]);
