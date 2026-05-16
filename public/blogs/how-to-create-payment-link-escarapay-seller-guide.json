@@ -1,0 +1,98 @@
+{
+  "slug": "how-to-create-payment-link-escarapay-seller-guide",
+  "title": "How to Create a Secure Payment Link on EscaraPay — Step by Step",
+  "subtitle": "From registration to your first protected order in under 5 minutes",
+  "date": "May 5, 2026",
+  "dateISO": "2026-05-05",
+  "readTime": "5 min read",
+  "category": "How To",
+  "categoryColor": "#10b981",
+  "coverImage": "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=1200&q=80",
+  "metaDescription": "Step-by-step guide to creating your first secure payment link on EscaraPay. Learn how to register, create an order, and share the payment link with your buyer on WhatsApp.",
+  "content": [
+    {
+      "type": "intro",
+      "text": "Creating a secure payment link on EscaraPay takes less than 2 minutes. Once set up, you can share it directly on WhatsApp or Instagram — and your buyer's token is protected until delivery is confirmed. Here's exactly how to do it, with real screenshots."
+    },
+    {
+      "type": "heading",
+      "text": "Step 1 — Open Your Seller Dashboard & Tap '+ New Order'"
+    },
+    {
+      "type": "text",
+      "text": "Log in at escarapay.in as a Seller. On your dashboard you'll see your stats — Total Orders, Active Orders, Token Earned, and RTO Saved. Tap the blue '+ New Order' button at the top to create your first protected order."
+    },
+    {
+      "type": "image",
+      "src": "/blog-images/step1-dashboard.png",
+      "caption": "Step 1 — Seller Dashboard. Tap '+ New Order' to begin creating a secure payment link."
+    },
+    {
+      "type": "callout",
+      "text": "💡 Your dashboard shows real-time stats — Token Earned shows total tokens received, RTO Saved shows how much loss EscaraPay has protected you from."
+    },
+    {
+      "type": "heading",
+      "text": "Step 2 — Fill in Order Details"
+    },
+    {
+      "type": "text",
+      "text": "A form will appear asking for your order details. Fill in the product name, order amount, token percentage, buyer name, and buyer's WhatsApp number. EscaraPay automatically calculates the token amount the buyer will pay — with a minimum of ₹200 always applied for protection."
+    },
+    {
+      "type": "image",
+      "src": "/blog-images/step2-order-form.png",
+      "caption": "Step 2 — Fill in product name, price, token %, and buyer details. The buyer's payment amount is calculated automatically."
+    },
+    {
+      "type": "list",
+      "items": [
+        { "title": "Product Name", "desc": "Enter the exact product you discussed with buyer (e.g. 'Saree', 'iPhone 14', 'Handmade Jewellery')" },
+        { "title": "Order Amount (₹)", "desc": "Total order value agreed with buyer. E.g. ₹1,500" },
+        { "title": "Token %", "desc": "Usually 10–30%. This is the protected deposit. Minimum ₹200 is always applied." },
+        { "title": "Buyer WhatsApp", "desc": "Buyer's WhatsApp number — confirmation link will be automatically sent here after you dispatch." }
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "Step 3 — Share the Payment Link"
+    },
+    {
+      "type": "text",
+      "text": "After tapping 'Generate Link', EscaraPay creates a unique secure link like escarapay.in/pay/EP3C6DHF. You can either tap 'WhatsApp' to send it directly to your buyer's WhatsApp, or tap 'Copy' to paste it anywhere — Instagram DM, SMS, or email."
+    },
+    {
+      "type": "image",
+      "src": "/blog-images/step3-share-link.png",
+      "caption": "Step 3 — Your unique payment link is ready. Share directly on WhatsApp or copy and send anywhere."
+    },
+    {
+      "type": "callout",
+      "text": "🔐 Each payment link is unique to one order only. The buyer pays securely via UPI, card, or net banking through Cashfree — fully RBI compliant."
+    },
+    {
+      "type": "heading",
+      "text": "Step 4 — Track & Confirm Delivery"
+    },
+    {
+      "type": "text",
+      "text": "Once the buyer pays the token, your order status changes to 'Token Paid'. Ship the product and mark it as dispatched in your dashboard with the courier tracking number. The buyer receives an automatic confirmation link. When they confirm delivery, your payout is released. The order screen shows the complete journey — Created → Token Paid → Dispatched → Delivered."
+    },
+    {
+      "type": "image",
+      "src": "/blog-images/step4-track-confirm.png",
+      "caption": "Step 4 — Track the full order journey. Once delivered and confirmed, your token payout is released automatically."
+    },
+    {
+      "type": "checklist",
+      "items": [
+        "Register at escarapay.in as Seller (free, 2 min)",
+        "Tap '+ New Order' and fill buyer + product details",
+        "Share payment link via WhatsApp button",
+        "Ship after 'Token Paid' status appears",
+        "Enter tracking number and mark as Dispatched",
+        "Receive payout after buyer confirms delivery"
+      ]
+    }
+  ]
+}

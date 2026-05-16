@@ -1,0 +1,68 @@
+{
+  "slug": "how-to-protect-yourself-from-fraud-in-whatsapp-selling",
+  "title": "How to Protect Yourself from Fraud in WhatsApp & Instagram Selling",
+  "subtitle": "Real stories, real risks — and how EscaraPay keeps your money safe",
+  "date": "April 15, 2026",
+  "dateISO": "2026-04-15",
+  "readTime": "5 min read",
+  "category": "Seller Safety",
+  "categoryColor": "#ef4444",
+  "coverImage": "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=1200&q=80",
+  "metaDescription": "Learn how to protect yourself from WhatsApp and Instagram selling fraud. Discover the 5 most common scams and how EscaraPay's token system keeps your money safe.",
+  "content": [
+    {
+      "type": "intro",
+      "text": "In India's booming social commerce space, millions of sellers use WhatsApp and Instagram to run their businesses. But with opportunity comes risk — fraud, fake payments, and disputes are at an all-time high. This guide will help you understand the threats and protect yourself."
+    },
+    {
+      "type": "image",
+      "src": "https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?w=900&q=80",
+      "caption": "Social commerce sellers face unique fraud risks every day"
+    },
+    {
+      "type": "heading",
+      "text": "🚨 The 5 Most Common Scams"
+    },
+    {
+      "type": "list",
+      "items": [
+        { "title": "Fake Payment Screenshots", "desc": "Buyers send edited UPI/NEFT screenshots claiming they've paid. The money never arrives." },
+        { "title": "Chargeback Fraud", "desc": "After receiving the product, buyers dispute the payment with their bank, getting a refund while keeping the goods." },
+        { "title": "Return Fraud", "desc": "Buyer claims the item is defective, returns a different or damaged item, and demands a full refund." },
+        { "title": "Disappearing Buyers", "desc": "After negotiating and agreeing on a deal, the buyer simply stops responding once they get the product." },
+        { "title": "Fake Seller Scam", "desc": "Sellers collect advance payments from multiple buyers and disappear without shipping anything." }
+      ]
+    },
+    {
+      "type": "image",
+      "src": "https://images.unsplash.com/photo-1563013544-824ae1b704d3?w=900&q=80",
+      "caption": "Token-based payment protection ensures both parties are safe"
+    },
+    {
+      "type": "heading",
+      "text": "✅ How EscaraPay Solves This"
+    },
+    {
+      "type": "text",
+      "text": "EscaraPay uses a token-based payment protection system. The buyer pays a token (10–30% of the order value) through our secure Cashfree-powered gateway. The funds are held safely — neither the buyer nor seller can access them. After the seller dispatches and the buyer confirms receipt, the payment is released. If there's a dispute, our team reviews evidence from both parties and makes a fair decision."
+    },
+    {
+      "type": "callout",
+      "text": "💡 Pro Tip: Always use EscaraPay for orders above ₹500. For smaller amounts, the peace of mind is worth every rupee."
+    },
+    {
+      "type": "heading",
+      "text": "📋 Checklist for Safe Selling"
+    },
+    {
+      "type": "checklist",
+      "items": [
+        "Always use a verified payment protection platform",
+        "Never accept payment screenshots as proof of payment",
+        "Keep delivery tracking numbers for all shipments",
+        "Document the product condition before shipping",
+        "Use EscaraPay's one-click buyer confirmation link"
+      ]
+    }
+  ]
+}

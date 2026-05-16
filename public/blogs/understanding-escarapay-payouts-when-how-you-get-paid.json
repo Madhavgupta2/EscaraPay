@@ -1,0 +1,108 @@
+{
+  "slug": "understanding-escarapay-payouts-when-how-you-get-paid",
+  "title": "Understanding EscaraPay Payouts: When and How You Get Paid",
+  "subtitle": "Everything sellers need to know about receiving payments, UTR numbers, and payout timelines",
+  "date": "May 3, 2026",
+  "dateISO": "2026-05-03",
+  "readTime": "4 min read",
+  "category": "Seller Guide",
+  "categoryColor": "#8b5cf6",
+  "coverImage": "https://images.unsplash.com/photo-1563013544-824ae1b704d3?w=1200&q=80",
+  "metaDescription": "Learn exactly when and how EscaraPay pays sellers. Understand the payout tab, UTR numbers, commission structure, and what happens after buyer confirms delivery.",
+  "content": [
+    {
+      "type": "intro",
+      "text": "One of the most common questions from EscaraPay sellers is — 'When will I get paid?' This guide explains exactly how our payout system works, what the Payouts tab shows, and what to expect after each order is delivered."
+    },
+    {
+      "type": "heading",
+      "text": "💰 How the Payout Process Works"
+    },
+    {
+      "type": "list",
+      "items": [
+        { "title": "Buyer pays token", "desc": "Buyer pays token via Cashfree (UPI/card/net banking). Funds are held by EscaraPay." },
+        { "title": "Seller dispatches", "desc": "Seller marks order as dispatched with tracking number. Token remains held." },
+        { "title": "Buyer confirms delivery", "desc": "Buyer taps the confirmation link — or 14 days pass with no response — token releases." },
+        { "title": "Admin transfers payout", "desc": "EscaraPay admin manually transfers the amount to seller's UPI ID within 24 hours." },
+        { "title": "Seller receives UTR", "desc": "Seller gets an email with UTR number and amount for their records." }
+      ]
+    },
+    {
+      "type": "image",
+      "src": "https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=900&q=80",
+      "caption": "EscaraPay payouts are processed manually by admin within 24 hours"
+    },
+    {
+      "type": "heading",
+      "text": "📊 Understanding the Payouts Tab"
+    },
+    {
+      "type": "text",
+      "text": "In your Seller Dashboard, the Payouts tab shows all your completed orders with their payout status. Each row shows the order ID, product name, token amount, and whether the payout is 'Pending' or 'Paid'."
+    },
+    {
+      "type": "image",
+      "src": "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=900&q=80",
+      "caption": "The Payouts tab shows all completed orders and their payment status"
+    },
+    {
+      "type": "heading",
+      "text": "💸 What Is the Commission?"
+    },
+    {
+      "type": "text",
+      "text": "EscaraPay charges a 5% commission on the token amount as a service fee. Additionally, the buyer pays a ~2% Cashfree gateway fee on top of the token. Here's a clear example:"
+    },
+    {
+      "type": "list",
+      "items": [
+        { "title": "Order Value", "desc": "₹1,000" },
+        { "title": "Token (20%)", "desc": "₹200 — buyer pays this upfront" },
+        { "title": "EscaraPay Commission (5%)", "desc": "₹10 deducted from token" },
+        { "title": "Seller Receives", "desc": "₹190 — transferred to your UPI ID" },
+        { "title": "Remaining (₹800)", "desc": "Collected directly from buyer by seller at delivery" }
+      ]
+    },
+    {
+      "type": "callout",
+      "text": "💡 The token is just a security deposit — the remaining 80% of the order value is your direct deal with the buyer. EscaraPay only handles the token portion."
+    },
+    {
+      "type": "heading",
+      "text": "⏰ Payout Timeline"
+    },
+    {
+      "type": "list",
+      "items": [
+        { "title": "Buyer confirms delivery", "desc": "Payout triggered immediately — admin notified" },
+        { "title": "14 days no response", "desc": "Auto-release — payout triggered automatically" },
+        { "title": "Admin processes payment", "desc": "Within 24 hours of trigger (usually same day)" },
+        { "title": "You receive UTR email", "desc": "Confirmation with bank reference number" },
+        { "title": "Money in your account", "desc": "Instant for UPI, 1-2 hours for bank" }
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "🔍 What is a UTR Number?"
+    },
+    {
+      "type": "text",
+      "text": "UTR stands for Unique Transaction Reference. It's a 12-22 digit number that uniquely identifies every bank/UPI transfer in India. When EscaraPay pays you, the UTR is sent in your payout email. You can use this number to verify the transfer with your bank if needed. In your dashboard Payouts tab, you can copy the UTR with one tap."
+    },
+    {
+      "type": "heading",
+      "text": "❓ What If I Haven't Received My Payout?"
+    },
+    {
+      "type": "checklist",
+      "items": [
+        "Check the Payouts tab — is status 'Paid' or 'Pending'?",
+        "If 'Pending' — buyer may not have confirmed yet (wait or remind them)",
+        "If 'Paid' — check your email for the UTR number",
+        "Verify the UTR with your bank or UPI app",
+        "Still not received? Email support@escarapay.in with your order ID"
+      ]
+    }
+  ]
+}

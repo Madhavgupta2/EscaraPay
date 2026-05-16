@@ -46,217 +46,34 @@ const updateMeta = ({ title, description, url, image }) => {
   setMeta("twitter:card", "summary_large_image");
 };
 
-// ── Blog Posts Data ──
-const BLOG_POSTS = [
-  {
-    slug: "how-to-protect-yourself-from-fraud-in-whatsapp-selling",
-    title: "How to Protect Yourself from Fraud in WhatsApp & Instagram Selling",
-    subtitle: "Real stories, real risks — and how EscaraPay keeps your money safe",
-    date: "April 15, 2026",
-    readTime: "5 min read",
-    category: "Seller Safety",
-    categoryColor: "#ef4444",
-    coverImage: "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=1200&q=80",
-    excerpt: "Every day, thousands of WhatsApp and Instagram sellers lose money to buyers who disappear after receiving products. Here's how to stop it.",
-    content: [
-      {
-        type: "intro",
-        text: "In India's booming social commerce space, millions of sellers use WhatsApp and Instagram to run their businesses. But with opportunity comes risk — fraud, fake payments, and disputes are at an all-time high. This guide will help you understand the threats and protect yourself.",
-      },
-      {
-        type: "image",
-        src: "https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?w=900&q=80",
-        caption: "Social commerce sellers face unique fraud risks",
-      },
-      {
-        type: "heading",
-        text: "🚨 The 5 Most Common Scams",
-      },
-      {
-        type: "list",
-        items: [
-          { title: "Fake Payment Screenshots", desc: "Buyers send edited UPI/NEFT screenshots claiming they've paid. The money never arrives." },
-          { title: "Chargeback Fraud", desc: "After receiving the product, buyers dispute the payment with their bank, getting a refund while keeping the goods." },
-          { title: "Return Fraud", desc: "Buyer claims the item is defective, returns a different/damaged item, and demands a full refund." },
-          { title: "Disappearing Buyers", desc: "After negotiating and agreeing on a deal, the buyer simply stops responding once they get the product." },
-          { title: "Fake Seller Scam", desc: "Sellers collect advance payments from multiple buyers and disappear without shipping." },
-        ],
-      },
-      {
-        type: "image",
-        src: "https://images.unsplash.com/photo-1563013544-824ae1b704d3?w=900&q=80",
-        caption: "Token-based payment protection ensures both parties are safe",
-      },
-      {
-        type: "heading",
-        text: "✅ How EscaraPay Solves This",
-      },
-      {
-        type: "text",
-        text: "EscaraPay uses a token-based payment protection system. Here's how it works: The buyer pays a token (10-30% of the order value) through our secure Cashfree-powered gateway. The funds are held safely — neither the buyer nor seller can access them. After the seller dispatches and the buyer confirms receipt, the payment is released. If there's a dispute, our team reviews evidence from both parties and makes a fair decision.",
-      },
-      {
-        type: "callout",
-        text: "💡 Pro Tip: Always use EscaraPay for orders above ₹500. For smaller amounts, the peace of mind is worth every rupee.",
-      },
-      {
-        type: "heading",
-        text: "📋 Checklist for Safe Selling",
-      },
-      {
-        type: "checklist",
-        items: [
-          "Always use a verified payment protection platform",
-          "Never accept payment screenshots as proof of payment",
-          "Keep delivery tracking numbers for all shipments",
-          "Document the product condition before shipping",
-          "Use EscaraPay's one-click buyer confirmation link",
-        ],
-      },
-    ],
-  },
-  {
-    slug: "why-token-payments-are-future-of-social-commerce-india",
-    title: "Why Token-Based Payments Are the Future of Social Commerce in India",
-    subtitle: "How a small upfront deposit changes everything for buyers and sellers",
-    date: "April 10, 2026",
-    readTime: "4 min read",
-    category: "Industry Insights",
-    categoryColor: "#0ea5e9",
-    coverImage: "https://images.unsplash.com/photo-1556742031-c6961e8560b0?w=1200&q=80",
-    excerpt: "India has 200M+ social commerce users. But trust remains the #1 problem. Token payments are changing the game — here's why.",
-    content: [
-      {
-        type: "intro",
-        text: "India's social commerce market is expected to reach $70 billion by 2030. But one thing holds it back — trust. Buyers don't trust sellers, sellers don't trust buyers, and everyone loses. Token-based payment protection is the solution the market has been waiting for.",
-      },
-      {
-        type: "image",
-        src: "https://images.unsplash.com/photo-1620714223084-8fcacc2dfd4d?w=900&q=80",
-        caption: "India's social commerce market is booming — but trust remains a challenge",
-      },
-      {
-        type: "heading",
-        text: "📊 The Trust Problem in Numbers",
-      },
-      {
-        type: "list",
-        items: [
-          { title: "67% of buyers", desc: "have been cheated by online sellers at least once" },
-          { title: "45% of sellers", desc: "have experienced payment fraud or non-payment" },
-          { title: "₹3,200 Cr+", desc: "lost to online fraud in India in 2023 alone" },
-          { title: "80% of disputes", desc: "could be prevented with proper payment protection" },
-        ],
-      },
-      {
-        type: "image",
-        src: "https://images.unsplash.com/photo-1556742393-d75f468bfcb0?w=900&q=80",
-        caption: "Secure payment gateways build trust in digital transactions",
-      },
-      {
-        type: "heading",
-        text: "🔐 How Token Payments Work",
-      },
-      {
-        type: "text",
-        text: "A token payment is a small percentage (usually 10-30%) paid upfront by the buyer before the seller ships. This token is held securely — the seller knows the buyer is serious, and the buyer knows their money is protected. Once delivery is confirmed, the token is released. It's a simple concept that builds trust instantly.",
-      },
-      {
-        type: "callout",
-        text: "🏆 EscaraPay processes tokens via Cashfree's RBI-authorized payment gateway — your money is always regulated and safe.",
-      },
-      {
-        type: "heading",
-        text: "🚀 Why This Is the Future",
-      },
-      {
-        type: "text",
-        text: "As social commerce grows in Tier 2 and Tier 3 cities, the need for simple, mobile-first payment protection becomes critical. EscaraPay is built specifically for this — no complex onboarding, no bank accounts required for buyers, and WhatsApp-native sharing for sellers. The future of India's social commerce depends on trust, and token payments deliver exactly that.",
-      },
-    ],
-  },
-  {
-    slug: "instagram-seller-guide-grow-business-safely-2026",
-    title: "The Complete Instagram Seller Guide: Grow Your Business Safely in 2026",
-    subtitle: "From building trust to getting paid — everything an Instagram seller needs to know",
-    date: "April 5, 2026",
-    readTime: "6 min read",
-    category: "Seller Guide",
-    categoryColor: "#8b5cf6",
-    coverImage: "https://images.unsplash.com/photo-1611162617474-5b21e879e113?w=1200&q=80",
-    excerpt: "Instagram has 500M+ active users in India. Here's how to build a profitable, secure selling business on the platform in 2026.",
-    content: [
-      {
-        type: "intro",
-        text: "Instagram has become India's #1 social selling platform. From handmade jewellery to ethnic wear, electronics to home decor — millions of sellers are building profitable businesses. But without proper systems, it can quickly become chaotic and risky. This guide covers everything you need.",
-      },
-      {
-        type: "image",
-        src: "https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?w=900&q=80",
-        caption: "Instagram has become India's premier social commerce platform",
-      },
-      {
-        type: "heading",
-        text: "📱 Setting Up Your Instagram Store",
-      },
-      {
-        type: "list",
-        items: [
-          { title: "Switch to a Business Account", desc: "Get access to analytics, contact buttons, and Instagram Shopping features." },
-          { title: "Perfect Your Bio", desc: "Include what you sell, your location, delivery info, and your EscaraPay link." },
-          { title: "Use Story Highlights", desc: "Create highlights for Products, Reviews, How to Order, and FAQs." },
-          { title: "Post Consistently", desc: "3-4 posts per week minimum. Use Reels for maximum organic reach." },
-        ],
-      },
-      {
-        type: "image",
-        src: "https://images.unsplash.com/photo-1523474253046-8cd2748b5fd2?w=900&q=80",
-        caption: "Professional product photography dramatically increases sales",
-      },
-      {
-        type: "heading",
-        text: "💰 Getting Paid Safely",
-      },
-      {
-        type: "text",
-        text: "The biggest mistake Instagram sellers make is accepting direct UPI payments without any protection. This leaves both buyer and seller vulnerable. EscaraPay solves this — create an order in 2 minutes, share the payment link on WhatsApp or Instagram DM, and the buyer pays a protected token. You dispatch once the token is secured. Simple, safe, professional.",
-      },
-      {
-        type: "callout",
-        text: "⭐ Top sellers on Instagram report 40% fewer payment disputes after switching to EscaraPay's payment protection system.",
-      },
-      {
-        type: "heading",
-        text: "📦 Delivery Best Practices",
-      },
-      {
-        type: "checklist",
-        items: [
-          "Always get a tracking number — use Delhivery, Shiprocket, or DTDC",
-          "Pack products with visible invoice and your business name",
-          "Send the EscaraPay confirmation link along with the tracking number",
-          "Photograph the packed product before shipping",
-          "Follow up with the buyer once the courier marks delivery",
-        ],
-      },
-      {
-        type: "image",
-        src: "https://images.unsplash.com/photo-1566576912321-d58ddd7a6088?w=900&q=80",
-        caption: "Professional packaging builds buyer trust and reduces return rates",
-      },
-      {
-        type: "heading",
-        text: "📈 Scaling Your Business",
-      },
-      {
-        type: "text",
-        text: "Once you have consistent orders, focus on reviews. Ask every happy buyer to send a review screenshot for your Story Highlights. Use EscaraPay's order history to track your GMV and commission data. Set targets — 10 orders/month, then 50, then 100. With proper payment protection, you can confidently take orders from strangers nationwide.",
-      },
-    ],
-  },
-];
+// ── Blog system — fetched from public/blogs/ ──
+// To add new blog: create public/blogs/your-slug.json + update public/blogs/registry.json
+// No App.js changes needed!
+const BLOG_CACHE = {}; // runtime cache
+
+const fetchRegistry = async () => {
+  if (BLOG_CACHE._registry) return BLOG_CACHE._registry;
+  try {
+    const r = await fetch("/blogs/registry.json");
+    const data = await r.json();
+    BLOG_CACHE._registry = data;
+    return data;
+  } catch { return []; }
+};
+
+const fetchBlogPost = async (slug) => {
+  if (BLOG_CACHE[slug]) return BLOG_CACHE[slug];
+  try {
+    const r = await fetch(`/blogs/${slug}.json`);
+    if (!r.ok) return null;
+    const data = await r.json();
+    BLOG_CACHE[slug] = data;
+    return data;
+  } catch { return null; }
+};
 
 // Language translations
+
 const T = {
   en: {
     tagline: "India's Trusted Payment Protection Platform",
@@ -3226,7 +3043,7 @@ function SellerDB({ user, userId, onLogout, dark, onToggle }) {
         {page==="payouts" && (
           <div className="fu">
             <h1 className="syne" style={{fontSize:"clamp(18px,3vw,26px)",fontWeight:800,marginBottom:6}}>Payout History 🏦</h1>
-            <p style={{color:"var(--muted)",fontSize:13,marginBottom:22}}>Sirf released/delivered orders — tumhe jo paisa mila</p>
+            <p style={{color:"var(--muted)",fontSize:13,marginBottom:22}}>All released & delivered orders — payments you have received</p>
 
             {/* Summary */}
             {(() => {
@@ -3259,7 +3076,7 @@ function SellerDB({ user, userId, onLogout, dark, onToggle }) {
             {/* Released Payouts Table */}
             <div className="card" style={{marginBottom:16}}>
               <h3 className="syne" style={{fontWeight:700,fontSize:15,marginBottom:4}}>✅ Released Payouts</h3>
-              <p style={{color:"var(--muted)",fontSize:12,marginBottom:16}}>Delivered + Buyer Cancel orders (token tumhare paas)</p>
+              <p style={{color:"var(--muted)",fontSize:12,marginBottom:16}}>Delivered & buyer-cancelled orders — tokens credited to you</p>
               {orders.filter(o=>["delivered","cancelled_buyer"].includes(o.status)).length === 0 ? (
                 <div style={{textAlign:"center",padding:30,color:"var(--muted)"}}>
                   <div style={{fontSize:36,marginBottom:8}}>💸</div>
@@ -3350,7 +3167,7 @@ function SellerDB({ user, userId, onLogout, dark, onToggle }) {
                     <div style={{fontFamily:"monospace",color:"var(--gold)",fontSize:11,marginBottom:2}}>{o.id}</div>
                     <div style={{fontWeight:600,fontSize:14}}>{o.product_name}</div>
                     <div style={{fontSize:13,color:"var(--muted)",marginTop:3}}>
-                      Token: ₹{o.token_amount} → <strong style={{color:"var(--green)"}}>Aapko: ₹{o.seller_receives}</strong>
+                      Token: ₹{o.token_amount} → <strong style={{color:"var(--green)"}}>You Received: ₹{o.seller_receives}</strong>
                     </div>
                   </div>
                   <div>{o.payout_status==="paid"?<span className="badge bg">✅ Payment Received</span>:<span className="badge borange">⏳ Payment Pending</span>}</div>
@@ -4158,27 +3975,62 @@ function UserDetailModal({ user, adminKey, onClose, onUpdate }) {
               ? <div style={{textAlign:"center",padding:30,color:"var(--muted)"}}>⏳ Loading orders...</div>
               : userOrders.length===0
                 ? <div style={{textAlign:"center",padding:30,color:"var(--muted)"}}>No orders found</div>
-                : <div style={{overflowX:"auto"}}>
-                    <table className="tbl">
-                      <thead><tr><th>ID</th><th>Product</th><th>Amount</th><th>Token</th><th>Status</th><th>Payout</th><th>Date</th></tr></thead>
-                      <tbody>{userOrders.map(o=>(
-                        <tr key={o.id}>
-                          <td style={{fontFamily:"monospace",color:"var(--gold)",fontSize:11}}>{o.id}</td>
-                          <td style={{fontSize:12}}>{o.product_name}</td>
-                          <td style={{fontSize:12,fontWeight:600}}>₹{o.order_amount}</td>
-                          <td style={{fontSize:12,color:"var(--green)"}}>₹{o.token_amount}</td>
-                          <td><Bdg status={o.status} /></td>
-                          <td>
-                            {["delivered","cancelled_buyer"].includes(o.status) ? (
-                              o.payout_status === "paid"
-                                ? <span className="badge bg" style={{fontSize:10}}>✅ Paid</span>
-                                : <span className="badge borange" style={{fontSize:10}}>⏳ Pending</span>
-                            ) : "—"}
-                          </td>
-                          <td style={{fontSize:11,color:"var(--muted)"}}>{(o.created_at||"").split("T")[0]}</td>
-                        </tr>
-                      ))}</tbody>
-                    </table>
+                : <div style={{display:"flex",flexDirection:"column",gap:10}}>
+                    {userOrders.map(o=>(
+                      <div key={o.id} style={{background:"var(--sf2)",borderRadius:12,padding:14,border:"1px solid var(--border)"}}>
+                        {/* Top row */}
+                        <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:10}}>
+                          <div>
+                            <div style={{fontFamily:"monospace",color:"var(--gold)",fontSize:11,marginBottom:2}}>{o.id}</div>
+                            <div style={{fontWeight:700,fontSize:14}}>{o.product_name}</div>
+                            <div style={{fontSize:11,color:"var(--muted)",marginTop:2}}>{(o.created_at||"").split("T")[0]}</div>
+                          </div>
+                          <div style={{textAlign:"right"}}>
+                            <Bdg status={o.status} />
+                            <div style={{fontSize:13,fontWeight:700,color:"var(--green)",marginTop:4}}>₹{o.token_amount}</div>
+                            <div style={{fontSize:11,color:"var(--muted)"}}>of ₹{o.order_amount}</div>
+                          </div>
+                        </div>
+                        {/* Buyer info */}
+                        <div style={{background:"rgba(14,165,233,.06)",border:"1px solid rgba(14,165,233,.15)",borderRadius:8,padding:"10px 12px",marginBottom:8}}>
+                          <div style={{fontSize:11,fontWeight:700,color:"var(--gold)",marginBottom:6}}>👤 Buyer</div>
+                          <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",flexWrap:"wrap",gap:6}}>
+                            <div>
+                              <div style={{fontSize:13,fontWeight:600}}>{o.buyer_name||"Not provided"}</div>
+                              {o.buyer_phone && (
+                                <div style={{fontSize:12,color:"var(--muted)",marginTop:2,fontFamily:"monospace"}}>{o.buyer_phone}</div>
+                              )}
+                            </div>
+                            {o.buyer_phone && (
+                              <a href={`https://wa.me/91${o.buyer_phone.replace(/\D/g,"")}`}
+                                target="_blank" rel="noreferrer"
+                                style={{display:"flex",alignItems:"center",gap:5,background:"#25D366",color:"#fff",padding:"5px 10px",borderRadius:7,textDecoration:"none",fontSize:12,fontWeight:600}}>
+                                💬 WhatsApp
+                              </a>
+                            )}
+                          </div>
+                        </div>
+                        {/* Tracking + payout */}
+                        <div style={{display:"flex",gap:8,flexWrap:"wrap"}}>
+                          {o.tracking_number && (
+                            <div style={{fontSize:11,background:"var(--surface)",border:"1px solid var(--border)",borderRadius:6,padding:"4px 8px"}}>
+                              📦 {o.tracking_number}
+                            </div>
+                          )}
+                          {["delivered","cancelled_buyer"].includes(o.status) && (
+                            <div style={{fontSize:11,padding:"4px 8px",borderRadius:6,background:o.payout_status==="paid"?"rgba(16,185,129,.1)":"rgba(251,146,60,.1)",border:`1px solid ${o.payout_status==="paid"?"rgba(16,185,129,.3)":"rgba(251,146,60,.3)"}`,color:o.payout_status==="paid"?"var(--green)":"#f97316",fontWeight:600}}>
+                              {o.payout_status==="paid"?"✅ Paid":"⏳ Payout Pending"}
+                            </div>
+                          )}
+                          {o.confirm_token && o.status==="dispatched" && (
+                            <button className="btn-ghost" style={{fontSize:11,padding:"4px 8px"}}
+                              onClick={()=>navigator.clipboard?.writeText(`https://escarapay.in/confirm/${o.confirm_token}`)}>
+                              🔗 Copy Confirm Link
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                    ))}
                   </div>
             }
           </div>
@@ -4469,10 +4321,31 @@ function AdminPanel({ adminKey: propKey, onLogout, dark, onToggle }) {
             {loading ? <div style={{textAlign:"center",padding:30,color:"var(--muted)"}}>⏳ Loading...</div> : (
               <div className="card" style={{padding:0,overflowX:"auto"}}>
                 <table className="tbl">
-                  <thead><tr><th>Order ID</th><th>Date</th><th>Seller</th><th>Buyer</th><th>Product</th><th>Amount</th><th>Token</th><th>Commission</th><th>Status</th><th>Receipt</th></tr></thead>
+                  <thead><tr><th>Order ID</th><th>Date</th><th>Seller</th><th>Buyer</th><th>Buyer Phone</th><th>Product</th><th>Amount</th><th>Token</th><th>Commission</th><th>Status</th><th>Receipt</th></tr></thead>
                   <tbody>
-                    {filteredOrders.length===0?<tr><td colSpan={10} style={{textAlign:"center",color:"var(--muted)",padding:30}}>No orders found</td></tr>:filteredOrders.map(o=>(
-                      <tr key={o.id}><td><span style={{fontFamily:"monospace",color:"var(--gold)",fontSize:11}}>{o.id}</span></td><td style={{fontSize:11,color:"var(--muted)"}}>{(o.created_at||"").split("T")[0]}</td><td style={{fontSize:12}}>{o.seller_name||"—"}</td><td style={{fontSize:12}}>{o.buyer_name||"—"}</td><td style={{fontSize:12,color:"var(--muted)"}}>{o.product_name}</td><td style={{fontWeight:600,fontSize:12}}>₹{o.order_amount}</td><td style={{color:"var(--green)",fontWeight:600,fontSize:12}}>₹{o.token_amount}</td><td style={{color:"var(--blue)",fontSize:12}}>₹{o.escara_commission||0}</td><td><Bdg status={o.status} /></td><td>{["token_paid","dispatched","delivered"].includes(o.status)&&<button className="btn-ghost" style={{padding:"3px 8px",fontSize:11}} onClick={()=>downloadReceipt(o,"admin")}>📄</button>}</td></tr>
+                    {filteredOrders.length===0?<tr><td colSpan={11} style={{textAlign:"center",color:"var(--muted)",padding:30}}>No orders found</td></tr>:filteredOrders.map(o=>(
+                      <tr key={o.id}>
+                        <td><span style={{fontFamily:"monospace",color:"var(--gold)",fontSize:11}}>{o.id}</span></td>
+                        <td style={{fontSize:11,color:"var(--muted)"}}>{(o.created_at||"").split("T")[0]}</td>
+                        <td style={{fontSize:12}}>{o.seller_name||"—"}</td>
+                        <td style={{fontSize:12}}>{o.buyer_name||"—"}</td>
+                        <td style={{fontSize:12}}>
+                          {o.buyer_phone
+                            ? <a href={`https://wa.me/91${o.buyer_phone.replace(/\D/g,"")}`} target="_blank" rel="noreferrer"
+                                style={{color:"#25D366",textDecoration:"none",fontFamily:"monospace",fontWeight:600}}
+                                title="Open WhatsApp">
+                                💬 {o.buyer_phone}
+                              </a>
+                            : <span style={{color:"var(--muted)"}}>—</span>
+                          }
+                        </td>
+                        <td style={{fontSize:12,color:"var(--muted)"}}>{o.product_name}</td>
+                        <td style={{fontWeight:600,fontSize:12}}>₹{o.order_amount}</td>
+                        <td style={{color:"var(--green)",fontWeight:600,fontSize:12}}>₹{o.token_amount}</td>
+                        <td style={{color:"var(--blue)",fontSize:12}}>₹{o.escara_commission||0}</td>
+                        <td><Bdg status={o.status} /></td>
+                        <td>{["token_paid","dispatched","delivered"].includes(o.status)&&<button className="btn-ghost" style={{padding:"3px 8px",fontSize:11}} onClick={()=>downloadReceipt(o,"admin")}>📄</button>}</td>
+                      </tr>
                     ))}
                   </tbody>
                 </table>
@@ -5177,9 +5050,13 @@ function ContactPage({ onBack, dark, onToggle }) {
 
 /* ══════════ BLOG LIST PAGE ══════════ */
 function BlogListPage({ dark, onToggle, onGoHome, onReadPost }) {
+  const [posts, setPosts] = useState([]);
+  const [loading, setLoading] = useState(true);
+
   useEffect(()=>{
     window.scrollTo({top:0,behavior:"instant"});
     updateMeta({title:"EscaraPay Blog | Payment Protection Tips for Indian Sellers",description:"Learn how to protect yourself from fraud, grow your WhatsApp/Instagram business safely.",url:"https://escarapay.in/blogs"});
+    fetchRegistry().then(data=>{ setPosts(data); setLoading(false); });
   },[]);
   return (
     <div style={{minHeight:"100vh"}}>
@@ -5190,28 +5067,35 @@ function BlogListPage({ dark, onToggle, onGoHome, onReadPost }) {
           <h1 className="syne" style={{fontWeight:900,fontSize:"clamp(26px,5vw,40px)",marginTop:12,marginBottom:10}}>Payment Protection Insights</h1>
           <p style={{color:"var(--muted)",fontSize:15,maxWidth:500,margin:"0 auto"}}>Tips, guides and industry insights for India's WhatsApp & Instagram sellers.</p>
         </div>
-        <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(280px,1fr))",gap:24}}>
-          {BLOG_POSTS.map(post=>(
-            <div key={post.slug} style={{background:"var(--surface)",border:"1px solid var(--border)",borderRadius:18,overflow:"hidden",cursor:"pointer",transition:"transform .2s,box-shadow .2s"}}
-              onMouseEnter={e=>{e.currentTarget.style.transform="translateY(-4px)";e.currentTarget.style.boxShadow="0 12px 40px rgba(0,0,0,.15)";}}
-              onMouseLeave={e=>{e.currentTarget.style.transform="";e.currentTarget.style.boxShadow="";}}
-              onClick={()=>onReadPost(post.slug)}>
-              <img src={post.coverImage} alt={post.title} style={{width:"100%",height:190,objectFit:"cover"}} loading="lazy"/>
-              <div style={{padding:"18px 20px 22px"}}>
-                <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:10}}>
-                  <span style={{background:post.categoryColor+"22",color:post.categoryColor,fontSize:11,fontWeight:700,padding:"3px 10px",borderRadius:20}}>{post.category}</span>
-                  <span style={{fontSize:11,color:"var(--muted)"}}>{post.readTime}</span>
-                </div>
-                <h2 className="syne" style={{fontWeight:800,fontSize:16,lineHeight:1.35,marginBottom:8}}>{post.title}</h2>
-                <p style={{fontSize:13,color:"var(--muted)",lineHeight:1.6,marginBottom:14}}>{post.excerpt}</p>
-                <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}>
-                  <span style={{fontSize:11,color:"var(--muted)"}}>{post.date}</span>
-                  <span style={{fontSize:13,color:"var(--gold)",fontWeight:600}}>Read →</span>
+        {loading ? (
+          <div style={{textAlign:"center",padding:60}}>
+            <div style={{width:40,height:40,border:"3px solid var(--gold)",borderTopColor:"transparent",borderRadius:"50%",animation:"spin .8s linear infinite",margin:"0 auto 16px"}}/>
+            <div style={{color:"var(--muted)"}}>Loading posts...</div>
+          </div>
+        ) : (
+          <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(280px,1fr))",gap:24}}>
+            {posts.map(post=>(
+              <div key={post.slug} style={{background:"var(--surface)",border:"1px solid var(--border)",borderRadius:18,overflow:"hidden",cursor:"pointer",transition:"transform .2s,box-shadow .2s"}}
+                onMouseEnter={e=>{e.currentTarget.style.transform="translateY(-4px)";e.currentTarget.style.boxShadow="0 12px 40px rgba(0,0,0,.15)";}}
+                onMouseLeave={e=>{e.currentTarget.style.transform="";e.currentTarget.style.boxShadow="";}}
+                onClick={()=>onReadPost(post.slug)}>
+                <img src={post.coverImage} alt={post.title} style={{width:"100%",height:190,objectFit:"cover"}} loading="lazy"/>
+                <div style={{padding:"18px 20px 22px"}}>
+                  <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:10}}>
+                    <span style={{background:post.categoryColor+"22",color:post.categoryColor,fontSize:11,fontWeight:700,padding:"3px 10px",borderRadius:20}}>{post.category}</span>
+                    <span style={{fontSize:11,color:"var(--muted)"}}>{post.readTime}</span>
+                  </div>
+                  <h2 className="syne" style={{fontWeight:800,fontSize:16,lineHeight:1.35,marginBottom:8}}>{post.title}</h2>
+                  <p style={{fontSize:13,color:"var(--muted)",lineHeight:1.6,marginBottom:14}}>{post.excerpt}</p>
+                  <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+                    <span style={{fontSize:11,color:"var(--muted)"}}>{post.date}</span>
+                    <span style={{fontSize:13,color:"var(--gold)",fontWeight:600}}>Read →</span>
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
       </div>
       <LegalFooter onNav={s=>{ if(s==="landing") onGoHome(); else window._goToPage(s); }}/>
     </div>
@@ -5220,11 +5104,32 @@ function BlogListPage({ dark, onToggle, onGoHome, onReadPost }) {
 
 /* ══════════ BLOG POST PAGE ══════════ */
 function BlogPostPage({ slug, dark, onToggle, onGoHome, onBlogList }) {
-  const post = BLOG_POSTS.find(p=>p.slug===slug);
+  const [post, setPost] = useState(null);
+  const [loading, setLoading] = useState(true);
+
   useEffect(()=>{
     window.scrollTo({top:0,behavior:"instant"});
-    if(post) updateMeta({title:`${post.title} | EscaraPay Blog`,description:post.excerpt,url:`https://escarapay.in/blogs/${post.slug}`,image:post.coverImage});
-  },[post]);
+    setLoading(true);
+    fetchBlogPost(slug).then(data=>{
+      setPost(data);
+      setLoading(false);
+      if(data) updateMeta({
+        title:`${data.title} | EscaraPay Blog`,
+        description: data.metaDescription || data.excerpt,
+        url:`https://escarapay.in/blogs/${data.slug}`,
+        image: data.coverImage
+      });
+    });
+  },[slug]);
+  if(loading) return (
+    <div style={{minHeight:"100vh"}}>
+      <nav className="nav"><Logo onClick={onGoHome}/><ThemeToggle dark={dark} onToggle={onToggle}/></nav>
+      <div style={{textAlign:"center",padding:80}}>
+        <div style={{width:44,height:44,border:"3px solid var(--gold)",borderTopColor:"transparent",borderRadius:"50%",animation:"spin .8s linear infinite",margin:"0 auto 16px"}}/>
+        <div style={{color:"var(--muted)"}}>Loading post...</div>
+      </div>
+    </div>
+  );
   if(!post) return (
     <div style={{minHeight:"100vh"}}>
       <nav className="nav"><Logo onClick={onGoHome}/><ThemeToggle dark={dark} onToggle={onToggle}/></nav>
@@ -5249,9 +5154,22 @@ function BlogPostPage({ slug, dark, onToggle, onGoHome, onBlogList }) {
           if(block.type==="text") return <p key={i} style={{fontSize:15,lineHeight:1.85,marginBottom:24}}>{block.text}</p>;
           if(block.type==="heading") return <h2 key={i} className="syne" style={{fontWeight:800,fontSize:22,marginTop:36,marginBottom:14}}>{block.text}</h2>;
           if(block.type==="image") return (
-            <div key={i} style={{marginBottom:28,borderRadius:14,overflow:"hidden",border:"1px solid var(--border)"}}>
-              <img src={block.src} alt={block.caption} style={{width:"100%",height:260,objectFit:"cover"}} loading="lazy"/>
-              {block.caption&&<div style={{background:"var(--sf2)",padding:"10px 16px",fontSize:12,color:"var(--muted)",textAlign:"center"}}>{block.caption}</div>}
+            <div key={i} style={{marginBottom:28,borderRadius:14,overflow:"hidden",border:"1px solid var(--border)",background:"var(--sf2)"}}>
+              <div style={{display:"flex",justifyContent:"center",padding: block.src&&block.src.includes('/blog-images/')?"16px":"0"}}>
+                <img src={block.src} alt={block.caption}
+                  style={{
+                    maxWidth:"100%",
+                    width: block.src&&block.src.includes('/blog-images/')?"auto":"100%",
+                    maxHeight: block.src&&block.src.includes('/blog-images/')?"520px":"320px",
+                    height:"auto",
+                    objectFit:"contain",
+                    borderRadius: block.src&&block.src.includes('/blog-images/')?"10px":"0",
+                    display:"block",
+                  }}
+                  loading="lazy"
+                />
+              </div>
+              {block.caption&&<div style={{padding:"10px 16px",fontSize:12,color:"var(--muted)",textAlign:"center",borderTop:"1px solid var(--border)"}}>{block.caption}</div>}
             </div>
           );
           if(block.type==="list") return (
