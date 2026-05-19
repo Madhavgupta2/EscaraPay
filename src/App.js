@@ -40,7 +40,17 @@ const updateMeta = ({ title, description, url, image }) => {
     setMeta("twitter:description", description);
   }
   if (title) { setMeta("og:title", title, true); setMeta("twitter:title", title); }
-  if (url) setMeta("og:url", url, true);
+  if (url) {
+    setMeta("og:url", url, true);
+    // ── Dynamic Canonical — fixes GSC "Alternate page with proper canonical tag" ──
+    let canonical = document.querySelector('link[rel="canonical"]');
+    if (!canonical) {
+      canonical = document.createElement("link");
+      canonical.setAttribute("rel", "canonical");
+      document.head.appendChild(canonical);
+    }
+    canonical.setAttribute("href", url);
+  }
   if (image) { setMeta("og:image", image, true); setMeta("twitter:image", image); }
   setMeta("og:type", "website", true);
   setMeta("twitter:card", "summary_large_image");
@@ -1266,6 +1276,16 @@ function Landing({ onEnter, onTrack, dark, onToggle, lang, onLangToggle }) {
   };
 
   const lc = LT[lang] || LT.hl;
+
+  // ── Reset meta to homepage on landing ──
+  useEffect(() => {
+    updateMeta({
+      title: "EscaraPay | WhatsApp Seller Payment Protection — Stop RTO & Fraud | India",
+      description: "EscaraPay — India's #1 payment protection platform for WhatsApp & Instagram sellers. Stop RTO losses, prevent COD fraud, and protect every transaction with our token-based Safe Pay system. Free for first 100 sellers.",
+      url: "https://www.escarapay.in/",
+      image: "https://www.escarapay.in/og-image.png"
+    });
+  }, []);
 
   // ── Stats IntersectionObserver ──
   useEffect(() => {
@@ -3421,7 +3441,7 @@ function BuyerDB({ user, userId, userPhone, onLogout, dark, onToggle }) {
             <p style={{color:"var(--muted)",marginBottom:20,fontSize:13}}>Paste the seller's payment link to view details and pay securely</p>
             <div className="card" style={{marginBottom:14}}>
               <label className="label">EscaraPay Order Link</label>
-              <input className="input" placeholder="https://escarapay.in/pay/ORDER-ID" value={linkInput} onChange={e=>setLinkInput(e.target.value)} style={{marginBottom:10}} />
+              <input className="input" placeholder="https://www.escarapay.in/pay/ORDER-ID" value={linkInput} onChange={e=>setLinkInput(e.target.value)} style={{marginBottom:10}} />
               <button className="btn-gold" style={{width:"100%"}} onClick={fetchLinkOrder}>{linkLoading?"⏳ Looking up order...":"🔍 Find Order"}</button>
               {linkError && <div style={{color:"var(--red)",fontSize:12,marginTop:8}}>❌ {linkError}</div>}
             </div>
@@ -3519,6 +3539,15 @@ function TrackPage({ orderId: initId, dark, onToggle, onGoHome }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [searched, setSearched] = useState(false);
+
+  useEffect(() => {
+    updateMeta({
+      title: "Track Your Order | EscaraPay — Payment Protection India",
+      description: "Track your EscaraPay protected order. Enter your Order ID to check delivery status, tracking details and token release status.",
+      url: "https://www.escarapay.in/track",
+      image: "https://www.escarapay.in/og-image.png"
+    });
+  }, []);
 
   useEffect(() => {
     if (initId) doSearch(initId);
@@ -4446,7 +4475,7 @@ function AboutPage({ onBack, dark, onToggle, lang, onLangToggle }) {
   const L = (en,hi,hl) => lang==="en"?en:lang==="hi"?hi:hl;
   useEffect(()=>{
     window.scrollTo({top:0,behavior:"instant"});
-    updateMeta({title:"About EscaraPay | India's Payment Protection Platform for WhatsApp Sellers",description:"Learn about EscaraPay — India's trusted token-based payment protection platform built for WhatsApp and Instagram sellers. Founded by Madhav Gupta, MSME registered.",url:"https://escarapay.in/about"});
+    updateMeta({title:"About EscaraPay | India's Payment Protection Platform for WhatsApp Sellers",description:"Learn about EscaraPay — India's trusted token-based payment protection platform built for WhatsApp and Instagram sellers. Founded by Madhav Gupta, MSME registered.",url:"https://www.escarapay.in/about"});
   },[]);
   return (
     <div style={{minHeight:"100vh"}}>
@@ -4710,7 +4739,12 @@ function LegalNav({ active, onNav, dark, onToggle }) {
 /* ══════════ REFUND POLICY PAGE ══════════ */
 function RefundPage({ onBack, dark, onToggle }) {
   const nav = (s) => { window._goToPage(s); };
-  useEffect(()=>{ window.scrollTo({top:0,behavior:"instant"}); updateMeta({title:"Refund Policy | EscaraPay — Payment Protection Platform",description:"EscaraPay's refund policy explains when and how token payments are refunded to buyers, including fraud cases and dispute resolutions.",url:"https://escarapay.in/refund"}); },[]);
+  useEffect(()=>{ window.scrollTo({top:0,behavior:"instant"}); updateMeta({
+      title: "Refund Policy | EscaraPay — 100% Token Refund Guarantee",
+      description: "EscaraPay's refund policy: buyers get 100% token refund if seller doesn't deliver. Understand when and how refunds are processed for WhatsApp and Instagram transactions.",
+      url: "https://www.escarapay.in/refund",
+      image: "https://www.escarapay.in/og-image.png"
+    }); },[]);
   return (
     <div style={{minHeight:"100vh"}}>
       <LegalNav active="refund" onNav={nav} dark={dark} onToggle={onToggle} />
@@ -4782,7 +4816,12 @@ function RefundPage({ onBack, dark, onToggle }) {
 /* ══════════ DISPUTE RESOLUTION PAGE ══════════ */
 function DisputePage({ onBack, dark, onToggle }) {
   const nav = (s) => { window._goToPage(s); };
-  useEffect(()=>{ window.scrollTo({top:0,behavior:"instant"}); updateMeta({title:"Dispute Resolution Policy | EscaraPay — Fair & Fast",description:"EscaraPay resolves buyer-seller disputes within 24 hours. Learn about our evidence-based dispute process and how we protect both parties.",url:"https://escarapay.in/dispute"}); },[]);
+  useEffect(()=>{ window.scrollTo({top:0,behavior:"instant"}); updateMeta({
+      title: "Dispute Resolution | EscaraPay — Fair Decision in 24 Hours",
+      description: "EscaraPay resolves buyer-seller disputes within 24 hours. Our expert mediators review evidence and deliver fair, binding decisions for WhatsApp and Instagram transactions.",
+      url: "https://www.escarapay.in/dispute",
+      image: "https://www.escarapay.in/og-image.png"
+    }); },[]);
   return (
     <div style={{minHeight:"100vh"}}>
       <LegalNav active="dispute" onNav={nav} dark={dark} onToggle={onToggle} />
@@ -4845,7 +4884,12 @@ function DisputePage({ onBack, dark, onToggle }) {
 
 function PrivacyPage({ onBack, dark, onToggle }) {
   const nav = (s) => { window._goToPage(s); };
-  useEffect(()=>{ window.scrollTo({top:0,behavior:"instant"}); updateMeta({title:"Privacy Policy | EscaraPay — Your Data is Safe",description:"EscaraPay's privacy policy explains how we collect, use and protect your personal information. We never sell your data to third parties.",url:"https://escarapay.in/privacy"}); },[]);
+  useEffect(()=>{ window.scrollTo({top:0,behavior:"instant"}); updateMeta({
+      title: "Privacy Policy | EscaraPay — Your Data is Protected",
+      description: "EscaraPay's privacy policy. We never sell your data. Learn how we collect, use and protect personal information of WhatsApp and Instagram sellers in India. MSME registered.",
+      url: "https://www.escarapay.in/privacy",
+      image: "https://www.escarapay.in/og-image.png"
+    }); },[]);
   return (
     <div style={{minHeight:"100vh"}}>
       <LegalNav active="privacy" onNav={nav} dark={dark} onToggle={onToggle} />
@@ -4881,7 +4925,12 @@ function PrivacyPage({ onBack, dark, onToggle }) {
 
 function TermsPage({ onBack, dark, onToggle }) {
   const nav = (s) => { window._goToPage(s); };
-  useEffect(()=>{ window.scrollTo({top:0,behavior:"instant"}); updateMeta({title:"Terms of Service | EscaraPay — Payment Protection Platform",description:"EscaraPay's terms of service govern the use of our payment protection platform for WhatsApp and Instagram sellers in India.",url:"https://escarapay.in/terms"}); },[]);
+  useEffect(()=>{ window.scrollTo({top:0,behavior:"instant"}); updateMeta({
+      title: "Terms & Conditions | EscaraPay — WhatsApp Seller Payment Protection India",
+      description: "EscaraPay's terms of service for WhatsApp and Instagram sellers in India. Token-based payment protection, RTO coverage, dispute resolution, and fee structure explained.",
+      url: "https://www.escarapay.in/terms",
+      image: "https://www.escarapay.in/og-image.png"
+    }); },[]);
   return (
     <div style={{minHeight:"100vh"}}>
       <LegalNav active="terms" onNav={nav} dark={dark} onToggle={onToggle} />
@@ -4950,7 +4999,12 @@ function ContactPage({ onBack, dark, onToggle }) {
   const [sending, setSending] = useState(false);
   const [sendError, setSendError] = useState("");
   const nav = (s) => { window._goToPage(s); };
-  useEffect(()=>{ window.scrollTo({top:0,behavior:"instant"}); updateMeta({title:"Contact EscaraPay | Support for WhatsApp & Instagram Sellers",description:"Get in touch with EscaraPay support. We respond within 24 hours for payment disputes, account issues, partnership queries and more.",url:"https://escarapay.in/contact"}); },[]);
+  useEffect(()=>{ window.scrollTo({top:0,behavior:"instant"}); updateMeta({
+      title: "Contact EscaraPay | 24-Hour Support for WhatsApp & Instagram Sellers",
+      description: "Contact EscaraPay support team. We respond within 24 hours for payment issues, disputes, refund requests, and partnership queries. support@escarapay.in",
+      url: "https://www.escarapay.in/contact",
+      image: "https://www.escarapay.in/og-image.png"
+    }); },[]);
 
   const handleSubmit = async () => {
     if (!form.name || !form.email || !form.subject || !form.message) {
@@ -5055,7 +5109,12 @@ function BlogListPage({ dark, onToggle, onGoHome, onReadPost }) {
 
   useEffect(()=>{
     window.scrollTo({top:0,behavior:"instant"});
-    updateMeta({title:"EscaraPay Blog | Payment Protection Tips for Indian Sellers",description:"Learn how to protect yourself from fraud, grow your WhatsApp/Instagram business safely.",url:"https://escarapay.in/blogs"});
+    updateMeta({
+      title: "EscaraPay Blog | WhatsApp Seller Tips, RTO Protection & Payment Guides India",
+      description: "Free guides for Indian WhatsApp & Instagram sellers: stop RTO losses, prevent payment fraud, safe selling tips, and payment protection strategies for social commerce.",
+      url: "https://www.escarapay.in/blogs",
+      image: "https://www.escarapay.in/og-image.png"
+    });
     fetchRegistry().then(data=>{ setPosts(data); setLoading(false); });
   },[]);
   return (
@@ -5115,9 +5174,9 @@ function BlogPostPage({ slug, dark, onToggle, onGoHome, onBlogList }) {
       setLoading(false);
       if(data) updateMeta({
         title:`${data.title} | EscaraPay Blog`,
-        description: data.metaDescription || data.excerpt,
-        url:`https://escarapay.in/blogs/${data.slug}`,
-        image: data.coverImage
+        description: data.metaDescription || data.excerpt || "Read the latest payment protection tips for WhatsApp and Instagram sellers in India on EscaraPay Blog.",
+        url:`https://www.escarapay.in/blogs/${data.slug}`,
+        image: data.coverImage || "https://www.escarapay.in/og-image.png"
       });
     });
   },[slug]);
@@ -5222,7 +5281,7 @@ function RTOCalculatorPage({ dark, onToggle, onGoHome }) {
     updateMeta({
       title:"RTO Loss Calculator for WhatsApp & Instagram Sellers | EscaraPay",
       description:"Calculate exactly how much money you lose to RTO returns every month. See how EscaraPay's token system protects your revenue.",
-      url:"https://escarapay.in/rto-calculator"
+      url:"https://www.escarapay.in/rto-calculator"
     });
   },[]);
 

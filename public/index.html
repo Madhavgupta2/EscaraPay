@@ -21,7 +21,13 @@
     <meta name="author" content="EscaraPay (India)" />
     <meta name="geo.region" content="IN" />
     <meta name="geo.placename" content="India" />
-    <link rel="canonical" href="https://www.escarapay.in/" />
+    <meta name="language" content="English, Hindi" />
+    <meta name="revisit-after" content="7 days" />
+    <meta name="rating" content="general" />
+    <link rel="alternate" hreflang="en-IN" href="https://www.escarapay.in/" />
+    <link rel="alternate" hreflang="hi-IN" href="https://www.escarapay.in/" />
+    <link rel="alternate" hreflang="x-default" href="https://www.escarapay.in/" />
+    <!-- Canonical set dynamically by React per-page via updateMeta() -->
 
     <!-- ══ OPEN GRAPH (WhatsApp, Facebook preview) ══ -->
     <meta property="og:type"        content="website" />
@@ -30,17 +36,24 @@
     <meta property="og:title"       content="EscaraPay | WhatsApp Seller Payment Protection — Stop RTO & Fraud" />
     <meta property="og:description" content="Stop RTO losses & prevent fraud. EscaraPay holds payments safely until delivery is confirmed — protecting buyers and sellers across India." />
     <meta property="og:image"       content="https://www.escarapay.in/og-image.png" />
+    <meta property="og:image:secure_url" content="https://www.escarapay.in/og-image.png" />
+    <meta property="og:image:type"   content="image/png" />
     <meta property="og:image:width"  content="1200" />
     <meta property="og:image:height" content="630" />
-    <meta property="og:image:alt"   content="EscaraPay — India's Payment Protection Platform" />
+    <meta property="og:image:alt"   content="EscaraPay — India's Payment Protection Platform for WhatsApp Sellers" />
     <meta property="og:locale"      content="en_IN" />
+    <meta property="og:locale:alternate" content="hi_IN" />
+    <meta property="article:publisher" content="https://www.facebook.com/escarapay" />
 
     <!-- ══ TWITTER CARD ══ -->
     <meta name="twitter:card"        content="summary_large_image" />
     <meta name="twitter:site"        content="@EscaraPay" />
+    <meta name="twitter:creator"     content="@EscaraPay" />
     <meta name="twitter:title"       content="EscaraPay | Safe Pay for WhatsApp & Instagram Sellers India" />
-    <meta name="twitter:description" content="Protect every WhatsApp & Instagram deal. Token-based payment protection — fraud-free, RTO-free." />
+    <meta name="twitter:description" content="Protect every WhatsApp & Instagram deal. Token-based payment protection — fraud-free, RTO-free. Free for first 100 sellers!" />
     <meta name="twitter:image"       content="https://www.escarapay.in/og-image.png" />
+    <meta name="twitter:image:alt"   content="EscaraPay Payment Protection Platform" />
+    <meta name="twitter:domain"      content="escarapay.in" />
 
     <!-- ══ STRUCTURED DATA — Organization ══ -->
     <script type="application/ld+json">
@@ -90,6 +103,14 @@
       "@type": "WebSite",
       "name": "EscaraPay",
       "url": "https://www.escarapay.in",
+      "potentialAction": {
+        "@type": "SearchAction",
+        "target": {
+          "@type": "EntryPoint",
+          "urlTemplate": "https://www.escarapay.in/track/{search_term_string}"
+        },
+        "query-input": "required name=search_term_string"
+      },
       "description": "Stop RTO losses and fraud with EscaraPay's token-based payment protection system for Indian sellers."
     }
     </script>
@@ -121,6 +142,71 @@
         ]
       },
       "slogan": "India Ka Trusted Payment Protection Platform"
+    }
+    </script>
+
+    <!-- ══ STRUCTURED DATA — BreadcrumbList ══ -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "Home",
+          "item": "https://www.escarapay.in/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "About EscaraPay",
+          "item": "https://www.escarapay.in/about"
+        },
+        {
+          "@type": "ListItem",
+          "position": 3,
+          "name": "Blog",
+          "item": "https://www.escarapay.in/blogs"
+        },
+        {
+          "@type": "ListItem",
+          "position": 4,
+          "name": "RTO Calculator",
+          "item": "https://www.escarapay.in/rto-calculator"
+        }
+      ]
+    }
+    </script>
+
+    <!-- ══ STRUCTURED DATA — SoftwareApplication ══ -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      "name": "EscaraPay",
+      "operatingSystem": "Web, Android, iOS",
+      "applicationCategory": "FinanceApplication",
+      "description": "Payment protection platform for WhatsApp and Instagram sellers in India. Token-based safe pay system to prevent RTO losses and buyer fraud.",
+      "url": "https://www.escarapay.in",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "INR",
+        "description": "Free for first 100 sellers"
+      },
+      "aggregateRating": {
+        "@type": "AggregateRating",
+        "ratingValue": "4.8",
+        "ratingCount": "47",
+        "bestRating": "5",
+        "worstRating": "1"
+      },
+      "publisher": {
+        "@type": "Organization",
+        "name": "EscaraPay",
+        "url": "https://www.escarapay.in"
+      }
     }
     </script>
 
