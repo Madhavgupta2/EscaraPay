@@ -400,8 +400,8 @@ const STATUS_META = {
 };
 
 const getDaysLeft = (d) => {
-  if (!d) return 7;
-  return Math.max(0, 7 - Math.floor((new Date()-new Date(d))/(1000*60*60*24)));
+  if (!d) return 14;
+  return Math.max(0, 14 - Math.floor((new Date()-new Date(d))/(1000*60*60*24)));
 };
 
 const getTrackingUrl = (tn) => {
@@ -5698,7 +5698,7 @@ export default function App() {
 
   useEffect(()=>{ window._goToPage=(s)=>{ const urls={about:"/about",privacy:"/privacy",terms:"/terms",refund:"/refund",dispute:"/dispute",contact:"/contact",landing:"/",track:"/track",admin:"/admin",blogs:"/blogs","blog-list":"/blogs","rto-calculator":"/rto-calculator"}; window.history.pushState({},"",urls[s]||"/"+s); setScreen(s==="blogs"?"blog-list":s); }; },[]);
   useEffect(()=>{
-    document.title = "Escara Pay | India's Trusted Payment Protection Platform";
+    document.title = "EscaraPay | India's Trusted Payment Protection Platform";
   },[]);
   useEffect(()=>{
     const path=window.location.pathname;
