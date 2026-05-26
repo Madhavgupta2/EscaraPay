@@ -400,8 +400,8 @@ const STATUS_META = {
 };
 
 const getDaysLeft = (d) => {
-  if (!d) return 14;
-  return Math.max(0, 14 - Math.floor((new Date()-new Date(d))/(1000*60*60*24)));
+  if (!d) return 7;
+  return Math.max(0, 7 - Math.floor((new Date()-new Date(d))/(1000*60*60*24)));
 };
 
 const getTrackingUrl = (tn) => {
@@ -2379,7 +2379,7 @@ function Auth({ type, onLogin, onBack, dark, onToggle }) {
     if (!validateEmail(form.email)) { setErrors({...errors, email:"Enter a valid email"}); return; }
     if (!form.name.trim()) { setErrors({...errors, name:"Please enter your name first"}); return; }
     setLoading(true); setRegOtpMsg("");
-    const r = await sendRegisterOTP(form.email, form.name);
+    const r = await sendRegisterOTP(form.email, form.name, type);
     setLoading(false);
     if (r.success) { setRegOtpSent(true); setOtpTimer(60); setRegOtpMsg("✅ " + r.message); }
     else setRegOtpMsg("❌ " + r.error);
@@ -3291,11 +3291,16 @@ function BuyerDB({ user, userId, userPhone, onLogout, dark, onToggle }) {
   const [dealForm, setDealForm] = useState({product:"",amount:"",token_pct:"10",seller_name:"",seller_phone:""});
   const [dealCreating, setDealCreating] = useState(false);
   const [dealLink, setDealLink] = useState(null);
+  const [receipt, setReceipt] = useState(null);
 
   useEffect(()=>{
     const load=async()=>{ setLoadingOrders(true); if(userPhone&&userPhone.trim()!==""){const r=await getBuyerOrders(userPhone.trim()); if(r.success) setOrders(r.data.orders||[]);} setLoadingOrders(false); };
     load();
   },[userPhone]);
+
+  // Split orders: seller-created pending (action needed) vs rest
+  const pendingSellerOrders = orders.filter(o=>o.status==="pending" && o.initiated_by==="seller");
+  const otherOrders = orders.filter(o=>!(o.status==="pending" && o.initiated_by==="seller"));
 
   const loadCashfree = () => new Promise((resolve, reject) => {
     if (document.getElementById("cashfree-script")) { resolve(); return; }
@@ -3324,6 +3329,7 @@ function BuyerDB({ user, userId, userPhone, onLogout, dark, onToggle }) {
         setPayStep(3);
         setOrders(prev=>prev.map(o=>o.id===order.id?{...o,status:"token_paid"}:o));
         setLinkOrder(prev=>prev&&prev.id===order.id?{...prev,status:"token_paid"}:prev);
+        setReceipt({...order, status:"token_paid", paid_at: new Date().toLocaleString("en-IN")});
         setTimeout(()=>{setPayStep(0);},2500);
       } else { setPayError("Verify failed: "+verify.error); setPayStep(0); }
     }).catch(e => { setPayError("Payment cancelled or failed."); setPayStep(0); });
@@ -3365,6 +3371,35 @@ function BuyerDB({ user, userId, userPhone, onLogout, dark, onToggle }) {
     <div style={{minHeight:"100vh"}}>
       {toast && <Toast msg={toast} onDone={()=>setToast("")} />}
       {showProfile && <ProfileModal user={userName} userId={userId} userType="buyer" onClose={()=>setShowProfile(false)} onUpdate={(n)=>setUserName(n)} />}
+
+      {/* ── Receipt Modal ── */}
+      {receipt && (
+        <div style={{position:"fixed",inset:0,background:"rgba(0,0,0,.65)",zIndex:9999,display:"flex",alignItems:"center",justifyContent:"center",padding:16}} onClick={()=>setReceipt(null)}>
+          <div style={{background:"var(--sf)",borderRadius:16,padding:28,maxWidth:420,width:"100%",boxShadow:"0 20px 60px rgba(0,0,0,.4)"}} onClick={e=>e.stopPropagation()}>
+            <div style={{textAlign:"center",marginBottom:20}}>
+              <div style={{fontSize:52,marginBottom:8}}>✅</div>
+              <div className="syne" style={{fontWeight:800,fontSize:22,marginBottom:4}}>Payment Successful!</div>
+              <div style={{fontSize:13,color:"var(--muted)"}}>Token secured — seller will dispatch soon</div>
+            </div>
+            <div style={{background:"var(--sf2)",borderRadius:12,padding:16,marginBottom:16,display:"flex",flexDirection:"column",gap:10}}>
+              <div style={{display:"flex",justifyContent:"space-between",fontSize:13}}><span style={{color:"var(--muted)"}}>Order ID</span><span style={{fontWeight:600,fontFamily:"monospace"}}>{receipt.id}</span></div>
+              <div style={{display:"flex",justifyContent:"space-between",fontSize:13}}><span style={{color:"var(--muted)"}}>Product</span><span style={{fontWeight:600}}>{receipt.product_name}</span></div>
+              <div style={{display:"flex",justifyContent:"space-between",fontSize:13}}><span style={{color:"var(--muted)"}}>Seller</span><span style={{fontWeight:600}}>{receipt.seller_name||"—"}</span></div>
+              <div style={{display:"flex",justifyContent:"space-between",fontSize:13}}><span style={{color:"var(--muted)"}}>Order Amount</span><span style={{fontWeight:600}}>₹{receipt.order_amount}</span></div>
+              <div style={{height:1,background:"var(--border)"}}/>
+              <div style={{display:"flex",justifyContent:"space-between",fontSize:15}}><span style={{color:"var(--muted)",fontWeight:600}}>Token Paid</span><span style={{fontWeight:800,color:"var(--green)"}}>₹{receipt.buyer_pays||receipt.token_amount}</span></div>
+              <div style={{display:"flex",justifyContent:"space-between",fontSize:12}}><span style={{color:"var(--muted)"}}>Paid At</span><span>{receipt.paid_at}</span></div>
+            </div>
+            <div style={{background:"rgba(5,150,105,.08)",border:"1px solid rgba(5,150,105,.2)",borderRadius:10,padding:12,fontSize:12,color:"#065f46",marginBottom:16}}>
+              🔐 Your token is held safely by EscaraPay. It will be released to the seller only after you confirm delivery — or automatically in 14 days.
+            </div>
+            <div style={{display:"flex",gap:8}}>
+              <button className="btn-ghost" style={{flex:1,fontSize:13}} onClick={()=>{const txt=`EscaraPay Payment Receipt\nOrder: ${receipt.id}\nProduct: ${receipt.product_name}\nToken Paid: ₹${receipt.buyer_pays||receipt.token_amount}\nDate: ${receipt.paid_at}`;navigator.clipboard?.writeText(txt);setToast("Receipt copied!");}}>📋 Copy Receipt</button>
+              <button className="btn-green" style={{flex:1,fontSize:13}} onClick={()=>setReceipt(null)}>Done ✓</button>
+            </div>
+          </div>
+        </div>
+      )}
       <nav className="nav">
         <Logo />
         <div style={{display:"flex",gap:8,alignItems:"center"}}>
@@ -3388,50 +3423,97 @@ function BuyerDB({ user, userId, userPhone, onLogout, dark, onToggle }) {
           <div className="fu">
             <h1 className="syne" style={{fontSize:"clamp(18px,3vw,26px)",fontWeight:800,marginBottom:18}}>My Orders</h1>
             {(!userPhone||userPhone.trim()==="") && <div style={{background:"rgba(239,68,68,.1)",border:"1px solid rgba(239,68,68,.3)",borderRadius:10,padding:14,marginBottom:16,fontSize:13}}>⚠️ Phone number not found. Please logout and login again.</div>}
-            <div style={{display:"flex",gap:8,flexWrap:"wrap",marginBottom:18}}>
-              <div className={`chip ${filterStatus==="all"?"active":""}`} onClick={()=>setFilterStatus("all")}>All ({orders.length})</div>
-              {Object.entries(STATUS_META).map(([key,val])=>{ const count=orders.filter(o=>o.status===key).length; if(!count) return null; return <div key={key} className={`chip ${filterStatus===key?"active":""}`} onClick={()=>setFilterStatus(key)}>{val.icon} {val.label} ({count})</div>; })}
-            </div>
-            {loadingOrders ? <div style={{textAlign:"center",padding:40,color:"var(--muted)"}}>⏳ Loading orders...</div>
-             : orders.length===0 ? (
-              <div style={{textAlign:"center",padding:40,color:"var(--muted)"}}>
-                <div style={{fontSize:40,marginBottom:10}}>🛍️</div>
-                <div style={{fontWeight:600,marginBottom:6}}>No orders yet!</div>
-                <div style={{display:"flex",gap:10,justifyContent:"center",flexWrap:"wrap",marginTop:14}}>
-                  <button className="btn-gold" onClick={()=>setPage("pay_order")}>🔗 Pay via Link</button>
-                  <button className="btn-outline" onClick={()=>setPage("create_deal")}>🤝 Create Deal</button>
-                </div>
-              </div>
-             ) : (
-              <div style={{display:"flex",flexDirection:"column",gap:10}}>
-                {filteredOrders.map(o=>{
-                  const daysLeft=o.status==="dispatched"?getDaysLeft(o.dispatched_at||o.updated_at):null;
-                  const trackingUrl=getTrackingUrl(o.tracking_number);
-                  return (
-                    <div key={o.id} className="card" style={{display:"flex",flexDirection:"column",gap:10}}>
-                      <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",flexWrap:"wrap",gap:8}}>
-                        <div style={{display:"flex",gap:12,alignItems:"center"}}>
-                          <div style={{width:44,height:44,borderRadius:11,background:"var(--sf2)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:20,flexShrink:0}}>🛍️</div>
-                          <div>
-                            <div style={{fontWeight:600,marginBottom:2,fontSize:14}}>{o.product_name}</div>
-                            <div style={{fontSize:12,color:"var(--muted)"}}>Seller: {o.seller_name||"—"} • {(o.created_at||"").split("T")[0]}</div>
-                            <div style={{fontSize:12,marginTop:2}}>₹{o.order_amount} | Token: <span style={{color:"var(--gold)",fontWeight:600}}>₹{o.token_amount}</span></div>
+
+            {loadingOrders ? <div style={{textAlign:"center",padding:40,color:"var(--muted)"}}>⏳ Loading orders...</div> : <>
+
+              {/* ── Pending Payments Section ── */}
+              {pendingSellerOrders.length>0 && (
+                <div style={{marginBottom:24}}>
+                  <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:12}}>
+                    <div style={{width:8,height:8,borderRadius:"50%",background:"#f59e0b",boxShadow:"0 0 8px #f59e0b",animation:"pulse 1.5s infinite"}}/>
+                    <span style={{fontWeight:700,fontSize:15,color:"#b45309"}}>Action Required — {pendingSellerOrders.length} Pending Payment{pendingSellerOrders.length>1?"s":""}</span>
+                  </div>
+                  <div style={{display:"flex",flexDirection:"column",gap:10}}>
+                    {pendingSellerOrders.map(o=>(
+                      <div key={o.id} className="card" style={{borderColor:"rgba(245,158,11,.4)",background:"rgba(245,158,11,.04)",display:"flex",flexDirection:"column",gap:10}}>
+                        <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",flexWrap:"wrap",gap:8}}>
+                          <div style={{display:"flex",gap:12,alignItems:"center"}}>
+                            <div style={{width:44,height:44,borderRadius:11,background:"rgba(245,158,11,.15)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:22,flexShrink:0}}>💳</div>
+                            <div>
+                              <div style={{fontWeight:700,marginBottom:2,fontSize:14}}>{o.product_name}</div>
+                              <div style={{fontSize:12,color:"var(--muted)"}}>Seller: {o.seller_name||"—"} • {(o.created_at||"").split("T")[0]}</div>
+                              <div style={{fontSize:12,marginTop:3}}>Order: <strong>₹{o.order_amount}</strong> | Token: <span style={{color:"var(--gold)",fontWeight:700}}>₹{o.token_amount}</span></div>
+                            </div>
                           </div>
+                          <span style={{background:"rgba(245,158,11,.15)",color:"#b45309",padding:"3px 10px",borderRadius:20,fontSize:11,fontWeight:700,whiteSpace:"nowrap"}}>⏳ PAYMENT DUE</span>
                         </div>
-                        <Bdg status={o.status} />
+                        <div style={{background:"rgba(245,158,11,.08)",border:"1px solid rgba(245,158,11,.2)",borderRadius:8,padding:"10px 12px",fontSize:12,color:"#92400e"}}>
+                          🔐 Pay ₹{o.buyer_pays||o.token_amount} token to secure this order. Seller will dispatch only after payment.
+                        </div>
+                        <div style={{display:"flex",gap:8}}>
+                          <button className="btn-gold pulse" style={{flex:1,padding:"10px 0",fontSize:14,fontWeight:700}} onClick={()=>handlePay(o)}>
+                            💳 Pay ₹{o.buyer_pays||o.token_amount} Now
+                          </button>
+                          <button className="btn-outline" style={{padding:"9px 12px",fontSize:12}} onClick={()=>window._goToTrack&&window._goToTrack(o.id)}>🔍 Track</button>
+                          <button className="btn-ghost" style={{padding:"9px 12px",fontSize:12}} onClick={()=>setShowOrder(o)}>Details</button>
+                        </div>
+                        {payStep>0 && <div style={{textAlign:"center",fontSize:13,color:"var(--muted)",padding:6}}>{payStep===1?"⏳ Loading payment gateway...":(payStep===2?"⏳ Verifying payment...":"✅ Payment confirmed!")}</div>}
+                        {payError && <div style={{color:"var(--red)",fontSize:12,padding:"4px 0"}}>❌ {payError}</div>}
                       </div>
-                      {o.tracking_number && <div className="tracking-box"><div style={{flex:1}}><div style={{fontSize:11,color:"var(--blue)",fontWeight:600,marginBottom:2}}>📦 Tracking</div><div style={{fontFamily:"monospace",fontWeight:700}}>{o.tracking_number}</div></div>{trackingUrl&&<a href={trackingUrl} target="_blank" rel="noreferrer" style={{background:"var(--blue)",color:"#fff",padding:"6px 12px",borderRadius:8,fontSize:12,fontWeight:600,textDecoration:"none"}}>Track →</a>}</div>}
-                      {o.status==="dispatched"&&daysLeft!==null&&<div className="hold-box"><div style={{fontSize:12,color:"#a78bfa",fontWeight:600}}>⏰ {daysLeft>0?`Token Hold: ${daysLeft} day${daysLeft===1?"":"s"} remaining`:"Auto-release ready!"}</div></div>}
-                      <div style={{display:"flex",gap:8,flexWrap:"wrap"}}>
-                        {o.status==="pending"&&<button className="btn-gold" style={{padding:"7px 14px",fontSize:13}} onClick={()=>handlePay(o)}>💳 Pay ₹{o.token_amount}</button>}
-                        {o.status==="dispatched"&&<button className="btn-green" style={{padding:"7px 14px",fontSize:13}} onClick={()=>confirmDelivery(o.id).then(r=>{if(r.success)setOrders(prev=>prev.map(x=>x.id===o.id?{...x,status:"delivered"}:x));})}>✅ Delivery Confirm</button>}
-                        <button className="btn-ghost" style={{padding:"6px 12px",fontSize:12}} onClick={()=>setShowOrder(o)}>View Details</button>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* ── Order History Section ── */}
+              {otherOrders.length>0 && <>
+                {pendingSellerOrders.length>0 && <div style={{fontSize:13,fontWeight:700,color:"var(--muted)",marginBottom:12,textTransform:"uppercase",letterSpacing:".5px"}}>Order History</div>}
+                <div style={{display:"flex",gap:8,flexWrap:"wrap",marginBottom:14}}>
+                  <div className={`chip ${filterStatus==="all"?"active":""}`} onClick={()=>setFilterStatus("all")}>All ({otherOrders.length})</div>
+                  {Object.entries(STATUS_META).map(([key,val])=>{ const count=otherOrders.filter(o=>o.status===key).length; if(!count) return null; return <div key={key} className={`chip ${filterStatus===key?"active":""}`} onClick={()=>setFilterStatus(key)}>{val.icon} {val.label} ({count})</div>; })}
+                </div>
+                <div style={{display:"flex",flexDirection:"column",gap:10}}>
+                  {(filterStatus==="all"?otherOrders:otherOrders.filter(o=>o.status===filterStatus)).map(o=>{
+                    const daysLeft=o.status==="dispatched"?getDaysLeft(o.dispatched_at||o.updated_at):null;
+                    const trackingUrl=getTrackingUrl(o.tracking_number);
+                    return (
+                      <div key={o.id} className="card" style={{display:"flex",flexDirection:"column",gap:10}}>
+                        <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",flexWrap:"wrap",gap:8}}>
+                          <div style={{display:"flex",gap:12,alignItems:"center"}}>
+                            <div style={{width:44,height:44,borderRadius:11,background:"var(--sf2)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:20,flexShrink:0}}>🛍️</div>
+                            <div>
+                              <div style={{fontWeight:600,marginBottom:2,fontSize:14}}>{o.product_name}</div>
+                              <div style={{fontSize:12,color:"var(--muted)"}}>Seller: {o.seller_name||"—"} • {(o.created_at||"").split("T")[0]}</div>
+                              <div style={{fontSize:12,marginTop:2}}>₹{o.order_amount} | Token: <span style={{color:"var(--gold)",fontWeight:600}}>₹{o.token_amount}</span></div>
+                            </div>
+                          </div>
+                          <Bdg status={o.status} />
+                        </div>
+                        {o.tracking_number && <div className="tracking-box"><div style={{flex:1}}><div style={{fontSize:11,color:"var(--blue)",fontWeight:600,marginBottom:2}}>📦 Tracking</div><div style={{fontFamily:"monospace",fontWeight:700}}>{o.tracking_number}</div></div>{trackingUrl&&<a href={trackingUrl} target="_blank" rel="noreferrer" style={{background:"var(--blue)",color:"#fff",padding:"6px 12px",borderRadius:8,fontSize:12,fontWeight:600,textDecoration:"none"}}>Track →</a>}</div>}
+                        {o.status==="dispatched"&&daysLeft!==null&&<div className="hold-box"><div style={{fontSize:12,color:"#a78bfa",fontWeight:600}}>⏰ {daysLeft>0?`Token Hold: ${daysLeft} day${daysLeft===1?"":"s"} remaining`:"Auto-release ready!"}</div></div>}
+                        <div style={{display:"flex",gap:8,flexWrap:"wrap"}}>
+                          {o.status==="dispatched"&&<button className="btn-green" style={{padding:"7px 14px",fontSize:13}} onClick={()=>confirmDelivery(o.id).then(r=>{if(r.success)setOrders(prev=>prev.map(x=>x.id===o.id?{...x,status:"delivered"}:x));})}>✅ Delivery Confirm</button>}
+                          {["dispatched","token_paid","delivered"].includes(o.status)&&<button className="btn-outline" style={{padding:"6px 12px",fontSize:12,display:"flex",alignItems:"center",gap:5}} onClick={()=>window._goToTrack&&window._goToTrack(o.id)}>🔍 Track Order</button>}
+                          <button className="btn-ghost" style={{padding:"6px 12px",fontSize:12}} onClick={()=>setShowOrder(o)}>Details</button>
+                        </div>
                       </div>
-                    </div>
-                  );
-                })}
-              </div>
-             )}
+                    );
+                  })}
+                </div>
+              </>}
+
+              {/* ── Empty State ── */}
+              {orders.length===0 && (
+                <div style={{textAlign:"center",padding:40,color:"var(--muted)"}}>
+                  <div style={{fontSize:40,marginBottom:10}}>🛍️</div>
+                  <div style={{fontWeight:600,marginBottom:6}}>No orders yet!</div>
+                  <div style={{display:"flex",gap:10,justifyContent:"center",flexWrap:"wrap",marginTop:14}}>
+                    <button className="btn-gold" onClick={()=>setPage("pay_order")}>🔗 Pay via Link</button>
+                    <button className="btn-outline" onClick={()=>setPage("create_deal")}>🤝 Create Deal</button>
+                  </div>
+                </div>
+              )}
+            </>}
           </div>
         )}
 
@@ -5696,9 +5778,9 @@ export default function App() {
   const [blogSlug, setBlogSlug] = useState(null);
   const [adminKey, setAdminKey] = useState(()=> localStorage.getItem("adminKey") || "");
 
-  useEffect(()=>{ window._goToPage=(s)=>{ const urls={about:"/about",privacy:"/privacy",terms:"/terms",refund:"/refund",dispute:"/dispute",contact:"/contact",landing:"/",track:"/track",admin:"/admin",blogs:"/blogs","blog-list":"/blogs","rto-calculator":"/rto-calculator"}; window.history.pushState({},"",urls[s]||"/"+s); setScreen(s==="blogs"?"blog-list":s); }; },[]);
+  useEffect(()=>{ window._goToPage=(s)=>{ const urls={about:"/about",privacy:"/privacy",terms:"/terms",refund:"/refund",dispute:"/dispute",contact:"/contact",landing:"/",track:"/track",admin:"/admin",blogs:"/blogs","blog-list":"/blogs","rto-calculator":"/rto-calculator"}; window.history.pushState({},"",urls[s]||"/"+s); setScreen(s==="blogs"?"blog-list":s); }; window._goToTrack=(orderId)=>{ setTrackOrderId(orderId); setScreen("track"); window.history.pushState({},"","/track/"+orderId); }; },[]);
   useEffect(()=>{
-    document.title = "EscaraPay | India's Trusted Payment Protection Platform";
+    document.title = "Escara Pay | India's Trusted Payment Protection Platform";
   },[]);
   useEffect(()=>{
     const path=window.location.pathname;

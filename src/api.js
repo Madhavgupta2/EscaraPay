@@ -184,11 +184,11 @@ export const verifyOTP = async (email, role, otp) => {
   } catch (err) { return { success: false, error: "Could not connect to server." }; }
 };
 
-export const sendRegisterOTP = async (email, name) => {
+export const sendRegisterOTP = async (email, name, role = "buyer") => {
   try {
     const res = await fetch(`${BASE_URL}/api/auth/send-otp-register`, {
       method: "POST", headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, name }),
+      body: JSON.stringify({ email, name, role }),
     });
     const data = await res.json();
     if (!res.ok) return { success: false, error: data.error || "OTP could not be sent" };
