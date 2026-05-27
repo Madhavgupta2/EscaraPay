@@ -1324,7 +1324,7 @@ function Landing({ onEnter, onTrack, dark, onToggle, lang, onLangToggle }) {
     { q:"अगर सेलर ने आइटम नहीं भेजा तो क्या होगा?", a:"अगर सेलर निर्धारित समय में आइटम नहीं भेजता, तो टोकन पूरी तरह बायर को वापस कर दिया जाएगा।" },
     { q:"टोकन का पैसा सेलर को कब मिलेगा?", a:"डिलीवरी की पुष्टि के बाद 7 दिनों में या जब बायर खुद कन्फर्म कर दे, तभी पैसा रिलीज होता है।" },
     { q:"क्या EscaraPay RBI से approved है?", a:"EscaraPay Cashfree के ज़रिए पेमेंट प्रोसेस करता है जो RBI-compliant और PCI DSS certified है।" },
-    { q:"विवाद कैसे उठाएं?", a:"डिलीवरी के 7 दिनों के अंदर अपने डैशबोर्ड में जाकर 'Dispute Raise Karo' बटन दबाएं। हमारी टीम 24 घंटे में जवाब देगी।" },
+    { q:"विवाद कैसे उठाएं?", a:"डिलीवरी के 7 दिनों के अंदर अपने डैशबोर्ड में जाकर 'Raise Dispute' बटन दबाएं। हमारी टीम 24 घंटे में जवाब देगी।" },
     { q:"क्या कोई hidden charges हैं?", a:"नहीं। केवल 2% Cashfree gateway fee है जो बायर को पेमेंट के समय दिखाई जाती है। कोई छुपी हुई फीस नहीं।" },
   ] : lang==="en" ? [
     { q:"What is the minimum token amount on EscaraPay?", a:"The minimum token is ₹200. It is a percentage of the order value that is held securely in our protected vault until delivery is confirmed." },
@@ -1338,7 +1338,7 @@ function Landing({ onEnter, onTrack, dark, onToggle, lang, onLangToggle }) {
     { q:"Agar seller ne item nahi bheja toh kya hoga?", a:"Agar seller decided time mein item nahi bhejta, toh poora token amount buyer ko automatically wapas kar diya jaata hai." },
     { q:"Seller ko token payment kab milegi?", a:"Delivery confirmation ke 7 din ke andar, ya jab buyer khud confirm kare — tab payment seller ko release hoti hai." },
     { q:"Kya EscaraPay RBI se approved hai?", a:"EscaraPay Cashfree ke zariye payments process karta hai jo RBI-compliant aur PCI DSS Level 1 certified hai." },
-    { q:"Dispute kaise raise karein?", a:"Delivery ke 7 din ke andar dashboard mein jaao aur 'Dispute Raise Karo' button dabao. Hamari team 24 ghante mein jawab degi." },
+    { q:"Dispute kaise raise karein?", a:"Delivery ke 7 din ke andar dashboard mein jaao aur 'Raise Dispute' button dabao. Hamari team 24 ghante mein jawab degi." },
     { q:"Koi hidden charges hain kya?", a:"Koi hidden charge nahi. Sirf 2% Cashfree gateway fee hai jo payment ke waqt clearly dikhti hai." },
   ];
 
@@ -2391,7 +2391,7 @@ function Auth({ type, onLogin, onBack, dark, onToggle }) {
     setLoading(true); setRegOtpMsg("");
     const r = await verifyRegisterOTP(form.email, regOtp);
     setLoading(false);
-    if (r.success) { setRegOtpVerified(true); setRegOtpMsg("✅ Email verified! Ab account banao."); }
+    if (r.success) { setRegOtpVerified(true); setRegOtpMsg("✅ Email verified! You can now create your account."); }
     else setRegOtpMsg("❌ " + r.error);
   };
 
@@ -2523,7 +2523,7 @@ function Auth({ type, onLogin, onBack, dark, onToggle }) {
             {/* Email — always show */}
             <div>
               <label className="label">Email *</label>
-              <input className="input" placeholder="aapki@email.com" type="email" value={form.email}
+              <input className="input" placeholder="your@email.com" type="email" value={form.email}
                 onChange={e=>setField("email",e.target.value)} />
               <FieldError msg={errors.email} />
             </div>
@@ -3273,6 +3273,35 @@ function SellerDB({ user, userId, onLogout, dark, onToggle }) {
 }
 
 /* ══════════ BUYER DASHBOARD ══════════ */
+function InlinePwdChange({ userId, onDone }) {
+  const [f, setF] = useState({cur:"",nw:"",conf:""});
+  const [saving, setSaving] = useState(false);
+  const [err, setErr] = useState("");
+  const save = async() => {
+    setErr("");
+    if(!f.cur||!f.nw||!f.conf){setErr("All fields required");return;}
+    if(f.nw!==f.conf){setErr("New passwords don't match");return;}
+    if(f.nw.length<6){setErr("Password must be at least 6 characters");return;}
+    setSaving(true);
+    try {
+      const res = await fetch(`${BACKEND_URL}/api/auth/change-password`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({user_id:userId,current_password:f.cur,new_password:f.nw})});
+      const d = await res.json();
+      if(d.success){setF({cur:"",nw:"",conf:""});onDone("✅ Password changed successfully!");}
+      else setErr(d.error||"Failed");
+    } catch(e){setErr("Could not connect");}
+    setSaving(false);
+  };
+  return (
+    <div style={{display:"flex",flexDirection:"column",gap:12}}>
+      <div><label className="label">Current Password</label><input className="input" type="password" placeholder="Enter current password" value={f.cur} onChange={e=>setF({...f,cur:e.target.value})} /></div>
+      <div><label className="label">New Password</label><input className="input" type="password" placeholder="Min 6 characters" value={f.nw} onChange={e=>setF({...f,nw:e.target.value})} /></div>
+      <div><label className="label">Confirm New Password</label><input className="input" type="password" placeholder="Repeat new password" value={f.conf} onChange={e=>setF({...f,conf:e.target.value})} /></div>
+      {err && <div style={{color:"var(--red)",fontSize:12}}>❌ {err}</div>}
+      <button className="btn-gold" style={{width:"100%",padding:12}} disabled={saving} onClick={save}>{saving?"⏳ Saving...":"🔐 Change Password"}</button>
+    </div>
+  );
+}
+
 function BuyerDB({ user, userId, userPhone, onLogout, dark, onToggle }) {
   const [page, setPage] = useState("orders");
   const [orders, setOrders] = useState([]);
@@ -3292,6 +3321,10 @@ function BuyerDB({ user, userId, userPhone, onLogout, dark, onToggle }) {
   const [dealCreating, setDealCreating] = useState(false);
   const [dealLink, setDealLink] = useState(null);
   const [receipt, setReceipt] = useState(null);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [settingsTab, setSettingsTab] = useState("profile");
+  const [settingsForm, setSettingsForm] = useState({name:"",phone:"",email:""});
+  const [settingsSaving, setSettingsSaving] = useState(false);
 
   useEffect(()=>{
     const load=async()=>{ setLoadingOrders(true); if(userPhone&&userPhone.trim()!==""){const r=await getBuyerOrders(userPhone.trim()); if(r.success) setOrders(r.data.orders||[]);} setLoadingOrders(false); };
@@ -3301,6 +3334,43 @@ function BuyerDB({ user, userId, userPhone, onLogout, dark, onToggle }) {
   // Split orders: seller-created pending (action needed) vs rest
   const pendingSellerOrders = orders.filter(o=>o.status==="pending" && o.initiated_by==="seller");
   const otherOrders = orders.filter(o=>!(o.status==="pending" && o.initiated_by==="seller"));
+
+  // Stats
+  const totalSpent = orders.filter(o=>o.status!=="pending"&&o.status!=="cancelled").reduce((s,o)=>s+(Number(o.buyer_pays||o.token_amount)||0),0);
+  const activeOrders = orders.filter(o=>["token_paid","dispatched"].includes(o.status)).length;
+
+  // Search filter
+  const sq = searchQuery.trim().toLowerCase();
+  const searchedOther = sq ? otherOrders.filter(o=>(o.product_name||"").toLowerCase().includes(sq)||(o.id||"").toLowerCase().includes(sq)||(o.seller_name||"").toLowerCase().includes(sq)) : otherOrders;
+
+  // Receipt PDF helper
+  const downloadReceipt = (o) => {
+    const w = window.open("","_blank","width=600,height=700");
+    w.document.write(`<!DOCTYPE html><html><head><title>EscaraPay Receipt — ${o.id}</title>
+    <style>body{font-family:Arial,sans-serif;padding:40px;color:#0c2340;max-width:520px;margin:auto}
+    .logo{font-size:22px;font-weight:800;color:#24A1E2;margin-bottom:4px}.sub{font-size:12px;color:#64748b;margin-bottom:28px}
+    h2{font-size:18px;margin-bottom:20px}.row{display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid #e2e8f0;font-size:14px}
+    .row span:last-child{font-weight:600}.total{background:#f0fdf4;padding:12px 0;font-size:16px;font-weight:700;color:#065f46}
+    .footer{margin-top:28px;font-size:11px;color:#94a3b8;text-align:center;border-top:1px solid #e2e8f0;padding-top:16px}
+    @media print{button{display:none!important}}</style></head><body>
+    <div class="logo">EscaraPay</div>
+    <div class="sub">Payment Protection Platform | MSME: UDYAM-UP-23-0036110</div>
+    <h2>Payment Receipt</h2>
+    <div class="row"><span>Order ID</span><span>${o.id}</span></div>
+    <div class="row"><span>Product</span><span>${o.product_name||"—"}</span></div>
+    <div class="row"><span>Seller</span><span>${o.seller_name||"—"}</span></div>
+    <div class="row"><span>Order Amount</span><span>₹${o.order_amount}</span></div>
+    <div class="row"><span>Status</span><span>${o.status}</span></div>
+    <div class="row"><span>Date</span><span>${(o.created_at||"").split("T")[0]}</span></div>
+    <div class="row total"><span>Token Paid (Protected)</span><span>₹${o.buyer_pays||o.token_amount}</span></div>
+    <div style="margin-top:20px;background:#fffbeb;border:1px solid #fde68a;border-radius:8px;padding:14px;font-size:12px;color:#92400e">
+      🔐 This token is held safely by EscaraPay until delivery is confirmed.
+    </div>
+    <div class="footer">Generated on ${new Date().toLocaleString("en-IN")} | support@escarapay.in | escarapay.in</div>
+    <br/><button onclick="window.print()" style="background:#24A1E2;color:#fff;border:none;padding:10px 28px;border-radius:8px;font-size:14px;cursor:pointer;margin-top:10px">🖨️ Print / Save PDF</button>
+    </body></html>`);
+    w.document.close();
+  };
 
   const loadCashfree = () => new Promise((resolve, reject) => {
     if (document.getElementById("cashfree-script")) { resolve(); return; }
@@ -3365,7 +3435,7 @@ function BuyerDB({ user, userId, userPhone, onLogout, dark, onToggle }) {
   const tokenPreview2 = dealForm.amount ? calcToken(dealForm.amount, dealForm.token_pct) : 0;
   const filteredOrders = filterStatus==="all" ? orders : orders.filter(o=>o.status===filterStatus);
 
-  const nav = [{id:"orders",icon:"📦",label:"My Orders"},{id:"pay_order",icon:"🔗",label:"Pay via Link"},{id:"create_deal",icon:"🤝",label:"Create Deal"},{id:"help",icon:"❓",label:"Help"}];
+  const nav = [{id:"orders",icon:"📦",label:"My Orders"},{id:"pay_order",icon:"🔗",label:"Pay via Link"},{id:"create_deal",icon:"🤝",label:"Create Deal"},{id:"settings",icon:"⚙️",label:"Settings"},{id:"help",icon:"❓",label:"Help"}];
 
   return (
     <div style={{minHeight:"100vh"}}>
@@ -3421,8 +3491,25 @@ function BuyerDB({ user, userId, userPhone, onLogout, dark, onToggle }) {
       <div className="main">
         {page==="orders" && (
           <div className="fu">
-            <h1 className="syne" style={{fontSize:"clamp(18px,3vw,26px)",fontWeight:800,marginBottom:18}}>My Orders</h1>
-            {(!userPhone||userPhone.trim()==="") && <div style={{background:"rgba(239,68,68,.1)",border:"1px solid rgba(239,68,68,.3)",borderRadius:10,padding:14,marginBottom:16,fontSize:13}}>⚠️ Phone number not found. Please logout and login again.</div>}
+            <h1 className="syne" style={{fontSize:"clamp(18px,3vw,26px)",fontWeight:800,marginBottom:14}}>My Orders</h1>
+            {(!userPhone||userPhone.trim()==="") && <div style={{background:"rgba(239,68,68,.1)",border:"1px solid rgba(239,68,68,.3)",borderRadius:10,padding:14,marginBottom:14,fontSize:13}}>⚠️ Phone number not found. Please logout and login again.</div>}
+
+            {/* ── Stats Cards ── */}
+            {orders.length>0 && (
+              <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:10,marginBottom:18}}>
+                {[
+                  {label:"Total Orders",val:orders.length,icon:"📦",color:"var(--blue)"},
+                  {label:"Active",val:activeOrders,icon:"🚚",color:"#f59e0b"},
+                  {label:"Total Spent",val:`₹${totalSpent.toLocaleString("en-IN")}`,icon:"💳",color:"var(--green)"},
+                ].map(s=>(
+                  <div key={s.label} className="card" style={{padding:"12px 14px",textAlign:"center"}}>
+                    <div style={{fontSize:20,marginBottom:4}}>{s.icon}</div>
+                    <div style={{fontWeight:800,fontSize:"clamp(13px,3vw,18px)",color:s.color}}>{s.val}</div>
+                    <div style={{fontSize:10,color:"var(--muted)",marginTop:2}}>{s.label}</div>
+                  </div>
+                ))}
+              </div>
+            )}
 
             {loadingOrders ? <div style={{textAlign:"center",padding:40,color:"var(--muted)"}}>⏳ Loading orders...</div> : <>
 
@@ -3430,7 +3517,7 @@ function BuyerDB({ user, userId, userPhone, onLogout, dark, onToggle }) {
               {pendingSellerOrders.length>0 && (
                 <div style={{marginBottom:24}}>
                   <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:12}}>
-                    <div style={{width:8,height:8,borderRadius:"50%",background:"#f59e0b",boxShadow:"0 0 8px #f59e0b",animation:"pulse 1.5s infinite"}}/>
+                    <div style={{width:8,height:8,borderRadius:"50%",background:"#f59e0b",boxShadow:"0 0 8px #f59e0b"}}/>
                     <span style={{fontWeight:700,fontSize:15,color:"#b45309"}}>Action Required — {pendingSellerOrders.length} Pending Payment{pendingSellerOrders.length>1?"s":""}</span>
                   </div>
                   <div style={{display:"flex",flexDirection:"column",gap:10}}>
@@ -3450,10 +3537,8 @@ function BuyerDB({ user, userId, userPhone, onLogout, dark, onToggle }) {
                         <div style={{background:"rgba(245,158,11,.08)",border:"1px solid rgba(245,158,11,.2)",borderRadius:8,padding:"10px 12px",fontSize:12,color:"#92400e"}}>
                           🔐 Pay ₹{o.buyer_pays||o.token_amount} token to secure this order. Seller will dispatch only after payment.
                         </div>
-                        <div style={{display:"flex",gap:8}}>
-                          <button className="btn-gold pulse" style={{flex:1,padding:"10px 0",fontSize:14,fontWeight:700}} onClick={()=>handlePay(o)}>
-                            💳 Pay ₹{o.buyer_pays||o.token_amount} Now
-                          </button>
+                        <div style={{display:"flex",gap:8,flexWrap:"wrap"}}>
+                          <button className="btn-gold pulse" style={{flex:1,padding:"10px 0",fontSize:14,fontWeight:700}} onClick={()=>handlePay(o)}>💳 Pay ₹{o.buyer_pays||o.token_amount} Now</button>
                           <button className="btn-outline" style={{padding:"9px 12px",fontSize:12}} onClick={()=>window._goToTrack&&window._goToTrack(o.id)}>🔍 Track</button>
                           <button className="btn-ghost" style={{padding:"9px 12px",fontSize:12}} onClick={()=>setShowOrder(o)}>Details</button>
                         </div>
@@ -3467,15 +3552,24 @@ function BuyerDB({ user, userId, userPhone, onLogout, dark, onToggle }) {
 
               {/* ── Order History Section ── */}
               {otherOrders.length>0 && <>
-                {pendingSellerOrders.length>0 && <div style={{fontSize:13,fontWeight:700,color:"var(--muted)",marginBottom:12,textTransform:"uppercase",letterSpacing:".5px"}}>Order History</div>}
+                <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:12,flexWrap:"wrap",gap:8}}>
+                  {pendingSellerOrders.length>0 && <div style={{fontSize:13,fontWeight:700,color:"var(--muted)",textTransform:"uppercase",letterSpacing:".5px"}}>Order History</div>}
+                  {/* ── Search Bar ── */}
+                  <div style={{position:"relative",flex:1,minWidth:180,maxWidth:320}}>
+                    <span style={{position:"absolute",left:10,top:"50%",transform:"translateY(-50%)",fontSize:14,pointerEvents:"none"}}>🔍</span>
+                    <input className="input" style={{paddingLeft:32,paddingTop:7,paddingBottom:7,fontSize:13,height:"auto"}} placeholder="Search product, order ID, seller…" value={searchQuery} onChange={e=>setSearchQuery(e.target.value)} />
+                  </div>
+                </div>
                 <div style={{display:"flex",gap:8,flexWrap:"wrap",marginBottom:14}}>
                   <div className={`chip ${filterStatus==="all"?"active":""}`} onClick={()=>setFilterStatus("all")}>All ({otherOrders.length})</div>
                   {Object.entries(STATUS_META).map(([key,val])=>{ const count=otherOrders.filter(o=>o.status===key).length; if(!count) return null; return <div key={key} className={`chip ${filterStatus===key?"active":""}`} onClick={()=>setFilterStatus(key)}>{val.icon} {val.label} ({count})</div>; })}
                 </div>
+                {searchedOther.length===0 && sq && <div style={{textAlign:"center",padding:24,color:"var(--muted)",fontSize:13}}>🔍 No orders found for "{searchQuery}"</div>}
                 <div style={{display:"flex",flexDirection:"column",gap:10}}>
-                  {(filterStatus==="all"?otherOrders:otherOrders.filter(o=>o.status===filterStatus)).map(o=>{
+                  {(filterStatus==="all"?searchedOther:searchedOther.filter(o=>o.status===filterStatus)).map(o=>{
                     const daysLeft=o.status==="dispatched"?getDaysLeft(o.dispatched_at||o.updated_at):null;
                     const trackingUrl=getTrackingUrl(o.tracking_number);
+                    const waSellerLink = o.seller_phone ? `https://wa.me/91${o.seller_phone.replace(/\D/g,"")}?text=${encodeURIComponent("Hi, I have a question about my EscaraPay order "+o.id+" ("+o.product_name+")")}` : null;
                     return (
                       <div key={o.id} className="card" style={{display:"flex",flexDirection:"column",gap:10}}>
                         <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",flexWrap:"wrap",gap:8}}>
@@ -3484,17 +3578,20 @@ function BuyerDB({ user, userId, userPhone, onLogout, dark, onToggle }) {
                             <div>
                               <div style={{fontWeight:600,marginBottom:2,fontSize:14}}>{o.product_name}</div>
                               <div style={{fontSize:12,color:"var(--muted)"}}>Seller: {o.seller_name||"—"} • {(o.created_at||"").split("T")[0]}</div>
-                              <div style={{fontSize:12,marginTop:2}}>₹{o.order_amount} | Token: <span style={{color:"var(--gold)",fontWeight:600}}>₹{o.token_amount}</span></div>
+                              <div style={{fontSize:12,marginTop:2}}>₹{o.order_amount} | Token: <span style={{color:"var(--gold)",fontWeight:600}}>₹{o.buyer_pays||o.token_amount}</span></div>
                             </div>
                           </div>
                           <Bdg status={o.status} />
                         </div>
                         {o.tracking_number && <div className="tracking-box"><div style={{flex:1}}><div style={{fontSize:11,color:"var(--blue)",fontWeight:600,marginBottom:2}}>📦 Tracking</div><div style={{fontFamily:"monospace",fontWeight:700}}>{o.tracking_number}</div></div>{trackingUrl&&<a href={trackingUrl} target="_blank" rel="noreferrer" style={{background:"var(--blue)",color:"#fff",padding:"6px 12px",borderRadius:8,fontSize:12,fontWeight:600,textDecoration:"none"}}>Track →</a>}</div>}
                         {o.status==="dispatched"&&daysLeft!==null&&<div className="hold-box"><div style={{fontSize:12,color:"#a78bfa",fontWeight:600}}>⏰ {daysLeft>0?`Token Hold: ${daysLeft} day${daysLeft===1?"":"s"} remaining`:"Auto-release ready!"}</div></div>}
-                        <div style={{display:"flex",gap:8,flexWrap:"wrap"}}>
-                          {o.status==="dispatched"&&<button className="btn-green" style={{padding:"7px 14px",fontSize:13}} onClick={()=>confirmDelivery(o.id).then(r=>{if(r.success)setOrders(prev=>prev.map(x=>x.id===o.id?{...x,status:"delivered"}:x));})}>✅ Delivery Confirm</button>}
-                          {["dispatched","token_paid","delivered"].includes(o.status)&&<button className="btn-outline" style={{padding:"6px 12px",fontSize:12,display:"flex",alignItems:"center",gap:5}} onClick={()=>window._goToTrack&&window._goToTrack(o.id)}>🔍 Track Order</button>}
-                          <button className="btn-ghost" style={{padding:"6px 12px",fontSize:12}} onClick={()=>setShowOrder(o)}>Details</button>
+                        <div style={{display:"flex",gap:7,flexWrap:"wrap"}}>
+                          {o.status==="dispatched"&&<button className="btn-green" style={{padding:"7px 12px",fontSize:12}} onClick={()=>confirmDelivery(o.id).then(r=>{if(r.success)setOrders(prev=>prev.map(x=>x.id===o.id?{...x,status:"delivered"}:x));})}>✅ Confirm Delivery</button>}
+                          {["dispatched","token_paid","delivered"].includes(o.status)&&<button className="btn-outline" style={{padding:"6px 11px",fontSize:12}} onClick={()=>window._goToTrack&&window._goToTrack(o.id)}>🔍 Track</button>}
+                          {waSellerLink && <a href={waSellerLink} target="_blank" rel="noreferrer" style={{background:"#25D366",color:"#fff",padding:"6px 11px",borderRadius:8,fontSize:12,fontWeight:600,textDecoration:"none",display:"flex",alignItems:"center",gap:4}}>💬 WhatsApp</a>}
+                          {["token_paid","dispatched","delivered"].includes(o.status)&&<button className="btn-ghost" style={{padding:"6px 11px",fontSize:12}} onClick={()=>downloadReceipt(o)}>🧾 Receipt</button>}
+                          <button className="btn-ghost" style={{padding:"6px 11px",fontSize:12}} onClick={()=>{ setDealForm({product:o.product_name||"",amount:o.order_amount||"",token_pct:"10",seller_name:o.seller_name||"",seller_phone:o.seller_phone||""}); setPage("create_deal"); setToast("Reorder form pre-filled!"); }}>🔁 Reorder</button>
+                          <button className="btn-ghost" style={{padding:"6px 11px",fontSize:12}} onClick={()=>setShowOrder(o)}>Details</button>
                         </div>
                       </div>
                     );
@@ -3559,9 +3656,9 @@ function BuyerDB({ user, userId, userPhone, onLogout, dark, onToggle }) {
                     <div><label className="label">Order Amount (₹) *</label><input className="input" type="number" placeholder="2000" value={dealForm.amount} onChange={e=>setDealForm({...dealForm,amount:e.target.value})} /></div>
                     <div><label className="label">Token %</label><select className="select" value={dealForm.token_pct} onChange={e=>setDealForm({...dealForm,token_pct:e.target.value})}><option value="5">5%</option><option value="10">10%</option><option value="15">15%</option><option value="20">20%</option></select></div>
                   </div>
-                  {dealForm.amount && <div style={{background:"rgba(14,165,233,.1)",border:"1px solid rgba(14,165,233,.25)",borderRadius:10,padding:14}}><div style={{fontSize:11,color:"var(--muted)",marginBottom:2}}>Aap Token Bharenge</div><div className="syne" style={{fontSize:24,fontWeight:800,color:"var(--gold)"}}>₹{Math.round(tokenPreview2*1.02)}</div></div>}
-                  <div><label className="label">Seller Ka Naam (optional)</label><input className="input" placeholder="Meena Crafts" value={dealForm.seller_name} onChange={e=>setDealForm({...dealForm,seller_name:e.target.value})} /></div>
-                  <div><label className="label">Seller Ka WhatsApp (optional)</label><input className="input" placeholder="9876543210" value={dealForm.seller_phone} onChange={e=>setDealForm({...dealForm,seller_phone:e.target.value})} /></div>
+                  {dealForm.amount && <div style={{background:"rgba(14,165,233,.1)",border:"1px solid rgba(14,165,233,.25)",borderRadius:10,padding:14}}><div style={{fontSize:11,color:"var(--muted)",marginBottom:2}}>Token Amount (You Pay)</div><div className="syne" style={{fontSize:24,fontWeight:800,color:"var(--gold)"}}>₹{Math.round(tokenPreview2*1.02)}</div></div>}
+                  <div><label className="label">Seller's Name (optional)</label><input className="input" placeholder="Meena Crafts" value={dealForm.seller_name} onChange={e=>setDealForm({...dealForm,seller_name:e.target.value})} /></div>
+                  <div><label className="label">Seller's WhatsApp (optional)</label><input className="input" placeholder="9876543210" value={dealForm.seller_phone} onChange={e=>setDealForm({...dealForm,seller_phone:e.target.value})} /></div>
                   <button className="btn-gold" style={{width:"100%",padding:12}} onClick={handleCreateDeal} disabled={!dealForm.product||!dealForm.amount||dealCreating}>{dealCreating?"⏳ Creating deal...":"🤝 Generate Deal Link"}</button>
                 </div>
               </div>
@@ -3579,12 +3676,49 @@ function BuyerDB({ user, userId, userPhone, onLogout, dark, onToggle }) {
           </div>
         )}
 
+        {page==="settings" && (
+          <div className="fu" style={{maxWidth:520}}>
+            <h1 className="syne" style={{fontSize:"clamp(18px,3vw,24px)",fontWeight:800,marginBottom:18}}>⚙️ Settings</h1>
+            <div style={{display:"flex",gap:8,marginBottom:20}}>
+              {[{id:"profile",label:"👤 Profile"},{id:"security",label:"🔐 Password"}].map(t=>(
+                <div key={t.id} className={`chip ${settingsTab===t.id?"active":""}`} onClick={()=>setSettingsTab(t.id)}>{t.label}</div>
+              ))}
+            </div>
+            {settingsTab==="profile" && (
+              <div className="card">
+                <div style={{display:"flex",flexDirection:"column",gap:14}}>
+                  <div><label className="label">Full Name</label><input className="input" placeholder={userName} value={settingsForm.name} onChange={e=>setSettingsForm({...settingsForm,name:e.target.value})} /></div>
+                  <div><label className="label">Phone Number</label><input className="input" placeholder={userPhone||"Not set"} value={settingsForm.phone} onChange={e=>setSettingsForm({...settingsForm,phone:e.target.value})} /></div>
+                  <div style={{background:"rgba(14,165,233,.08)",border:"1px solid rgba(14,165,233,.2)",borderRadius:8,padding:"10px 12px",fontSize:12,color:"var(--muted)"}}>
+                    ℹ️ Email change requires OTP verification — contact support@escarapay.in
+                  </div>
+                  <button className="btn-gold" style={{width:"100%",padding:12}} disabled={settingsSaving||(!settingsForm.name&&!settingsForm.phone)} onClick={async()=>{
+                    setSettingsSaving(true);
+                    try {
+                      const res = await fetch(`${BACKEND_URL}/api/users/${userId}/update-profile`, {method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({name:settingsForm.name||undefined,phone:settingsForm.phone||undefined})});
+                      const d = await res.json();
+                      if(d.success){ if(settingsForm.name) setUserName(settingsForm.name); setSettingsForm({name:"",phone:"",email:""}); setToast("✅ Profile updated!"); }
+                      else setToast("❌ "+d.error);
+                    } catch(e){ setToast("❌ Could not save"); }
+                    setSettingsSaving(false);
+                  }}>{settingsSaving?"⏳ Saving...":"💾 Save Changes"}</button>
+                </div>
+              </div>
+            )}
+            {settingsTab==="security" && (
+              <div className="card">
+                <InlinePwdChange userId={userId} onDone={(msg)=>setToast(msg)} />
+              </div>
+            )}
+          </div>
+        )}
+
         {page==="help" && (
           <div className="fu" style={{maxWidth:560}}>
             <h1 className="syne" style={{fontSize:"clamp(18px,3vw,24px)",fontWeight:800,marginBottom:22}}>Help & Safety</h1>
             {[
               {q:"What is the difference between Create Deal and Pay via Link?",a:"Pay via Link: Seller created the order. Create Deal: You create the order, seller confirms. Both offer the same protection!"},
-              {q:"When does the seller receive the token?",a:"Token is held for 7 days after delivery confirmation. No dispute → auto-released to seller."},
+              {q:"When does the seller receive the token?",a:"Token is held for 14 days after dispatch. If no dispute is raised, it is auto-released to the seller."},
               {q:"Item not received?",a:"Go to 'View Details' → 'Raise Dispute'. Our team investigates within 24 hours."},
               {q:"How do I track my order?",a:"Click the 'Track →' button on your order card."},
             ].map(({q,a})=>(
@@ -4860,7 +4994,7 @@ function RefundPage({ onBack, dark, onToggle }) {
             {head:"Bank Processing",body:"Once EscaraPay initiates the refund, your bank may take additional 2–3 business days to reflect in your account."},
           ]},
           {t:"4. How to Request a Refund",icon:"📋",color:"var(--accent)",sections:[
-            {head:"Step 1 — Raise a Dispute",body:"Open your order in the EscaraPay app → Click 'Dispute Raise Karo' → Provide reason and evidence."},
+            {head:"Step 1 — Raise a Dispute",body:"Open your order in the EscaraPay app → Click 'Raise Dispute' → Provide reason and evidence."},
             {head:"Step 2 — Investigation",body:"Our team investigates within 24 business hours. We may contact both buyer and seller for clarification."},
             {head:"Step 3 — Resolution",body:"If resolved in your favor, refund is initiated within 2 business days. You'll receive a confirmation email."},
             {head:"Step 4 — Contact Support",body:"For any refund queries: support@escarapay.in | Response time: within 24 hours."},
@@ -4923,7 +5057,7 @@ function DisputePage({ onBack, dark, onToggle }) {
         <div className="card" style={{marginBottom:16}}>
           <h2 className="syne" style={{fontWeight:700,fontSize:16,marginBottom:16}}>📋 Dispute Process Step by Step</h2>
           {[
-            {n:"1",c:"var(--gold)",   t:"Raise Dispute",       d:"Open your order → Click 'Dispute Raise Karo' → Select reason → Add any evidence (photos, screenshots). Must be raised within 48 hours of expected delivery."},
+            {n:"1",c:"var(--gold)",   t:"Raise Dispute",       d:"Open your order → Click 'Raise Dispute' → Select reason → Add evidence (photos, screenshots). Must be raised within 48 hours of expected delivery."},
             {n:"2",c:"var(--blue)",   t:"Notification",         d:"Both buyer and seller are notified immediately. The protected token is frozen — no one can access it during investigation."},
             {n:"3",c:"var(--accent)", t:"Evidence Collection",  d:"Both parties must submit evidence within 24 hours: photos of item received, tracking screenshots, chat screenshots, any proof of delivery or non-delivery."},
             {n:"4",c:"var(--red)",    t:"Investigation",        d:"EscaraPay's dispute team reviews all evidence. We may contact courier partners for tracking verification. Investigation completes within 24 business hours."},
@@ -5041,7 +5175,7 @@ function TermsPage({ onBack, dark, onToggle }) {
           <div style={{display:"flex",flexDirection:"column",gap:10}}>
             {[
               {icon:"⏰",t:"Dispute Window",d:"Buyers must raise a dispute within 48 hours of expected delivery date. After 48 hours, token auto-releases to seller."},
-              {icon:"📋",t:"How to Raise Dispute",d:"Open your order → Click 'Dispute Raise Karo' → Select reason → Submit evidence if any. Seller will be notified immediately."},
+              {icon:"📋",t:"How to Raise Dispute",d:"Open your order → Click 'Raise Dispute' → Select reason → Submit evidence if any. Seller will be notified immediately."},
               {icon:"🔍",t:"Investigation Process",d:"EscaraPay team investigates within 24 business hours. Both buyer and seller must provide evidence (photos, screenshots, tracking info). During investigation, token remains frozen."},
               {icon:"⚖️",t:"Resolution",d:"EscaraPay's decision is final and binding. If buyer is right → full token refunded to buyer. If seller is right → token released to seller. Partial resolutions may be made at EscaraPay's discretion."},
               {icon:"🚫",t:"Invalid Disputes",d:"Disputes raised after 48 hours, disputes without valid reason, or repeated false disputes may result in account suspension."},
