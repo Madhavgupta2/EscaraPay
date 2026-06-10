@@ -1,5 +1,17 @@
 const BASE_URL = "https://escarapay-backend.onrender.com";
 
+// ── JWT Token Helpers ──
+const getToken = () => localStorage.getItem("escara_auth_token") || "";
+const saveToken = (token) => { if (token) localStorage.setItem("escara_auth_token", token); };
+export const clearToken = () => localStorage.removeItem("escara_auth_token");
+
+// Builds Authorization header for protected API calls
+const authHeader = () => {
+  const token = getToken();
+  return token ? { "Content-Type": "application/json", "Authorization": `Bearer ${token}` }
+               : { "Content-Type": "application/json" };
+};
+
 /* ── Auth ── */
 export const registerUser = async (name, email, phone, role, password, shopName = "", pan = "", gst = "") => {
   try {
@@ -21,6 +33,8 @@ export const loginUser = async (email, password, role) => {
     });
     const data = await res.json();
     if (!res.ok) return { success: false, error: data.error || "Login failed" };
+    // ✅ Save JWT token to localStorage automatically
+    saveToken(data.token);
     return { success: true, data };
   } catch (err) { return { success: false, error: "Could not connect to server. Please try again." }; }
 };
@@ -29,7 +43,7 @@ export const loginUser = async (email, password, role) => {
 export const createOrder = async (sellerId, productName, orderAmount, tokenPct, buyerName, buyerPhone) => {
   try {
     const res = await fetch(`${BASE_URL}/api/orders/create`, {
-      method: "POST", headers: { "Content-Type": "application/json" },
+      method: "POST", headers: authHeader(),
       body: JSON.stringify({ seller_id: sellerId, product_name: productName, order_amount: orderAmount, token_pct: tokenPct, buyer_name: buyerName, buyer_phone: buyerPhone }),
     });
     const data = await res.json();
@@ -40,7 +54,9 @@ export const createOrder = async (sellerId, productName, orderAmount, tokenPct, 
 
 export const getSellerOrders = async (sellerId) => {
   try {
-    const res = await fetch(`${BASE_URL}/api/orders/seller/${sellerId}`);
+    const res = await fetch(`${BASE_URL}/api/orders/seller/${sellerId}`, {
+      headers: authHeader(),
+    });
     const data = await res.json();
     if (!res.ok) return { success: false, error: data.error || "Orders could not be loaded" };
     return { success: true, data };
@@ -49,7 +65,9 @@ export const getSellerOrders = async (sellerId) => {
 
 export const getBuyerOrders = async (buyerPhone) => {
   try {
-    const res = await fetch(`${BASE_URL}/api/orders/buyer/${buyerPhone}`);
+    const res = await fetch(`${BASE_URL}/api/orders/buyer/${buyerPhone}`, {
+      headers: authHeader(),
+    });
     const data = await res.json();
     if (!res.ok) return { success: false, error: data.error || "Orders could not be loaded" };
     return { success: true, data };
@@ -65,11 +83,11 @@ export const getOrderById = async (orderId) => {
   } catch (err) { return { success: false, error: "Could not connect to server." }; }
 };
 
-// ✅ Fixed — seller_id now sent to verify ownership
+// ✅ Fixed — seller_id now sent to verify ownership + JWT auth header
 export const dispatchOrder = async (orderId, trackingNumber, sellerId) => {
   try {
     const res = await fetch(`${BASE_URL}/api/orders/${orderId}/dispatch`, {
-      method: "POST", headers: { "Content-Type": "application/json" },
+      method: "POST", headers: authHeader(),
       body: JSON.stringify({ tracking_number: trackingNumber, seller_id: sellerId }),
     });
     const data = await res.json();
@@ -117,7 +135,7 @@ export const buyerCancel = async (orderId, buyerPhone) => {
 export const sellerCancel = async (orderId, sellerId) => {
   try {
     const res = await fetch(`${BASE_URL}/api/orders/${orderId}/seller-cancel`, {
-      method: "POST", headers: { "Content-Type": "application/json" },
+      method: "POST", headers: authHeader(),
       body: JSON.stringify({ seller_id: sellerId }),
     });
     const data = await res.json();
@@ -153,7 +171,9 @@ export const verifyPayment = async (rzpOrderId, rzpPaymentId, rzpSignature, esca
 
 export const getSellerAnalytics = async (sellerId) => {
   try {
-    const res = await fetch(`${BASE_URL}/api/analytics/seller/${sellerId}`);
+    const res = await fetch(`${BASE_URL}/api/analytics/seller/${sellerId}`, {
+      headers: authHeader(),
+    });
     const data = await res.json();
     if (!res.ok) return { success: false, error: data.error || "Analytics could not be loaded" };
     return { success: true, data };
@@ -180,6 +200,8 @@ export const verifyOTP = async (email, role, otp) => {
     });
     const data = await res.json();
     if (!res.ok) return { success: false, error: data.error || "OTP verification failed" };
+    // ✅ Save JWT token to localStorage automatically
+    saveToken(data.token);
     return { success: true, data };
   } catch (err) { return { success: false, error: "Could not connect to server." }; }
 };

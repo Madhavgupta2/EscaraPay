@@ -1,5 +1,5 @@
 /* eslint-disable */
-import { registerUser, loginUser, createOrder as apiCreateOrder, getSellerOrders, getBuyerOrders, getOrderById, createPaymentOrder, verifyPayment, confirmDelivery, raiseDispute, dispatchOrder, sendOTP, verifyOTP, sendRegisterOTP, verifyRegisterOTP } from './api';
+import { registerUser, loginUser, createOrder as apiCreateOrder, getSellerOrders, getBuyerOrders, getOrderById, createPaymentOrder, verifyPayment, confirmDelivery, raiseDispute, dispatchOrder, sendOTP, verifyOTP, sendRegisterOTP, verifyRegisterOTP, clearToken } from './api';
 import { useState, useEffect } from "react";
 import LOGO_SRC from "./escarapay-logo.jpg";
 
@@ -5937,7 +5937,7 @@ export default function App() {
 
   const props = { dark, onToggle:toggleDark, lang, onLangToggle:toggleLang };
   const handleLogin=(t,n,id,phone)=>{setUserType(t);setUserName(n);setUserId(id);setUserPhone(phone||"");setScreen("dashboard");};
-  const handleLogout=()=>{setScreen("landing");setUserType(null);setUserId(null);setUserPhone("");setUserName("");};
+  const handleLogout=()=>{clearToken();setScreen("landing");setUserType(null);setUserId(null);setUserPhone("");setUserName("");};
   const goHome=()=>{window.history.pushState({},"","/");setScreen("landing");setPayOrderId(null);setDealOrderId(null);setTrackOrderId(null);setConfirmToken(null);setBlogSlug(null);};
   const goToScreen=(s,url)=>{window.history.pushState({},"",(url||"/"));setScreen(s);};
 
