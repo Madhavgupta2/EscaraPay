@@ -1,5 +1,5 @@
 /* eslint-disable */
-import { registerUser, loginUser, createOrder as apiCreateOrder, getSellerOrders, getBuyerOrders, getOrderById, createPaymentOrder, verifyPayment, confirmDelivery, raiseDispute, dispatchOrder, sendOTP, verifyOTP, sendRegisterOTP, verifyRegisterOTP, clearToken } from './api';
+import { registerUser, loginUser, createOrder as apiCreateOrder, getSellerOrders, getBuyerOrders, getOrderById, createPaymentOrder, verifyPayment, confirmDelivery, raiseDispute, dispatchOrder, sendOTP, verifyOTP, sendRegisterOTP, verifyRegisterOTP, clearToken, getIntegrationKey, generateIntegrationKey } from './api';
 import { useState, useEffect } from "react";
 import LOGO_SRC from "./escarapay-logo.jpg";
 
@@ -2299,7 +2299,7 @@ function ProfileModal({ user, userId, userType, onClose, onUpdate }) {
 function Auth({ type, onLogin, onBack, dark, onToggle }) {
   const [mode, setMode] = useState("login");        // login | register
   const [loginMethod, setLoginMethod] = useState("password"); // password | otp
-  const [form, setForm] = useState({name:"",email:"",password:"",shop:"",phone:"",pan:"",gst:""});
+  const [form, setForm] = useState({name:"",email:"",password:"",shop:"",phone:"",pan:"",gst:"",sellerType:null,websiteUrl:""});
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
   // OTP states
@@ -2365,12 +2365,12 @@ function Auth({ type, onLogin, onBack, dark, onToggle }) {
     }
     setLoading(true);
     const result = mode === "register"
-      ? await registerUser(form.name,form.email,form.phone,type,form.password,form.shop||"",form.pan||"",form.gst||"")
+      ? await registerUser(form.name,form.email,form.phone,type,form.password,form.shop||"",form.pan||"",form.gst||"",form.sellerType||null,form.websiteUrl||"")
       : await loginUser(form.email,form.password,type);
     setLoading(false);
     if (result.success) {
       const u = result.data.user;
-      onLogin(type, u.name, u.id, u.phone||form.phone||"");
+      onLogin(type, u.name, u.id, u.phone||form.phone||"", u.seller_type||null, u.website_url||"");
     } else alert("❌ " + result.error);
   };
 
@@ -2418,7 +2418,7 @@ function Auth({ type, onLogin, onBack, dark, onToggle }) {
     setLoading(false);
     if (r.success) {
       const u = r.data.user;
-      onLogin(type, u.name, u.id, u.phone||"");
+      onLogin(type, u.name, u.id, u.phone||"", u.seller_type||null, u.website_url||"");
     } else {
       setOtpMsg("❌ " + r.error);
     }
@@ -2672,6 +2672,49 @@ function Auth({ type, onLogin, onBack, dark, onToggle }) {
               </div>
             )}
 
+            {/* ── Seller Type Selection (Optional) ── */}
+            {mode==="register"&&type==="seller" && (
+              <div style={{background:"rgba(245,158,11,.06)",border:"1px solid rgba(245,158,11,.25)",borderRadius:10,padding:14}}>
+                <div style={{fontSize:12,fontWeight:700,marginBottom:10,color:"var(--gold)"}}>
+                  🏪 What kind of seller are you?
+                  <span style={{color:"var(--muted)",fontWeight:400,fontSize:11,marginLeft:6}}>(Optional — can change later)</span>
+                </div>
+                <div style={{display:"flex",gap:10,marginBottom:form.sellerType==="website"?12:0}}>
+                  <div onClick={()=>setField("sellerType", form.sellerType==="social_media"?null:"social_media")} style={{
+                    flex:1,padding:14,borderRadius:12,cursor:"pointer",textAlign:"center",transition:"all .15s",
+                    border:`2px solid ${form.sellerType==="social_media"?"var(--gold)":"var(--border)"}`,
+                    background:form.sellerType==="social_media"?"rgba(245,158,11,.12)":"transparent",
+                  }}>
+                    <div style={{fontSize:26,marginBottom:5}}>📱</div>
+                    <div style={{fontWeight:700,fontSize:13}}>Social Media</div>
+                    <div style={{fontSize:11,color:"var(--muted)",marginTop:3}}>Instagram, WhatsApp, Facebook</div>
+                  </div>
+                  <div onClick={()=>setField("sellerType", form.sellerType==="website"?null:"website")} style={{
+                    flex:1,padding:14,borderRadius:12,cursor:"pointer",textAlign:"center",transition:"all .15s",
+                    border:`2px solid ${form.sellerType==="website"?"var(--gold)":"var(--border)"}`,
+                    background:form.sellerType==="website"?"rgba(245,158,11,.12)":"transparent",
+                  }}>
+                    <div style={{fontSize:26,marginBottom:5}}>🏪</div>
+                    <div style={{fontWeight:700,fontSize:13}}>Website Store</div>
+                    <div style={{fontSize:11,color:"var(--muted)",marginTop:3}}>Shopify, Wix, WooCommerce</div>
+                  </div>
+                </div>
+                {form.sellerType==="website" && (
+                  <div>
+                    <label className="label">Store Website URL <span style={{color:"var(--muted)",fontWeight:400}}>(Optional)</span></label>
+                    <input className="input" placeholder="https://yourstore.com" value={form.websiteUrl}
+                      onChange={e=>setField("websiteUrl",e.target.value)} />
+                    <div style={{fontSize:11,color:"var(--muted)",marginTop:4}}>You can set up auto COD protection for your store from the dashboard.</div>
+                  </div>
+                )}
+                {!form.sellerType && (
+                  <div style={{textAlign:"center",fontSize:11,color:"var(--muted)",marginTop:4}}>
+                    Click to select · You can also set this later in Profile Settings
+                  </div>
+                )}
+              </div>
+            )}
+
             {/* OTP login flow */}
             {mode==="login" && loginMethod==="otp" && (
               <div>
@@ -2730,20 +2773,359 @@ function Auth({ type, onLogin, onBack, dark, onToggle }) {
 }
 
 
-/* ══════════ SELLER SETTINGS COMPONENT ══════════ */
-function SellerSettings({ userId, userName, BACKEND_URL }) {
-  const [form, setForm] = useState({ shop_name:"", phone:"", upi_id:"" });
-  const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
-  const [msg, setMsg] = useState("");
+/* ══════════ SELLER INTEGRATION COMPONENT ══════════ */
+function SellerIntegration({ userId, BACKEND_URL }) {
+  const [keyInfo,    setKeyInfo]    = useState(null);
+  const [loading,    setLoading]    = useState(true);
+  const [generating, setGenerating] = useState(false);
+  const [newKey,     setNewKey]     = useState("");
+  const [copied,     setCopied]     = useState("");
+  const [platform,   setPlatform]   = useState("universal");
+
+  const authHdr = () => {
+    const t = localStorage.getItem("escara_auth_token") || "";
+    return t
+      ? { "Content-Type": "application/json", "Authorization": `Bearer ${t}` }
+      : { "Content-Type": "application/json" };
+  };
+
+  const WEBHOOK_URLS = {
+    universal:   `${BACKEND_URL}/api/integrations/order`,
+    shopify:     `${BACKEND_URL}/api/integrations/shopify/webhook`,
+    woocommerce: `${BACKEND_URL}/api/integrations/woocommerce/webhook`,
+    other:       `${BACKEND_URL}/api/integrations/order`,
+  };
 
   useEffect(() => {
     const load = async () => {
       try {
-        const r = await fetch(`${BACKEND_URL}/api/users/${userId}/profile`);
+        const r = await fetch(`${BACKEND_URL}/api/integrations/my-key`, { headers: authHdr() });
+        const d = await r.json();
+        if (d.success) setKeyInfo(d);
+      } catch(e) {}
+      setLoading(false);
+    };
+    if (userId) load();
+  }, [userId, BACKEND_URL]);
+
+  const handleGenerate = async () => {
+    if (keyInfo?.hasKey) {
+      if (!window.confirm(
+        "⚠️ Regenerating will invalidate your current API key.\n\nAll existing integrations will break until you update the key in your store.\n\nContinue?"
+      )) return;
+    }
+    setGenerating(true);
+    setNewKey("");
+    try {
+      const r = await fetch(`${BACKEND_URL}/api/integrations/generate-key`, {
+        method: "POST", headers: authHdr(),
+      });
+      const d = await r.json();
+      if (d.success) {
+        setNewKey(d.api_key);
+        const mk = d.api_key.slice(0, 12) + "••••••••••••" + d.api_key.slice(-4);
+        setKeyInfo(prev => ({ ...prev, hasKey: true, masked_key: mk, webhooks_count: prev?.webhooks_count || 0 }));
+      } else {
+        alert("❌ " + (d.error || "Failed to generate key. Please try again."));
+      }
+    } catch(e) {
+      alert("❌ Connection error. Please try again.");
+    }
+    setGenerating(false);
+  };
+
+  const copyText = (text, label) => {
+    navigator.clipboard?.writeText(text);
+    setCopied(label);
+    setTimeout(() => setCopied(""), 2000);
+  };
+
+  const platforms = [
+    { id: "universal",   label: "🌐 Universal / Wix" },
+    { id: "shopify",     label: "🛒 Shopify" },
+    { id: "woocommerce", label: "🔌 WooCommerce" },
+    { id: "other",       label: "📦 Custom / API" },
+  ];
+
+  const displayKey        = newKey || (keyInfo?.hasKey ? keyInfo.masked_key : "");
+  const currentWebhookUrl = WEBHOOK_URLS[platform] || WEBHOOK_URLS.universal;
+  const shopifyUrl        = `${WEBHOOK_URLS.shopify}?key=${newKey || (keyInfo?.hasKey ? "[YOUR_API_KEY]" : "YOUR_API_KEY")}`;
+
+  const samplePayload = JSON.stringify({
+    buyer_name: "Priya Sharma", buyer_phone: "9876543210",
+    buyer_email: "priya@example.com", product_name: "Handmade Silk Saree",
+    order_amount: 2500, token_pct: 10, platform_order_id: "YOUR-ORDER-123"
+  }, null, 2);
+
+  const curlKey     = newKey || displayKey || "YOUR_API_KEY";
+  const curlExample = `curl -X POST "${WEBHOOK_URLS.universal}" \\\n  -H "Content-Type: application/json" \\\n  -H "x-api-key: ${curlKey}" \\\n  -d '{"buyer_name":"Priya Sharma","buyer_phone":"9876543210","buyer_email":"priya@example.com","product_name":"Silk Saree","order_amount":2500}'`;
+
+  const universalSteps = [
+    "Generate your API Key below (click the button).",
+    "Copy the Webhook URL shown below for your platform.",
+    "In your store/platform, set up an automation triggered on COD order placement that sends a POST request to the Webhook URL.",
+    "Include your API key in the request header: x-api-key: YOUR_KEY",
+    "EscaraPay instantly creates the order, emails the buyer a token payment link, and adds the order to your dashboard.",
+    "After buyer pays the token, order appears as 'Token Paid' in your dashboard — dispatch as usual.",
+  ];
+  const shopifySteps = [
+    "Generate your API Key below.",
+    "In Shopify Admin → Settings → Notifications → scroll down → Webhooks → Create webhook.",
+    "Event: Order creation | Format: JSON",
+    "Delivery URL: paste the Shopify URL shown below (your key is already embedded).",
+    "Save. Every new Shopify COD order will auto-create in EscaraPay and buyer gets a payment email instantly.",
+    "Prepaid Shopify orders (Razorpay, PayTM etc.) are automatically skipped — EscaraPay only processes COD.",
+  ];
+  const wooSteps = [
+    "Generate your API Key below.",
+    "In WordPress Admin → WooCommerce → Settings → Advanced → Webhooks → Add webhook.",
+    "Name: EscaraPay COD | Status: Active | Topic: Order created | Delivery URL: paste URL below.",
+    "For the x-api-key header, use WP Webhooks Pro plugin, or use Zapier/Make to forward WooCommerce COD orders.",
+    "Using Zapier? Trigger: WooCommerce New Order → Action: Webhooks POST to Universal URL with x-api-key header.",
+    "Only COD/Cash on Delivery orders are processed — prepaid orders return a 'skipped' response automatically.",
+  ];
+
+  if (loading) return <div style={{padding:40,textAlign:"center",color:"var(--muted)"}}>⏳ Loading integration settings...</div>;
+
+  return (
+    <div className="fu">
+      <div style={{marginBottom:22}}>
+        <h1 className="syne" style={{fontSize:"clamp(18px,3vw,26px)",fontWeight:800,marginBottom:4}}>Ecommerce Integration 🔗</h1>
+        <p style={{color:"var(--muted)",fontSize:13,margin:0}}>Auto-protect COD orders from your Shopify, Wix, WooCommerce, or any custom website.</p>
+      </div>
+
+      {keyInfo?.hasKey && (
+        <div className="g3" style={{marginBottom:20}}>
+          {[
+            {label:"Webhook Orders",value:keyInfo.webhooks_count||0,icon:"⚡",color:"var(--gold)"},
+            {label:"Integration",   value:"Active",                  icon:"✅",color:"var(--green)"},
+            {label:"Mode",          value:"Live",                    icon:"🔴",color:"var(--blue)"},
+          ].map(s=>(
+            <div key={s.label} className="stat-card">
+              <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start"}}>
+                <div>
+                  <div style={{fontSize:11,color:"var(--muted)",marginBottom:6}}>{s.label}</div>
+                  <div className="syne" style={{fontSize:22,fontWeight:800,color:s.color}}>{s.value}</div>
+                </div>
+                <span style={{fontSize:22}}>{s.icon}</span>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* ── API KEY ── */}
+      <div className="card" style={{marginBottom:16}}>
+        <h3 className="syne" style={{fontWeight:700,fontSize:15,marginBottom:4}}>🔑 Your API Key</h3>
+        <p style={{color:"var(--muted)",fontSize:12,marginBottom:14}}>Use this key to authenticate requests from your store to EscaraPay. Keep it secret.</p>
+
+        {newKey && (
+          <div style={{background:"rgba(34,197,94,.1)",border:"1px solid rgba(34,197,94,.4)",borderRadius:10,padding:14,marginBottom:14}}>
+            <div style={{fontSize:12,fontWeight:700,color:"#059669",marginBottom:8}}>✅ New API Key generated — Copy it now! It won't be shown again in full.</div>
+            <div style={{display:"flex",gap:8,alignItems:"center",flexWrap:"wrap"}}>
+              <code style={{background:"var(--sf2)",padding:"8px 12px",borderRadius:8,fontSize:12,fontFamily:"monospace",color:"var(--gold)",wordBreak:"break-all",flex:1}}>{newKey}</code>
+              <button className="btn-gold" style={{padding:"8px 14px",fontSize:12,whiteSpace:"nowrap"}} onClick={()=>copyText(newKey,"key")}>
+                {copied==="key"?"✅ Copied!":"📋 Copy Key"}
+              </button>
+            </div>
+          </div>
+        )}
+
+        {!newKey && keyInfo?.hasKey && (
+          <div style={{display:"flex",gap:8,alignItems:"center",marginBottom:14,background:"var(--sf2)",borderRadius:10,padding:"10px 14px"}}>
+            <code style={{fontSize:13,fontFamily:"monospace",color:"var(--muted)",flex:1}}>{keyInfo.masked_key}</code>
+            <span style={{fontSize:11,color:"var(--muted)"}}>Hidden for security</span>
+          </div>
+        )}
+
+        {!keyInfo?.hasKey && !newKey && (
+          <div style={{background:"rgba(245,158,11,.08)",border:"1px solid rgba(245,158,11,.3)",borderRadius:10,padding:14,marginBottom:14}}>
+            <div style={{fontSize:13,color:"#92400e",fontWeight:600}}>⚠️ No API key yet. Generate one below to start integrating your store.</div>
+          </div>
+        )}
+
+        <div style={{display:"flex",gap:10,alignItems:"center",flexWrap:"wrap"}}>
+          <button className="btn-gold" style={{fontSize:13,padding:"10px 20px"}} onClick={handleGenerate} disabled={generating}>
+            {generating?"⏳ Generating...":keyInfo?.hasKey?"🔄 Regenerate Key":"🔑 Generate API Key"}
+          </button>
+          {keyInfo?.created_at && <span style={{fontSize:11,color:"var(--muted)"}}>Created: {new Date(keyInfo.created_at).toLocaleDateString("en-IN")}</span>}
+        </div>
+        {keyInfo?.hasKey && <p style={{fontSize:11,color:"var(--muted)",marginTop:8}}>⚠️ Regenerating will break existing integrations until you update the key in your store.</p>}
+      </div>
+
+      {/* ── WEBHOOK URL ── */}
+      <div className="card" style={{marginBottom:16}}>
+        <h3 className="syne" style={{fontWeight:700,fontSize:15,marginBottom:4}}>🌐 Webhook URL</h3>
+        <p style={{color:"var(--muted)",fontSize:12,marginBottom:14}}>Send COD order data from your store to this URL. Select your platform:</p>
+
+        <div style={{display:"flex",gap:6,flexWrap:"wrap",marginBottom:14}}>
+          {platforms.map(p=>(
+            <div key={p.id} onClick={()=>setPlatform(p.id)} style={{
+              padding:"6px 14px",borderRadius:20,fontSize:12,fontWeight:600,cursor:"pointer",
+              border:`1px solid ${platform===p.id?"var(--gold)":"var(--border)"}`,
+              background:platform===p.id?"rgba(245,158,11,.12)":"transparent",
+              color:platform===p.id?"var(--gold)":"var(--muted)",transition:"all .15s",
+            }}>{p.label}</div>
+          ))}
+        </div>
+
+        <div style={{display:"flex",gap:8,alignItems:"center",flexWrap:"wrap"}}>
+          <code style={{background:"var(--sf2)",padding:"10px 14px",borderRadius:8,fontSize:11,fontFamily:"monospace",color:"var(--blue)",wordBreak:"break-all",flex:1,lineHeight:1.6}}>
+            {platform==="shopify"?shopifyUrl:currentWebhookUrl}
+          </code>
+          <button className="btn-ghost" style={{padding:"9px 14px",fontSize:12,whiteSpace:"nowrap"}} onClick={()=>copyText(platform==="shopify"?shopifyUrl:currentWebhookUrl,"url")}>
+            {copied==="url"?"✅ Copied!":"📋 Copy"}
+          </button>
+        </div>
+        {platform==="shopify"
+          ? <p style={{fontSize:11,color:"var(--muted)",marginTop:8}}>💡 For Shopify, your API key is embedded in the URL — no extra header needed.</p>
+          : <p style={{fontSize:11,color:"var(--muted)",marginTop:8}}>💡 Send header: <code style={{background:"var(--sf2)",padding:"2px 6px",borderRadius:4}}>x-api-key: {displayKey||"YOUR_API_KEY"}</code></p>
+        }
+      </div>
+
+      {/* ── INSTRUCTIONS ── */}
+      <div className="card">
+        <h3 className="syne" style={{fontWeight:700,fontSize:15,marginBottom:16}}>📋 Setup Instructions</h3>
+
+        {(platform==="universal"||platform==="other") && (
+          <div>
+            <div style={{fontWeight:700,fontSize:13,marginBottom:12,color:"var(--gold)"}}>
+              {platform==="other"?"📦 Any Platform / Custom API":"🌐 Universal / Wix / Custom"}
+            </div>
+            <div style={{display:"flex",flexDirection:"column",gap:10,marginBottom:20}}>
+              {universalSteps.map((step,i)=>(
+                <div key={i} style={{display:"flex",gap:10,alignItems:"flex-start"}}>
+                  <div style={{background:"var(--gold)",color:"#fff",borderRadius:"50%",width:22,height:22,display:"flex",alignItems:"center",justifyContent:"center",fontSize:11,fontWeight:700,flexShrink:0,marginTop:2}}>{i+1}</div>
+                  <div style={{fontSize:13,color:"var(--muted)",lineHeight:1.65}}>{step}</div>
+                </div>
+              ))}
+            </div>
+            <div style={{background:"var(--sf2)",border:"1px solid var(--border)",borderRadius:10,padding:14,marginBottom:12}}>
+              <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:8}}>
+                <div style={{fontSize:12,fontWeight:700}}>📝 Required JSON Body</div>
+                <button className="btn-ghost" style={{padding:"4px 10px",fontSize:11}} onClick={()=>copyText(samplePayload,"payload")}>{copied==="payload"?"✅ Copied!":"📋 Copy"}</button>
+              </div>
+              <pre style={{fontSize:11,color:"var(--muted)",margin:0,overflowX:"auto",lineHeight:1.7,fontFamily:"monospace"}}>{samplePayload}</pre>
+              <div style={{marginTop:10,fontSize:11,color:"var(--muted)",lineHeight:1.8}}>
+                <strong>Required:</strong> buyer_name, order_amount (min ₹200), and at least one of buyer_phone / buyer_email<br/>
+                <strong>Optional:</strong> token_pct (5–100, default 10%), platform_order_id (for your reference)
+              </div>
+            </div>
+            <div style={{background:"var(--sf2)",border:"1px solid var(--border)",borderRadius:10,padding:14,marginBottom:12}}>
+              <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:8}}>
+                <div style={{fontSize:12,fontWeight:700}}>🧪 Test with cURL</div>
+                <button className="btn-ghost" style={{padding:"4px 10px",fontSize:11}} onClick={()=>copyText(curlExample,"curl")}>{copied==="curl"?"✅ Copied!":"📋 Copy"}</button>
+              </div>
+              <pre style={{fontSize:10,color:"var(--muted)",margin:0,lineHeight:1.8,fontFamily:"monospace",whiteSpace:"pre-wrap",wordBreak:"break-all"}}>{curlExample}</pre>
+            </div>
+            <div style={{background:"var(--sf2)",border:"1px solid var(--border)",borderRadius:10,padding:14}}>
+              <div style={{fontSize:12,fontWeight:700,marginBottom:8}}>✅ Success Response</div>
+              <pre style={{fontSize:11,color:"var(--muted)",margin:0,fontFamily:"monospace",lineHeight:1.7}}>{`{\n  "success": true,\n  "escara_order_id": "EP-ABCD1234",\n  "payment_link": "https://escarapay.in/pay/EP-ABCD1234",\n  "token_amount": 250,\n  "buyer_pays": 255,\n  "message": "Order created. Buyer notified via email."\n}`}</pre>
+            </div>
+          </div>
+        )}
+
+        {platform==="shopify" && (
+          <div>
+            <div style={{fontWeight:700,fontSize:13,marginBottom:12,color:"#5c6ac4"}}>🛒 Shopify Native Webhook Setup</div>
+            <div style={{display:"flex",flexDirection:"column",gap:10,marginBottom:20}}>
+              {shopifySteps.map((step,i)=>(
+                <div key={i} style={{display:"flex",gap:10,alignItems:"flex-start"}}>
+                  <div style={{background:"#5c6ac4",color:"#fff",borderRadius:"50%",width:22,height:22,display:"flex",alignItems:"center",justifyContent:"center",fontSize:11,fontWeight:700,flexShrink:0,marginTop:2}}>{i+1}</div>
+                  <div style={{fontSize:13,color:"var(--muted)",lineHeight:1.65}}>{step}</div>
+                </div>
+              ))}
+            </div>
+            <div style={{background:"rgba(92,106,196,.08)",border:"1px solid rgba(92,106,196,.3)",borderRadius:10,padding:14}}>
+              <div style={{fontWeight:700,fontSize:12,marginBottom:6,color:"#5c6ac4"}}>🔗 Your Shopify Webhook URL (key embedded):</div>
+              <code style={{fontSize:11,wordBreak:"break-all",color:"var(--gold)",fontFamily:"monospace",lineHeight:1.7,display:"block"}}>{shopifyUrl}</code>
+              <button className="btn-ghost" style={{marginTop:10,padding:"6px 14px",fontSize:12}} onClick={()=>copyText(shopifyUrl,"shopify")}>{copied==="shopify"?"✅ Copied!":"📋 Copy Shopify URL"}</button>
+            </div>
+            <div style={{background:"rgba(14,165,233,.06)",border:"1px solid rgba(14,165,233,.2)",borderRadius:10,padding:14,marginTop:12}}>
+              <div style={{fontWeight:700,fontSize:12,marginBottom:4}}>ℹ️ Shopify fields auto-parsed:</div>
+              <code style={{fontSize:11,color:"var(--muted)",fontFamily:"monospace",lineHeight:2,display:"block"}}>
+                buyer_name ← billing_address.first_name + last_name<br/>
+                buyer_email ← email<br/>
+                buyer_phone ← billing_address.phone (last 10 digits)<br/>
+                product_name ← line_items names + quantities<br/>
+                order_amount ← total_price<br/>
+                platform_order_id ← SHOPIFY-order_number
+              </code>
+            </div>
+          </div>
+        )}
+
+        {platform==="woocommerce" && (
+          <div>
+            <div style={{fontWeight:700,fontSize:13,marginBottom:12,color:"#7f54b3"}}>🔌 WooCommerce Webhook Setup</div>
+            <div style={{display:"flex",flexDirection:"column",gap:10,marginBottom:20}}>
+              {wooSteps.map((step,i)=>(
+                <div key={i} style={{display:"flex",gap:10,alignItems:"flex-start"}}>
+                  <div style={{background:"#7f54b3",color:"#fff",borderRadius:"50%",width:22,height:22,display:"flex",alignItems:"center",justifyContent:"center",fontSize:11,fontWeight:700,flexShrink:0,marginTop:2}}>{i+1}</div>
+                  <div style={{fontSize:13,color:"var(--muted)",lineHeight:1.65}}>{step}</div>
+                </div>
+              ))}
+            </div>
+            <div style={{background:"rgba(127,84,179,.08)",border:"1px solid rgba(127,84,179,.3)",borderRadius:10,padding:14}}>
+              <div style={{fontWeight:700,fontSize:12,marginBottom:6,color:"#7f54b3"}}>🔗 WooCommerce Delivery URL:</div>
+              <code style={{fontSize:11,wordBreak:"break-all",color:"var(--gold)",fontFamily:"monospace",display:"block",lineHeight:1.7}}>{WEBHOOK_URLS.woocommerce}</code>
+              <button className="btn-ghost" style={{marginTop:10,padding:"6px 14px",fontSize:12}} onClick={()=>copyText(WEBHOOK_URLS.woocommerce,"woo")}>{copied==="woo"?"✅ Copied!":"📋 Copy URL"}</button>
+              <div style={{borderTop:"1px solid var(--border)",marginTop:12,paddingTop:12}}>
+                <div style={{fontWeight:700,fontSize:12,marginBottom:6,color:"#7f54b3"}}>🔁 Using Zapier / Make? Map these fields:</div>
+                <code style={{fontSize:11,color:"var(--muted)",fontFamily:"monospace",lineHeight:2,display:"block"}}>
+                  buyer_name ← billing.first_name + billing.last_name<br/>
+                  buyer_email ← billing.email<br/>
+                  buyer_phone ← billing.phone (10 digits)<br/>
+                  product_name ← line_items[0].name<br/>
+                  order_amount ← total<br/>
+                  platform_order_id ← id
+                </code>
+              </div>
+            </div>
+          </div>
+        )}
+
+        <div style={{marginTop:20,padding:14,background:"rgba(239,68,68,.05)",border:"1px solid rgba(239,68,68,.18)",borderRadius:10}}>
+          <div style={{fontWeight:700,fontSize:12,marginBottom:6}}>⚠️ Important Notes</div>
+          <div style={{fontSize:12,color:"var(--muted)",lineHeight:2}}>
+            • Only COD/Cash-on-Delivery orders need EscaraPay — prepaid orders are automatically skipped.<br/>
+            • Buyer gets a token payment email instantly after webhook. Dispatch only after token is paid.<br/>
+            • Min order amount: ₹200 · Max: ₹5,00,000 · Default token: 10% of order amount.<br/>
+            • Webhook orders appear in your dashboard under Orders with status "Pending".<br/>
+            • Need help? <a href="mailto:support@escarapay.in" style={{color:"var(--blue)"}}>support@escarapay.in</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+
+/* ══════════ SELLER SETTINGS COMPONENT ══════════ */
+function SellerSettings({ userId, userName, BACKEND_URL, onTypeUpdate }) {
+  const [form, setForm] = useState({ shop_name:"", phone:"", upi_id:"", seller_type:null, website_url:"" });
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [msg, setMsg] = useState("");
+
+  const authHdrSS = () => {
+    const t = localStorage.getItem("escara_auth_token") || "";
+    return t ? { "Content-Type":"application/json","Authorization":`Bearer ${t}` } : { "Content-Type":"application/json" };
+  };
+
+  useEffect(() => {
+    const load = async () => {
+      try {
+        const r = await fetch(`${BACKEND_URL}/api/users/${userId}/profile`, { headers: authHdrSS() });
         const d = await r.json();
         if (d.success && d.user) {
-          setForm({ shop_name: d.user.shop_name||"", phone: d.user.phone||"", upi_id: d.user.upi_id||"" });
+          setForm({
+            shop_name:   d.user.shop_name  || "",
+            phone:       d.user.phone      || "",
+            upi_id:      d.user.upi_id     || "",
+            seller_type: d.user.seller_type|| null,
+            website_url: d.user.website_url|| "",
+          });
         }
       } catch(e) {}
       setLoading(false);
@@ -2755,21 +3137,74 @@ function SellerSettings({ userId, userName, BACKEND_URL }) {
     setSaving(true); setMsg("");
     try {
       const r = await fetch(`${BACKEND_URL}/api/users/${userId}/update-profile`, {
-        method:"POST", headers:{"Content-Type":"application/json"},
+        method:"POST", headers: authHdrSS(),
         body: JSON.stringify({ ...form, user_id: userId }),
       });
       const d = await r.json();
       setSaving(false);
-      if (d.success) setMsg("✅ Profile updated successfully!");
-      else setMsg("❌ " + (d.error || "Update failed"));
+      if (d.success) {
+        setMsg("✅ Profile updated successfully!");
+        if (onTypeUpdate) onTypeUpdate(form.seller_type, form.website_url);
+      } else setMsg("❌ " + (d.error || "Update failed"));
     } catch(e) { setSaving(false); setMsg("❌ Could not connect to server."); }
   };
+
+  const sellerTypes = [
+    { id:"social_media", icon:"📱", label:"Social Media", desc:"Instagram, WhatsApp, Facebook" },
+    { id:"website",      icon:"🏪", label:"Website Store", desc:"Shopify, Wix, WooCommerce" },
+  ];
 
   if (loading) return <div style={{padding:40,textAlign:"center",color:"var(--muted)"}}>⏳ Loading...</div>;
 
   return (
     <div className="fu">
       <h1 className="syne" style={{fontSize:"clamp(18px,3vw,26px)",fontWeight:800,marginBottom:22}}>Settings</h1>
+
+      {/* ── Seller Type Card ── */}
+      <div className="card" style={{maxWidth:480,marginBottom:16}}>
+        <h3 className="syne" style={{fontWeight:700,marginBottom:4,fontSize:15}}>🏪 Seller Type</h3>
+        <p style={{color:"var(--muted)",fontSize:12,marginBottom:14}}>Helps EscaraPay personalise your dashboard and features.</p>
+        <div style={{display:"flex",gap:10,marginBottom:form.seller_type==="website"?14:0}}>
+          {sellerTypes.map(st=>(
+            <div key={st.id} onClick={()=>setForm({...form,seller_type:form.seller_type===st.id?null:st.id})} style={{
+              flex:1,padding:14,borderRadius:12,cursor:"pointer",textAlign:"center",transition:"all .15s",
+              border:`2px solid ${form.seller_type===st.id?"var(--gold)":"var(--border)"}`,
+              background:form.seller_type===st.id?"rgba(245,158,11,.1)":"transparent",
+            }}>
+              <div style={{fontSize:26,marginBottom:4}}>{st.icon}</div>
+              <div style={{fontWeight:700,fontSize:13}}>{st.label}</div>
+              <div style={{fontSize:11,color:"var(--muted)",marginTop:3}}>{st.desc}</div>
+              {form.seller_type===st.id && <div style={{marginTop:6,fontSize:11,color:"var(--gold)",fontWeight:700}}>✅ Selected</div>}
+            </div>
+          ))}
+        </div>
+        {form.seller_type==="website" && (
+          <div>
+            <label className="label">Store Website URL</label>
+            <div style={{display:"flex",gap:8}}>
+              <input className="input" style={{flex:1}} placeholder="https://yourstore.com"
+                value={form.website_url} onChange={e=>setForm({...form,website_url:e.target.value})} />
+              {form.website_url && (
+                <button className="btn-ghost" style={{padding:"0 12px",fontSize:12,color:"var(--red)"}}
+                  onClick={()=>setForm({...form,website_url:""})}>✕ Clear</button>
+              )}
+            </div>
+            {form.website_url && (
+              <div style={{fontSize:11,color:"var(--muted)",marginTop:4}}>
+                🔗 <a href={form.website_url} target="_blank" rel="noopener noreferrer" style={{color:"var(--blue)"}}>{form.website_url}</a>
+              </div>
+            )}
+            <div style={{marginTop:10,background:"rgba(245,158,11,.08)",border:"1px solid rgba(245,158,11,.25)",borderRadius:8,padding:10,fontSize:12,color:"#92400e"}}>
+              💡 Go to <strong>Integration tab</strong> in sidebar to connect your store and auto-protect COD orders.
+            </div>
+          </div>
+        )}
+        {!form.seller_type && (
+          <div style={{fontSize:11,color:"var(--muted)",textAlign:"center",marginTop:8}}>Click a card above to select your seller type</div>
+        )}
+      </div>
+
+      {/* ── Profile & Payment Card ── */}
       <div className="card" style={{maxWidth:480}}>
         <h3 className="syne" style={{fontWeight:700,marginBottom:16,fontSize:15}}>Profile & Payment Details</h3>
         <div style={{display:"flex",flexDirection:"column",gap:14}}>
@@ -2799,7 +3234,9 @@ function SellerSettings({ userId, userName, BACKEND_URL }) {
 }
 
 /* ══════════ SELLER DASHBOARD ══════════ */
-function SellerDB({ user, userId, onLogout, dark, onToggle }) {
+function SellerDB({ user, userId, onLogout, dark, onToggle, sellerType: initSellerType, websiteUrl: initWebsiteUrl }) {
+  const [sellerType, setSellerType] = useState(initSellerType || null);
+  const [websiteUrl, setWebsiteUrl] = useState(initWebsiteUrl || "");
   const [page, setPage] = useState("dashboard");
   const [orders, setOrders] = useState([]);
   const [loadingOrders, setLoadingOrders] = useState(true);
@@ -2846,7 +3283,7 @@ function SellerDB({ user, userId, onLogout, dark, onToggle }) {
     window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, "_blank");
   };
 
-  const nav = [{id:"dashboard",icon:"📊",label:"Dashboard"},{id:"orders",icon:"📦",label:"Orders"},{id:"analytics",icon:"📈",label:"Analytics"},{id:"payments",icon:"💰",label:"Payments"},{id:"payouts",icon:"🏦",label:"Payouts"},{id:"settings",icon:"⚙️",label:"Settings"}];
+  const nav = [{id:"dashboard",icon:"📊",label:"Dashboard"},{id:"orders",icon:"📦",label:"Orders"},{id:"analytics",icon:"📈",label:"Analytics"},{id:"payments",icon:"💰",label:"Payments"},{id:"payouts",icon:"🏦",label:"Payouts"},{id:"settings",icon:"⚙️",label:"Settings"},{id:"integration",icon:"🔗",label:"Integration",badge:sellerType==="website"?"Live":null}];
 
   return (
     <div style={{minHeight:"100vh"}}>
@@ -2864,7 +3301,7 @@ function SellerDB({ user, userId, onLogout, dark, onToggle }) {
       </nav>
       <div className="sidebar">
         <div style={{marginBottom:16,padding:"0 8px"}}><div style={{fontSize:10,color:"var(--muted)",fontWeight:700,textTransform:"uppercase",letterSpacing:".6px"}}>Seller Panel</div></div>
-        {nav.map(n=>(<div key={n.id} className={`si ${page===n.id?"active":""}`} onClick={()=>setPage(n.id)}><span>{n.icon}</span><span>{n.label}</span></div>))}
+        {nav.map(n=>(<div key={n.id} className={`si ${page===n.id?"active":""}`} onClick={()=>setPage(n.id)}><span>{n.icon}</span><span>{n.label}</span>{n.badge&&<span style={{marginLeft:"auto",background:"var(--green)",color:"#fff",borderRadius:8,fontSize:10,padding:"1px 6px",fontWeight:700,flexShrink:0}}>{n.badge}</span>}</div>))}
         <div style={{marginTop:"auto",paddingTop:16}}>
           <div className="card" style={{padding:14,background:"rgba(14,165,233,.08)",borderColor:"rgba(14,165,233,.2)"}}>
             <div style={{fontSize:11,color:"var(--gold)",fontWeight:700,marginBottom:4}}>Free Plan</div>
@@ -2895,6 +3332,30 @@ function SellerDB({ user, userId, onLogout, dark, onToggle }) {
                 </div>
               ))}
             </div>
+            {/* ── Integration Banner: Website Sellers ── */}
+            {sellerType==="website" && (
+              <div style={{background:"linear-gradient(135deg,rgba(245,158,11,.12),rgba(14,165,233,.08))",border:"1px solid rgba(245,158,11,.3)",borderRadius:14,padding:18,marginBottom:18,display:"flex",justifyContent:"space-between",alignItems:"center",flexWrap:"wrap",gap:12}}>
+                <div style={{display:"flex",gap:14,alignItems:"center"}}>
+                  <div style={{fontSize:36}}>🔗</div>
+                  <div>
+                    <div className="syne" style={{fontWeight:800,fontSize:15,marginBottom:3}}>Connect Your Store</div>
+                    <div style={{fontSize:13,color:"var(--muted)"}}>Auto-protect every COD order from your website — no manual work.</div>
+                    {websiteUrl && <div style={{fontSize:11,color:"var(--blue)",marginTop:3}}>🌐 {websiteUrl}</div>}
+                  </div>
+                </div>
+                <button className="btn-gold" style={{fontSize:13,padding:"10px 18px",whiteSpace:"nowrap"}} onClick={()=>setPage("integration")}>
+                  ⚡ Setup Integration →
+                </button>
+              </div>
+            )}
+            {/* ── Prompt: Unknown seller type ── */}
+            {!sellerType && (
+              <div style={{background:"rgba(14,165,233,.05)",border:"1px solid rgba(14,165,233,.2)",borderRadius:12,padding:12,marginBottom:18,display:"flex",justifyContent:"space-between",alignItems:"center",flexWrap:"wrap",gap:8}}>
+                <div style={{fontSize:13,color:"var(--muted)"}}>🏪 Have a website store? Connect it to auto-protect COD orders.</div>
+                <button className="btn-ghost" style={{fontSize:12,padding:"6px 14px",whiteSpace:"nowrap"}} onClick={()=>setPage("settings")}>Set up →</button>
+              </div>
+            )}
+
             <div className="card" style={{overflowX:"auto"}}>
               <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:16}}>
                 <h3 className="syne" style={{fontWeight:700,fontSize:16}}>Recent Orders</h3>
@@ -3226,7 +3687,11 @@ function SellerDB({ user, userId, onLogout, dark, onToggle }) {
           </div>
         )}
         {page==="settings" && (
-          <SellerSettings userId={userId} userName={user} BACKEND_URL={BACKEND_URL} />
+          <SellerSettings userId={userId} userName={user} BACKEND_URL={BACKEND_URL}
+            onTypeUpdate={(st, wu) => { setSellerType(st); setWebsiteUrl(wu); }} />
+        )}
+        {page==="integration" && (
+          <SellerIntegration userId={userId} BACKEND_URL={BACKEND_URL} />
         )}
       </div>
 
@@ -5901,6 +6366,8 @@ export default function App() {
   const [userName, setUserName] = useState("");
   const [userId, setUserId] = useState(null);
   const [userPhone, setUserPhone] = useState("");
+  const [sellerType, setSellerType] = useState(null);
+  const [websiteUrl, setWebsiteUrl] = useState("");
   const [dark, setDark] = useState(()=> localStorage.getItem("escara_dark")==="true");
   const toggleDark = () => { const nd=!dark; setDark(nd); localStorage.setItem("escara_dark",nd); };
   const [lang, setLang] = useState(()=> localStorage.getItem("escara_lang")||"hl");
@@ -5936,8 +6403,8 @@ export default function App() {
   },[]);
 
   const props = { dark, onToggle:toggleDark, lang, onLangToggle:toggleLang };
-  const handleLogin=(t,n,id,phone)=>{setUserType(t);setUserName(n);setUserId(id);setUserPhone(phone||"");setScreen("dashboard");};
-  const handleLogout=()=>{clearToken();setScreen("landing");setUserType(null);setUserId(null);setUserPhone("");setUserName("");};
+  const handleLogin=(t,n,id,phone,st,wu)=>{setUserType(t);setUserName(n);setUserId(id);setUserPhone(phone||"");setSellerType(st||null);setWebsiteUrl(wu||"");setScreen("dashboard");};
+  const handleLogout=()=>{clearToken();setScreen("landing");setUserType(null);setUserId(null);setUserPhone("");setUserName("");setSellerType(null);setWebsiteUrl("");};
   const goHome=()=>{window.history.pushState({},"","/");setScreen("landing");setPayOrderId(null);setDealOrderId(null);setTrackOrderId(null);setConfirmToken(null);setBlogSlug(null);};
   const goToScreen=(s,url)=>{window.history.pushState({},"",(url||"/"));setScreen(s);};
 
@@ -5961,7 +6428,7 @@ export default function App() {
       {screen==="contact"     && <ContactPage onBack={goHome} {...props} />}
       {screen==="landing"     && <Landing     onEnter={t=>{setUserType(t);goToScreen("auth","/login");}} onTrack={()=>{window.history.pushState({},"","/track");setScreen("track");setTrackOrderId(null);}} {...props} />}
       {screen==="auth"        && <Auth        type={userType} onLogin={handleLogin} onBack={goHome} {...props} />}
-      {screen==="dashboard"   && userType==="seller" && <SellerDB user={userName||"Seller"} userId={userId} onLogout={handleLogout} {...props} />}
+      {screen==="dashboard"   && userType==="seller" && <SellerDB user={userName||"Seller"} userId={userId} onLogout={handleLogout} sellerType={sellerType} websiteUrl={websiteUrl} {...props} />}
       {screen==="dashboard"   && userType==="buyer"  && <BuyerDB  user={userName||"Buyer"}  userId={userId} userPhone={userPhone} onLogout={handleLogout} {...props} />}
     </>
   );

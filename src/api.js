@@ -13,11 +13,11 @@ const authHeader = () => {
 };
 
 /* ── Auth ── */
-export const registerUser = async (name, email, phone, role, password, shopName = "", pan = "", gst = "") => {
+export const registerUser = async (name, email, phone, role, password, shopName = "", pan = "", gst = "", sellerType = null, websiteUrl = "") => {
   try {
     const res = await fetch(`${BASE_URL}/api/auth/register`, {
       method: "POST", headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name, email, phone, role, password, upi_id: "", shop_name: shopName, pan_number: pan, gst_number: gst }),
+      body: JSON.stringify({ name, email, phone, role, password, upi_id: "", shop_name: shopName, pan_number: pan, gst_number: gst, seller_type: sellerType, website_url: websiteUrl }),
     });
     const data = await res.json();
     if (!res.ok) return { success: false, error: data.error || "Register failed" };
@@ -227,5 +227,31 @@ export const verifyRegisterOTP = async (email, otp) => {
     const data = await res.json();
     if (!res.ok) return { success: false, error: data.error || "OTP verification failed" };
     return { success: true };
+  } catch (err) { return { success: false, error: "Could not connect to server." }; }
+};
+
+/* ── Ecommerce Integration ── */
+
+// Get current API key info (masked) — requireAuth
+export const getIntegrationKey = async () => {
+  try {
+    const res = await fetch(`${BASE_URL}/api/integrations/my-key`, {
+      headers: authHeader(),
+    });
+    const data = await res.json();
+    if (!res.ok) return { success: false, error: data.error || "Could not load integration info" };
+    return { success: true, data };
+  } catch (err) { return { success: false, error: "Could not connect to server." }; }
+};
+
+// Generate / regenerate API key — requireAuth
+export const generateIntegrationKey = async () => {
+  try {
+    const res = await fetch(`${BASE_URL}/api/integrations/generate-key`, {
+      method: "POST", headers: authHeader(),
+    });
+    const data = await res.json();
+    if (!res.ok) return { success: false, error: data.error || "Could not generate API key" };
+    return { success: true, data };
   } catch (err) { return { success: false, error: "Could not connect to server." }; }
 };
