@@ -4662,6 +4662,7 @@ function UserDetailModal({ user, adminKey, onClose, onUpdate }) {
               ["Email", user.email, undefined],
               ["Phone", user.phone, undefined],
               ["Role", user.role, undefined],
+              ["Seller Type", user.role==="seller" ? (user.seller_type==="website" ? "🏪 Website Store" : user.seller_type==="social_media" ? "📱 Social Media" : "Not set") : "—", user.seller_type?"var(--gold)":undefined],
               ["PAN", user.pan_number||"—", user.pan_number?"var(--green)":undefined],
               ["GST", user.gst_number||"—", user.gst_number?"var(--green)":undefined],
               ["Shop", user.shop_name||"—", undefined],
@@ -4675,6 +4676,15 @@ function UserDetailModal({ user, adminKey, onClose, onUpdate }) {
                 <span style={{fontSize:12,fontWeight:600,fontFamily:label==="PAN"||label==="GST"?"monospace":"inherit",color:color||"var(--text)"}}>{val}</span>
               </div>
             ))}
+            {user.role==="seller" && user.website_url && (
+              <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"9px 12px",background:"var(--sf2)",borderRadius:8}}>
+                <span style={{fontSize:12,color:"var(--muted)",fontWeight:500}}>Website</span>
+                <a href={user.website_url} target="_blank" rel="noopener noreferrer"
+                   style={{fontSize:12,fontWeight:600,color:"var(--blue)",textDecoration:"none",maxWidth:200,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>
+                  🔗 {user.website_url.replace(/^https?:\/\/(www\.)?/,"")}
+                </a>
+              </div>
+            )}
           </div>
         )}
 
@@ -5069,7 +5079,7 @@ function AdminPanel({ adminKey: propKey, onLogout, dark, onToggle }) {
             {loading?<div style={{textAlign:"center",padding:30,color:"var(--muted)"}}>⏳ Loading...</div>:(
               <div className="card" style={{padding:0,overflowX:"auto"}}>
                 <table className="tbl">
-                  <thead><tr><th>ID</th><th>Name</th><th>Email</th><th>Phone</th><th>Role</th><th>PAN</th><th>GST</th><th>Status</th><th>Joined</th><th>Action</th></tr></thead>
+                  <thead><tr><th>ID</th><th>Name</th><th>Email</th><th>Phone</th><th>Role</th><th>Type</th><th>Website</th><th>PAN</th><th>GST</th><th>Status</th><th>Joined</th><th>Action</th></tr></thead>
                   <tbody>{users.map(u=>(
                     <tr key={u.id} style={{cursor:"pointer"}} onClick={()=>setSelectedUser(u)}>
                       <td style={{color:"var(--muted)",fontSize:12}}>{u.id}</td>
@@ -5077,6 +5087,27 @@ function AdminPanel({ adminKey: propKey, onLogout, dark, onToggle }) {
                       <td style={{fontSize:12,color:"var(--muted)"}}>{u.email}</td>
                       <td style={{fontSize:12}}>{u.phone}</td>
                       <td><span className={`badge ${u.role==="seller"?"bg":"bo"}`} style={{fontSize:11}}>{u.role}</span></td>
+                      <td style={{fontSize:11}}>
+                        {u.role==="seller"
+                          ? u.seller_type==="website"
+                            ? <span className="badge" style={{fontSize:10,background:"rgba(14,165,233,.12)",color:"var(--blue)",border:"1px solid rgba(14,165,233,.3)"}}>🏪 Website</span>
+                            : u.seller_type==="social_media"
+                              ? <span className="badge" style={{fontSize:10,background:"rgba(245,158,11,.12)",color:"var(--gold)",border:"1px solid rgba(245,158,11,.3)"}}>📱 Social</span>
+                              : <span style={{color:"var(--muted)",fontSize:11}}>—</span>
+                          : <span style={{color:"var(--muted)",fontSize:11}}>—</span>
+                        }
+                      </td>
+                      <td style={{fontSize:11,maxWidth:140,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>
+                        {u.website_url
+                          ? <a href={u.website_url} target="_blank" rel="noopener noreferrer"
+                              style={{color:"var(--blue)",textDecoration:"none",fontWeight:600}}
+                              onClick={e=>e.stopPropagation()}
+                              title={u.website_url}>
+                              🔗 {u.website_url.replace(/^https?:\/\/(www\.)?/,"")}
+                            </a>
+                          : <span style={{color:"var(--muted)"}}>—</span>
+                        }
+                      </td>
                       <td style={{fontFamily:"monospace",fontSize:11,color:u.pan_number?"var(--green)":"var(--muted)"}}>{u.pan_number||"—"}</td>
                       <td style={{fontFamily:"monospace",fontSize:11,color:u.gst_number?"var(--green)":"var(--muted)"}}>{u.gst_number||"—"}</td>
                       <td><span className={`badge ${u.user_status==="banned"?"br":u.warning_count>0?"borange":"bg"}`} style={{fontSize:10}}>{u.user_status==="banned"?"🚫 Banned":u.warning_count>0?"⚠️ Warned":"✅ Active"}</span></td>
