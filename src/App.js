@@ -2310,6 +2310,7 @@ function Auth({ type, onLogin, onBack, dark, onToggle }) {
   // Register OTP states
   const [regOtpSent, setRegOtpSent] = useState(false);
   const [regOtpVerified, setRegOtpVerified] = useState(false);
+  const [regVerificationToken, setRegVerificationToken] = useState("");
   const [regOtp, setRegOtp] = useState("");
   const [regOtpMsg, setRegOtpMsg] = useState("");
   // Forgot Password states
@@ -2365,7 +2366,7 @@ function Auth({ type, onLogin, onBack, dark, onToggle }) {
     }
     setLoading(true);
     const result = mode === "register"
-      ? await registerUser(form.name,form.email,form.phone,type,form.password,form.shop||"",form.pan||"",form.gst||"",form.sellerType||null,form.websiteUrl||"")
+      ? await registerUser(form.name,form.email,form.phone,type,form.password,form.shop||"",form.pan||"",form.gst||"",form.sellerType||null,form.websiteUrl||"",regVerificationToken)
       : await loginUser(form.email,form.password,type);
     setLoading(false);
     if (result.success) {
@@ -2391,7 +2392,7 @@ function Auth({ type, onLogin, onBack, dark, onToggle }) {
     setLoading(true); setRegOtpMsg("");
     const r = await verifyRegisterOTP(form.email, regOtp);
     setLoading(false);
-    if (r.success) { setRegOtpVerified(true); setRegOtpMsg("✅ Email verified! You can now create your account."); }
+    if (r.success) { setRegOtpVerified(true); setRegVerificationToken(r.verification_token || ""); setRegOtpMsg("✅ Email verified! You can now create your account."); }
     else setRegOtpMsg("❌ " + r.error);
   };
 

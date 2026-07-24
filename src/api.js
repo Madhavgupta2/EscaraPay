@@ -13,11 +13,11 @@ const authHeader = () => {
 };
 
 /* ── Auth ── */
-export const registerUser = async (name, email, phone, role, password, shopName = "", pan = "", gst = "", sellerType = null, websiteUrl = "") => {
+export const registerUser = async (name, email, phone, role, password, shopName = "", pan = "", gst = "", sellerType = null, websiteUrl = "", verificationToken = "") => {
   try {
     const res = await fetch(`${BASE_URL}/api/auth/register`, {
       method: "POST", headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name, email, phone, role, password, upi_id: "", shop_name: shopName, pan_number: pan, gst_number: gst, seller_type: sellerType, website_url: websiteUrl }),
+      body: JSON.stringify({ name, email, phone, role, password, upi_id: "", shop_name: shopName, pan_number: pan, gst_number: gst, seller_type: sellerType, website_url: websiteUrl, verification_token: verificationToken }),
     });
     const data = await res.json();
     if (!res.ok) return { success: false, error: data.error || "Register failed" };
@@ -226,7 +226,7 @@ export const verifyRegisterOTP = async (email, otp) => {
     });
     const data = await res.json();
     if (!res.ok) return { success: false, error: data.error || "OTP verification failed" };
-    return { success: true };
+    return { success: true, verification_token: data.verification_token };
   } catch (err) { return { success: false, error: "Could not connect to server." }; }
 };
 
