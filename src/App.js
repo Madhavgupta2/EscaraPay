@@ -4439,14 +4439,21 @@ function DealPage({ orderId, dark, onToggle, onGoHome }) {
   useEffect(()=>{ getOrderById(orderId).then(r=>{ setLoading(false); if(r.success) setOrder(r.data.order); else setError("Deal not found."); }); },[orderId]);
 
   const handleConfirm = async () => {
+    const token = localStorage.getItem("escara_auth_token") || "";
+    if (!token) {
+      setError("Please log in to your seller account first to confirm this deal.");
+      return;
+    }
     setConfirming(true);
     try {
       const res = await fetch(`${BACKEND_URL}/api/orders/${orderId}/seller-confirm-deal`, {
-        method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({seller_id:0}),
+        method:"POST",
+        headers:{"Content-Type":"application/json", "Authorization": `Bearer ${token}`},
       });
       const data = await res.json();
       setConfirming(false);
       if (data.success) { setConfirmed(true); setPaymentLink(data.paymentLink); }
+      else if (res.status === 401) setError("Your session has expired. Please log in again to confirm this deal.");
       else setError(data.error||"Confirmation failed");
     } catch(e) { setConfirming(false); setError("Could not connect to server. Please try again."); }
   };
@@ -4946,7 +4953,7 @@ function UserDetailModal({ user, adminKey, onClose, onUpdate }) {
 
 
 function AdminPanel({ adminKey: propKey, onLogout, dark, onToggle }) {
-  const [adminKey] = useState(()=> propKey || localStorage.getItem("adminKey") || "admin123");
+  const [adminKey] = useState(()=> propKey || localStorage.getItem("adminKey") || "");
   const [page, setPage] = useState("dashboard");
   const [stats, setStats] = useState(null);
   const [orders, setOrders] = useState([]);
@@ -5154,12 +5161,10 @@ function AdminLogin({ onLogin, dark, onToggle }) {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const LOCAL_PASSWORDS = ["admin123", "escarapay-admin-2026"];
 
   const handle = async () => {
     if (!password) { setError("❌ Please enter the password!"); return; }
     setLoading(true); setError("");
-    if (LOCAL_PASSWORDS.includes(password)) { setLoading(false); localStorage.setItem("adminKey",password); onLogin(password); return; }
     try {
       const res=await fetch(`${ADMIN_URL}/api/admin/login`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({password})});
       const data=await res.json(); setLoading(false);
