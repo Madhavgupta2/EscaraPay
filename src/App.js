@@ -693,6 +693,19 @@ function PayPage({ orderId, dark, onToggle, onGoHome }) {
               </div>
             ) : (
               <div className="fu">
+                {/* ── Layer 3: Seller Branding — Trust Building ── */}
+                {order.seller_name && (
+                  <div style={{textAlign:"center",marginBottom:16,background:"rgba(14,165,233,.06)",border:"1px solid rgba(14,165,233,.2)",borderRadius:14,padding:16}}>
+                    <div style={{fontSize:11,color:"var(--muted)",marginBottom:4,textTransform:"uppercase",letterSpacing:".5px"}}>Order From</div>
+                    <div className="syne" style={{fontWeight:800,fontSize:22,marginBottom:4}}>{order.seller_name}</div>
+                    <div style={{display:"flex",alignItems:"center",justifyContent:"center",gap:6,fontSize:12,color:"var(--muted)"}}>
+                      <span>🛡️</span><span>COD payment secured by <strong style={{color:"var(--blue)"}}>EscaraPay</strong></span>
+                    </div>
+                    {order.platform_order_id && (
+                      <div style={{marginTop:6,fontSize:11,color:"var(--muted)"}}>Store Order: <code style={{background:"var(--sf2)",padding:"1px 6px",borderRadius:4}}>{order.platform_order_id}</code></div>
+                    )}
+                  </div>
+                )}
                 <div style={{textAlign:"center",marginBottom:20}}>
                   <img src={LOGO_SRC} alt="EscaraPay" style={{height:44,objectFit:"contain",marginBottom:12}} onError={e=>e.target.style.display="none"} />
                   <div style={{fontSize:12,color:"var(--muted)",marginBottom:4}}>🛡️ Secured by EscaraPay</div>
@@ -4508,7 +4521,7 @@ function DealPage({ orderId, dark, onToggle, onGoHome }) {
 const ADMIN_URL = BACKEND_URL;
 
 /* ══════════ USER DETAIL MODAL (Admin) ══════════ */
-function UserDetailModal({ user, adminKey, onClose, onUpdate }) {
+function UserDetailModal({ user, adminToken, onClose, onUpdate }) {
   const [userOrders, setUserOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState("");
@@ -4527,8 +4540,8 @@ function UserDetailModal({ user, adminKey, onClose, onUpdate }) {
   const [bulkLoading, setBulkLoading] = useState(false);
   const [bulkMsg, setBulkMsg] = useState("");
 
-  // ✅ hdrs defined FIRST before any function that uses it
-  const hdrs = { "Content-Type":"application/json", "x-admin-key": adminKey };
+  // ✅ Bearer token auth — no raw password in headers
+  const hdrs = { "Content-Type":"application/json", "Authorization": `Bearer ${adminToken}` };
 
   // Computed from userOrders
   const pendingPayouts = userOrders.filter(o => ["delivered","cancelled_buyer"].includes(o.status) && o.payout_status !== "paid");
@@ -4953,8 +4966,8 @@ function UserDetailModal({ user, adminKey, onClose, onUpdate }) {
 }
 
 
-function AdminPanel({ adminKey: propKey, onLogout, dark, onToggle }) {
-  const [adminKey] = useState(()=> propKey || localStorage.getItem("adminKey") || "");
+function AdminPanel({ adminToken: propToken, onLogout, dark, onToggle }) {
+  const [adminToken] = useState(()=> propToken || localStorage.getItem("adminSessionToken") || "");
   const [page, setPage] = useState("dashboard");
   const [stats, setStats] = useState(null);
   const [orders, setOrders] = useState([]);
@@ -4967,12 +4980,20 @@ function AdminPanel({ adminKey: propKey, onLogout, dark, onToggle }) {
   const [authError, setAuthError] = useState("");
   const [selectedUser, setSelectedUser] = useState(null);
 
-  const headers = { "Content-Type":"application/json", "x-admin-key": adminKey };
+  // ✅ Bearer token auth — no raw password in headers
+  const headers = { "Content-Type":"application/json", "Authorization": `Bearer ${adminToken}` };
 
   const safeFetch = async (url, opts={}) => {
     try {
       const r = await fetch(url, { ...opts, headers: {...headers, ...(opts.headers||{})} });
-      if (r.status === 401) { setAuthError(`401 Error — Key mismatch. Using: "${adminKey}"`); return null; }
+      if (r.status === 401) {
+        // ✅ Auto-logout on session expiry — clears token and redirects
+        const data = await r.json().catch(()=>({}));
+        setAuthError("⏰ " + (data.error || "Session expired. Logging out..."));
+        localStorage.removeItem("adminSessionToken");
+        setTimeout(() => onLogout(), 2000);
+        return null;
+      }
       setAuthError("");
       return await r.json();
     } catch(e) { setAuthError("Network error: " + e.message); return null; }
@@ -5031,6 +5052,60 @@ function AdminPanel({ adminKey: propKey, onLogout, dark, onToggle }) {
                     <div key={s.label} className="stat-card"><div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start"}}><div><div style={{fontSize:11,color:"var(--muted)",marginBottom:6}}>{s.label}</div><div className="syne" style={{fontSize:22,fontWeight:800,color:s.color}}>{s.value}</div></div><span style={{fontSize:20}}>{s.icon}</span></div></div>
                   ))}
                 </div>
+
+                {/* ── Pending Token — Manual Contact Section ── */}
+                {(()=>{
+                  const pendingOrders = orders.filter(o=>o.status==="pending" && o.buyer_phone).slice(0,10);
+                  if(!pendingOrders.length) return null;
+                  return (
+                    <div className="card" style={{marginBottom:16,border:"1px solid rgba(245,158,11,.35)",background:"rgba(245,158,11,.04)"}}>
+                      <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:14,flexWrap:"wrap",gap:8}}>
+                        <div>
+                          <div className="syne" style={{fontWeight:800,fontSize:15,marginBottom:2}}>📱 Pending Token — Contact Buyers ({orders.filter(o=>o.status==="pending").length})</div>
+                          <div style={{fontSize:12,color:"var(--muted)"}}>Token abhi tak pay nahi hua — directly WhatsApp karo</div>
+                        </div>
+                        <button className="btn-ghost" style={{fontSize:12,padding:"6px 14px"}} onClick={()=>setPage("orders")}>View All →</button>
+                      </div>
+                      <div style={{display:"flex",flexDirection:"column",gap:10}}>
+                        {pendingOrders.map(o=>{
+                          const phone=(o.buyer_phone||"").replace(/\D/g,"");
+                          const sellerName=o.seller_name||"Seller";
+                          const waMsg=encodeURIComponent(
+                            `Hi ${o.buyer_name||""}! 👋\n\n*${sellerName}* pe aapka COD order place hua hai.\n\n` +
+                            `🛍️ Product: ${o.product_name}\n💰 Order Amount: ₹${o.order_amount}\n🔐 Token Amount: ₹${o.token_amount}\n\n` +
+                            `Apna order confirm karne ke liye neeche link se chhota sa token pay karein 👇\nhttps://escarapay.in/pay/${o.id}\n\n` +
+                            `Token pay hone ke baad hi seller dispatch karega.\n_Secured by EscaraPay 🛡️_`
+                          );
+                          const waLink=`https://wa.me/91${phone}?text=${waMsg}`;
+                          const daysPending=Math.floor((Date.now()-new Date(o.created_at))/86400000);
+                          return (
+                            <div key={o.id} style={{display:"flex",justifyContent:"space-between",alignItems:"center",background:"var(--sf2)",borderRadius:10,padding:"10px 14px",flexWrap:"wrap",gap:8}}>
+                              <div style={{flex:1,minWidth:0}}>
+                                <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:3,flexWrap:"wrap"}}>
+                                  <span className="syne" style={{fontWeight:700,fontSize:13}}>{o.buyer_name||"Unknown"}</span>
+                                  <code style={{fontSize:10,color:"var(--gold)",background:"rgba(245,158,11,.1)",padding:"1px 6px",borderRadius:4}}>{o.id}</code>
+                                  {daysPending>0&&<span style={{fontSize:10,color:daysPending>3?"var(--red)":"var(--muted)",background:"rgba(239,68,68,.08)",padding:"1px 6px",borderRadius:4}}>{daysPending}d ago</span>}
+                                </div>
+                                <div style={{fontSize:12,color:"var(--muted)",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>
+                                  {o.product_name} · ₹{o.order_amount} · <strong style={{color:"var(--gold)"}}>Token: ₹{o.token_amount}</strong>
+                                </div>
+                                {o.seller_name&&<div style={{fontSize:11,color:"var(--muted)",marginTop:2}}>🏪 {o.seller_name}</div>}
+                              </div>
+                              <div style={{display:"flex",gap:8,flexShrink:0}}>
+                                <a href={waLink} target="_blank" rel="noreferrer"
+                                   style={{background:"#25D366",color:"#fff",padding:"8px 14px",borderRadius:8,fontSize:12,fontWeight:700,textDecoration:"none",whiteSpace:"nowrap",display:"flex",alignItems:"center",gap:5}}>
+                                  💬 WhatsApp
+                                </a>
+                                {phone&&<a href={`tel:+91${phone}`} style={{background:"var(--sf2)",border:"1px solid var(--border)",color:"var(--text)",padding:"8px 12px",borderRadius:8,fontSize:12,fontWeight:700,textDecoration:"none"}}>📞 Call</a>}
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  );
+                })()}
+
                 {stats.pendingDisputes>0 && <div style={{background:"rgba(239,68,68,.1)",border:"1px solid rgba(239,68,68,.3)",borderRadius:12,padding:16,display:"flex",justifyContent:"space-between",alignItems:"center"}}><div><div style={{fontWeight:700,color:"var(--red)",marginBottom:4}}>⚠️ {stats.pendingDisputes} Pending Dispute(s)</div><div style={{fontSize:12,color:"var(--muted)"}}>Resolve within 24 hours</div></div><button className="btn-red" style={{padding:"8px 16px",fontSize:13}} onClick={()=>setPage("disputes")}>Resolve →</button></div>}
               </>
             )}
@@ -5128,7 +5203,7 @@ function AdminPanel({ adminKey: propKey, onLogout, dark, onToggle }) {
                 </table>
               </div>
             )}
-            {selectedUser && <UserDetailModal user={selectedUser} adminKey={adminKey} onClose={()=>setSelectedUser(null)} onUpdate={(uid,action)=>{
+            {selectedUser && <UserDetailModal user={selectedUser} adminToken={adminToken} onClose={()=>setSelectedUser(null)} onUpdate={(uid,action)=>{
               setUsers(users.map(u=>u.id===uid ? {...u, user_status: action==="ban"?"banned":"active", warning_count: action==="warn"?(u.warning_count||0)+1:u.warning_count} : u));
               setSelectedUser(null);
             }} />}
@@ -5169,8 +5244,12 @@ function AdminLogin({ onLogin, dark, onToggle }) {
     try {
       const res=await fetch(`${ADMIN_URL}/api/admin/login`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({password})});
       const data=await res.json(); setLoading(false);
-      if(data.success){localStorage.setItem("adminKey",password);onLogin(password);}
-      else setError("❌ Wrong password!");
+      if(data.success && data.token){
+        // ✅ Save JWT token (not password) — expires in 8h
+        localStorage.setItem("adminSessionToken", data.token);
+        localStorage.removeItem("adminKey"); // clear old insecure key
+        onLogin(data.token);
+      } else setError("❌ " + (data.error || "Wrong password!"));
     } catch(e) { setLoading(false); setError("❌ Could not connect to server. Please try again."); }
   };
 
@@ -6414,7 +6493,7 @@ export default function App() {
   const [trackOrderId, setTrackOrderId] = useState(null);
   const [confirmToken, setConfirmToken] = useState(null);
   const [blogSlug, setBlogSlug] = useState(null);
-  const [adminKey, setAdminKey] = useState(()=> localStorage.getItem("adminKey") || "");
+  const [adminToken, setAdminToken] = useState(()=> localStorage.getItem("adminSessionToken") || "");
 
   useEffect(()=>{ window._goToPage=(s)=>{ const urls={about:"/about",privacy:"/privacy",terms:"/terms",refund:"/refund",dispute:"/dispute",contact:"/contact",landing:"/",track:"/track",admin:"/admin",blogs:"/blogs","blog-list":"/blogs","rto-calculator":"/rto-calculator"}; window.history.pushState({},"",urls[s]||"/"+s); setScreen(s==="blogs"?"blog-list":s); }; window._goToTrack=(orderId)=>{ setTrackOrderId(orderId); setScreen("track"); window.history.pushState({},"","/track/"+orderId); }; },[]);
   useEffect(()=>{
@@ -6455,8 +6534,20 @@ export default function App() {
       {screen==="rto-calculator" && <RTOCalculatorPage dark={dark} onToggle={toggleDark} onGoHome={goHome} />}
       {screen==="blog-list"   && <BlogListPage dark={dark} onToggle={toggleDark} onGoHome={goHome} onReadPost={(slug)=>{ window.history.pushState({},"",`/blogs/${slug}`); setBlogSlug(slug); setScreen("blog-post"); }} />}
       {screen==="blog-post"   && blogSlug && <BlogPostPage slug={blogSlug} dark={dark} onToggle={toggleDark} onGoHome={goHome} onBlogList={()=>{ window.history.pushState({},"","/blogs"); setScreen("blog-list"); }} />}
-      {screen==="admin-login" && <AdminLogin  onLogin={(k)=>{setAdminKey(k);setScreen("admin");}} dark={dark} onToggle={toggleDark} />}
-      {screen==="admin"       && <AdminPanel  adminKey={adminKey} onLogout={()=>{localStorage.removeItem("adminKey");setScreen("landing");}} dark={dark} onToggle={toggleDark} />}
+      {screen==="admin-login" && <AdminLogin  onLogin={(token)=>{setAdminToken(token);setScreen("admin");}} dark={dark} onToggle={toggleDark} />}
+      {screen==="admin"       && <AdminPanel  adminToken={adminToken} onLogout={async()=>{
+        // ✅ Call server logout to blacklist token before clearing locally
+        try {
+          await fetch(`${ADMIN_URL}/api/admin/logout`,{
+            method:"POST",
+            headers:{"Authorization":`Bearer ${adminToken}`}
+          });
+        } catch(e) {}
+        localStorage.removeItem("adminSessionToken");
+        localStorage.removeItem("adminKey"); // clean up old key if present
+        setAdminToken("");
+        setScreen("landing");
+      }} dark={dark} onToggle={toggleDark} />}
       {screen==="about"       && <AboutPage   onBack={goHome} {...props} />}
       {screen==="privacy"     && <PrivacyPage onBack={goHome} {...props} />}
       {screen==="terms"       && <TermsPage   onBack={goHome} {...props} />}
