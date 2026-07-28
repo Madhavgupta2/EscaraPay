@@ -414,6 +414,15 @@ const getTrackingUrl = (tn) => {
   return `https://www.google.com/search?q=track+courier+${tn}`;
 };
 
+// ✅ SECURITY: Prevent javascript:// and data: XSS in href attributes
+const safeUrl = (url) => {
+  if (!url) return null;
+  try {
+    const u = new URL(url);
+    return (u.protocol === "https:" || u.protocol === "http:") ? url : null;
+  } catch { return null; }
+};
+
 function Toast({ msg, onDone }) {
   useEffect(()=>{ const t=setTimeout(onDone,2500); return ()=>clearTimeout(t); },[onDone]);
   return <div className="copy-toast">✅ {msg}</div>;
@@ -2026,6 +2035,141 @@ function Landing({ onEnter, onTrack, dark, onToggle, lang, onLangToggle }) {
         </div>
       </div>
 
+      {/* ── ECOMMERCE INTEGRATION SECTION ── */}
+      <div className="reveal" style={{padding:"80px clamp(16px,5vw,40px)",background:"var(--surface)"}}>
+        <div style={{maxWidth:1060,margin:"0 auto"}}>
+          {/* Header */}
+          <div style={{textAlign:"center",marginBottom:52}}>
+            <span style={{
+              display:"inline-block",background:"rgba(14,165,233,.1)",
+              border:"1px solid rgba(14,165,233,.2)",borderRadius:100,
+              padding:"4px 16px",fontSize:11,fontWeight:700,color:"var(--gold)",
+              letterSpacing:"2px",textTransform:"uppercase",marginBottom:14
+            }}>ECOMMERCE INTEGRATION</span>
+            <h2 className="syne" style={{fontSize:"clamp(24px,3.5vw,42px)",fontWeight:800,marginBottom:14,letterSpacing:"-0.5px"}}>
+              🏪 Apne Online Store ko<br/>EscaraPay se Jodo
+            </h2>
+            <p style={{color:"var(--muted)",fontSize:15,maxWidth:520,margin:"0 auto",lineHeight:1.7}}>
+              Shopify, Wix, WooCommerce, ya koi bhi website — <strong>ek line ka code</strong> add karo aur sab COD orders automatically protect ho jayenge.
+            </p>
+          </div>
+
+          {/* How it works — 3 steps */}
+          <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(240px,1fr))",gap:20,marginBottom:48}}>
+            {[
+              { step:"01", icon:"🛒", title:"Buyer COD Order Karta Hai", desc:"Buyer aapke Shopify ya Wix store pe COD select karta hai aur order place karta hai." },
+              { step:"02", icon:"⚡", title:"EscaraPay Auto-Create", desc:"Milliseconds mein order aapke EscaraPay dashboard mein aata hai — koi manual kaam nahi." },
+              { step:"03", icon:"💳", title:"Buyer Token Pay Karta Hai", desc:"Buyer ko turant email aata hai token pay karne ka. Token pay hone ke baad aap dispatch karo." },
+            ].map(s=>(
+              <div key={s.step} className="card" style={{padding:"28px 22px",position:"relative",overflow:"hidden"}}>
+                <div style={{
+                  position:"absolute",top:12,right:16,
+                  fontSize:48,fontWeight:900,color:"rgba(14,165,233,.07)",
+                  fontFamily:"monospace",lineHeight:1,pointerEvents:"none"
+                }}>{s.step}</div>
+                <div style={{fontSize:32,marginBottom:14}}>{s.icon}</div>
+                <div className="syne" style={{fontWeight:700,fontSize:15,marginBottom:8}}>{s.title}</div>
+                <div style={{fontSize:13,color:"var(--muted)",lineHeight:1.7}}>{s.desc}</div>
+              </div>
+            ))}
+          </div>
+
+          {/* Platform badges */}
+          <div style={{
+            background:dark?"rgba(255,255,255,.03)":"rgba(14,165,233,.04)",
+            border:"1px solid rgba(14,165,233,.15)",
+            borderRadius:16,padding:"28px 24px",marginBottom:40,
+          }}>
+            <div style={{textAlign:"center",marginBottom:20}}>
+              <div className="syne" style={{fontWeight:700,fontSize:15,marginBottom:4}}>Works with every platform</div>
+              <div style={{fontSize:13,color:"var(--muted)"}}>Seller ko bas ek line ka code apni site mein add karna hai</div>
+            </div>
+            <div style={{display:"flex",flexWrap:"wrap",gap:12,justifyContent:"center",marginBottom:20}}>
+              {[
+                {icon:"🛒",name:"Shopify",color:"#5c6ac4"},
+                {icon:"🌐",name:"Wix",color:"#facc15"},
+                {icon:"🔌",name:"WooCommerce",color:"#7f54b3"},
+                {icon:"📄",name:"HTML Sites",color:"#0ea5e9"},
+                {icon:"📦",name:"Custom Stores",color:"#059669"},
+                {icon:"⚡",name:"Any Platform",color:"var(--gold)"},
+              ].map(p=>(
+                <div key={p.name} style={{
+                  display:"flex",alignItems:"center",gap:7,
+                  background:dark?"rgba(255,255,255,.06)":"#fff",
+                  border:"1px solid var(--border)",borderRadius:40,
+                  padding:"6px 14px",fontSize:13,fontWeight:600,
+                  boxShadow:"0 1px 3px rgba(0,0,0,.06)",
+                }}>
+                  <span style={{fontSize:16}}>{p.icon}</span>
+                  <span>{p.name}</span>
+                </div>
+              ))}
+            </div>
+            {/* Code snippet */}
+            <div style={{
+              background:dark?"#0a0a14":"#0c2340",
+              borderRadius:12,padding:"16px 20px",
+              fontFamily:"monospace",fontSize:13,
+              color:"#e2e8f0",lineHeight:1.7,
+              border:"1px solid rgba(255,255,255,.08)",
+            }}>
+              <span style={{color:"rgba(255,255,255,.3)"}}>{"<!-- Sirf ye ek line apni site mein add karo -->"}</span><br/>
+              <span style={{color:"#7dd3fc"}}>&lt;script </span>
+              <span style={{color:"#86efac"}}>src</span>
+              <span style={{color:"#7dd3fc"}}>=</span>
+              <span style={{color:"#fde68a"}}>"https://escarapay.in/sdk/escara.js"</span><br/>
+              <span style={{color:"rgba(255,255,255,.3)",paddingLeft:8}}>{"        "}</span>
+              <span style={{color:"#86efac"}}>data-seller-id</span>
+              <span style={{color:"#7dd3fc"}}>=</span>
+              <span style={{color:"#fde68a"}}>"YOUR_SELLER_ID"</span>
+              <span style={{color:"#7dd3fc"}}>&gt;&lt;/script&gt;</span>
+            </div>
+            <div style={{textAlign:"center",marginTop:12,fontSize:12,color:"var(--muted)"}}>
+              ✅ Badge automatic dikhega &nbsp;·&nbsp; ✅ COD orders auto-detect honge &nbsp;·&nbsp; ✅ Buyer ko turant email jayega
+            </div>
+          </div>
+
+          {/* 2 cards — Social vs Website */}
+          <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(280px,1fr))",gap:16,marginBottom:40}}>
+            <div className="card" style={{padding:"24px",border:"1px solid rgba(245,158,11,.3)",background:"rgba(245,158,11,.04)"}}>
+              <div style={{fontSize:28,marginBottom:10}}>📱</div>
+              <div className="syne" style={{fontWeight:800,fontSize:16,marginBottom:8}}>Social Media Seller</div>
+              <div style={{fontSize:13,color:"var(--muted)",lineHeight:1.8}}>
+                Instagram, WhatsApp, Facebook pe sell karte ho?<br/>
+                <strong>Manual order create karo</strong> seller dashboard se — buyer ko payment link share karo.
+              </div>
+              <div style={{marginTop:14,display:"flex",gap:8,flexWrap:"wrap"}}>
+                {["📎 WhatsApp Link","📊 Dashboard","🔔 Auto Reminder"].map(t=>(
+                  <span key={t} style={{fontSize:11,background:"rgba(245,158,11,.12)",color:"var(--gold)",padding:"3px 10px",borderRadius:20,fontWeight:600}}>{t}</span>
+                ))}
+              </div>
+            </div>
+            <div className="card" style={{padding:"24px",border:"1px solid rgba(14,165,233,.3)",background:"rgba(14,165,233,.04)"}}>
+              <div style={{fontSize:28,marginBottom:10}}>🏪</div>
+              <div className="syne" style={{fontWeight:800,fontSize:16,marginBottom:8}}>Website Store Seller</div>
+              <div style={{fontSize:13,color:"var(--muted)",lineHeight:1.8}}>
+                Shopify, Wix, WooCommerce pe store hai?<br/>
+                <strong>Ek baar setup karo</strong> — har COD order automatically EscaraPay se protect hoga.
+              </div>
+              <div style={{marginTop:14,display:"flex",gap:8,flexWrap:"wrap"}}>
+                {["⚡ Auto-Orders","🛡️ Trust Badge","📧 Auto Email"].map(t=>(
+                  <span key={t} style={{fontSize:11,background:"rgba(14,165,233,.12)",color:"var(--blue)",padding:"3px 10px",borderRadius:20,fontWeight:600}}>{t}</span>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* CTA */}
+          <div style={{textAlign:"center"}}>
+            <div className="syne" style={{fontWeight:700,fontSize:18,marginBottom:8}}>Apna Store Connect Karo — Free Mein</div>
+            <div style={{color:"var(--muted)",fontSize:13,marginBottom:20}}>Registration ke baad Dashboard → Integration tab mein sab setup guide available hai.</div>
+            <button className="cta-btn" onClick={onEnter} style={{fontSize:15,padding:"14px 36px"}}>
+              🚀 Start for Free
+            </button>
+          </div>
+        </div>
+      </div>
+
       {/* ── FAQ ── */}
       <div className="reveal" style={{padding:"70px clamp(16px,5vw,40px)",background:"var(--sf2)"}}>
         <div style={{textAlign:"center",marginBottom:48}}>
@@ -3203,9 +3347,9 @@ function SellerSettings({ userId, userName, BACKEND_URL, onTypeUpdate }) {
                   onClick={()=>setForm({...form,website_url:""})}>✕ Clear</button>
               )}
             </div>
-            {form.website_url && (
+            {form.website_url && safeUrl(form.website_url) && (
               <div style={{fontSize:11,color:"var(--muted)",marginTop:4}}>
-                🔗 <a href={form.website_url} target="_blank" rel="noopener noreferrer" style={{color:"var(--blue)"}}>{form.website_url}</a>
+                🔗 <a href={safeUrl(form.website_url)} target="_blank" rel="noopener noreferrer" style={{color:"var(--blue)"}}>{form.website_url}</a>
               </div>
             )}
             <div style={{marginTop:10,background:"rgba(245,158,11,.08)",border:"1px solid rgba(245,158,11,.25)",borderRadius:8,padding:10,fontSize:12,color:"#92400e"}}>
@@ -3824,8 +3968,10 @@ function BuyerDB({ user, userId, userPhone, onLogout, dark, onToggle }) {
 
   // Receipt PDF helper
   const downloadReceipt = (o) => {
+    // ✅ SECURITY FIX: Escape all user-supplied data before document.write
+    const esc = (s) => String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#39;");
     const w = window.open("","_blank","width=600,height=700");
-    w.document.write(`<!DOCTYPE html><html><head><title>EscaraPay Receipt — ${o.id}</title>
+    w.document.write(`<!DOCTYPE html><html><head><title>EscaraPay Receipt — ${esc(o.id)}</title>
     <style>body{font-family:Arial,sans-serif;padding:40px;color:#0c2340;max-width:520px;margin:auto}
     .logo{font-size:22px;font-weight:800;color:#24A1E2;margin-bottom:4px}.sub{font-size:12px;color:#64748b;margin-bottom:28px}
     h2{font-size:18px;margin-bottom:20px}.row{display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid #e2e8f0;font-size:14px}
@@ -3835,17 +3981,17 @@ function BuyerDB({ user, userId, userPhone, onLogout, dark, onToggle }) {
     <div class="logo">EscaraPay</div>
     <div class="sub">Payment Protection Platform | MSME: UDYAM-UP-23-0036110</div>
     <h2>Payment Receipt</h2>
-    <div class="row"><span>Order ID</span><span>${o.id}</span></div>
-    <div class="row"><span>Product</span><span>${o.product_name||"—"}</span></div>
-    <div class="row"><span>Seller</span><span>${o.seller_name||"—"}</span></div>
-    <div class="row"><span>Order Amount</span><span>₹${o.order_amount}</span></div>
-    <div class="row"><span>Status</span><span>${o.status}</span></div>
-    <div class="row"><span>Date</span><span>${(o.created_at||"").split("T")[0]}</span></div>
-    <div class="row total"><span>Token Paid (Protected)</span><span>₹${o.buyer_pays||o.token_amount}</span></div>
+    <div class="row"><span>Order ID</span><span>${esc(o.id)}</span></div>
+    <div class="row"><span>Product</span><span>${esc(o.product_name)||"—"}</span></div>
+    <div class="row"><span>Seller</span><span>${esc(o.seller_name)||"—"}</span></div>
+    <div class="row"><span>Order Amount</span><span>₹${esc(o.order_amount)}</span></div>
+    <div class="row"><span>Status</span><span>${esc(o.status)}</span></div>
+    <div class="row"><span>Date</span><span>${esc((o.created_at||"").split("T")[0])}</span></div>
+    <div class="row total"><span>Token Paid (Protected)</span><span>₹${esc(o.buyer_pays||o.token_amount)}</span></div>
     <div style="margin-top:20px;background:#fffbeb;border:1px solid #fde68a;border-radius:8px;padding:14px;font-size:12px;color:#92400e">
       🔐 This token is held safely by EscaraPay until delivery is confirmed.
     </div>
-    <div class="footer">Generated on ${new Date().toLocaleString("en-IN")} | support@escarapay.in | escarapay.in</div>
+    <div class="footer">Generated on ${esc(new Date().toLocaleString("en-IN"))} | support@escarapay.in | escarapay.in</div>
     <br/><button onclick="window.print()" style="background:#24A1E2;color:#fff;border:none;padding:10px 28px;border-radius:8px;font-size:14px;cursor:pointer;margin-top:10px">🖨️ Print / Save PDF</button>
     </body></html>`);
     w.document.close();
@@ -4697,10 +4843,10 @@ function UserDetailModal({ user, adminToken, onClose, onUpdate }) {
                 <span style={{fontSize:12,fontWeight:600,fontFamily:label==="PAN"||label==="GST"?"monospace":"inherit",color:color||"var(--text)"}}>{val}</span>
               </div>
             ))}
-            {user.role==="seller" && user.website_url && (
+            {user.role==="seller" && user.website_url && safeUrl(user.website_url) && (
               <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"9px 12px",background:"var(--sf2)",borderRadius:8}}>
                 <span style={{fontSize:12,color:"var(--muted)",fontWeight:500}}>Website</span>
-                <a href={user.website_url} target="_blank" rel="noopener noreferrer"
+                <a href={safeUrl(user.website_url)} target="_blank" rel="noopener noreferrer"
                    style={{fontSize:12,fontWeight:600,color:"var(--blue)",textDecoration:"none",maxWidth:200,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>
                   🔗 {user.website_url.replace(/^https?:\/\/(www\.)?/,"")}
                 </a>
@@ -5181,8 +5327,8 @@ function AdminPanel({ adminToken: propToken, onLogout, dark, onToggle }) {
                         }
                       </td>
                       <td style={{fontSize:11,maxWidth:140,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>
-                        {u.website_url
-                          ? <a href={u.website_url} target="_blank" rel="noopener noreferrer"
+                        {u.website_url && safeUrl(u.website_url)
+                          ? <a href={safeUrl(u.website_url)} target="_blank" rel="noopener noreferrer"
                               style={{color:"var(--blue)",textDecoration:"none",fontWeight:600}}
                               onClick={e=>e.stopPropagation()}
                               title={u.website_url}>
