@@ -2,63 +2,51 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xmlns:xhtml="http://www.w3.org/1999/xhtml"
+        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1"
         xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9
         http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">
 
-  <!-- ═══ HOMEPAGE ═══ -->
+  <!-- ═══════════════════════════════════════════
+       HOMEPAGE — Priority 1.0
+       Updated: Major SEO + Integration section added
+  ════════════════════════════════════════════ -->
   <url>
     <loc>https://www.escarapay.in/</loc>
-    <lastmod>2026-05-17</lastmod>
-    <changefreq>weekly</changefreq>
+    <lastmod>2026-07-28</lastmod>
+    <changefreq>daily</changefreq>
     <priority>1.0</priority>
-    <xhtml:link rel="alternate" hreflang="en-IN" href="https://www.escarapay.in/"/>
-    <xhtml:link rel="alternate" hreflang="hi-IN" href="https://www.escarapay.in/"/>
+    <xhtml:link rel="alternate" hreflang="en-IN"   href="https://www.escarapay.in/"/>
+    <xhtml:link rel="alternate" hreflang="hi-IN"   href="https://www.escarapay.in/"/>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://www.escarapay.in/"/>
+    <image:image>
+      <image:loc>https://www.escarapay.in/og-image.png</image:loc>
+      <image:title>EscaraPay — COD Payment Protection for Shopify, Wix &amp; WhatsApp Sellers India</image:title>
+      <image:caption>India's trusted COD payment protection platform. Auto-protect every COD order from Shopify, Wix, WooCommerce, WhatsApp and Instagram stores.</image:caption>
+    </image:image>
   </url>
 
-  <!-- ═══ HIGH PRIORITY PAGES ═══ -->
-  <url>
-    <loc>https://www.escarapay.in/about</loc>
-    <lastmod>2026-05-17</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-
-  <url>
-    <loc>https://www.escarapay.in/contact</loc>
-    <lastmod>2026-05-17</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-
-  <url>
-    <loc>https://www.escarapay.in/track</loc>
-    <lastmod>2026-05-17</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-
-  <url>
-    <loc>https://www.escarapay.in/login</loc>
-    <lastmod>2026-05-14</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-
-  <!-- ═══ TOOLS ═══ -->
+  <!-- ═══════════════════════════════════════════
+       TOOLS — High Value SEO Pages
+  ════════════════════════════════════════════ -->
   <url>
     <loc>https://www.escarapay.in/rto-calculator</loc>
-    <lastmod>2026-05-17</lastmod>
+    <lastmod>2026-07-28</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
+    <xhtml:link rel="alternate" hreflang="en-IN"   href="https://www.escarapay.in/rto-calculator"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.escarapay.in/rto-calculator"/>
   </url>
 
-  <!-- ═══ BLOG ═══ -->
+  <!-- ═══════════════════════════════════════════
+       BLOG — High Value SEO Section
+  ════════════════════════════════════════════ -->
   <url>
     <loc>https://www.escarapay.in/blogs</loc>
-    <lastmod>2026-05-17</lastmod>
+    <lastmod>2026-07-28</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
+    <xhtml:link rel="alternate" hreflang="en-IN"   href="https://www.escarapay.in/blogs"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.escarapay.in/blogs"/>
   </url>
 
   <url>
@@ -96,33 +84,56 @@
     <priority>0.8</priority>
   </url>
 
-  <!-- ═══ LEGAL PAGES ═══ -->
+  <!-- ═══════════════════════════════════════════
+       IMPORTANT PAGES
+  ════════════════════════════════════════════ -->
+  <url>
+    <loc>https://www.escarapay.in/about</loc>
+    <lastmod>2026-07-28</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+    <xhtml:link rel="alternate" hreflang="en-IN"   href="https://www.escarapay.in/about"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.escarapay.in/about"/>
+  </url>
+
+  <url>
+    <loc>https://www.escarapay.in/contact</loc>
+    <lastmod>2026-07-28</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+    <xhtml:link rel="alternate" hreflang="en-IN"   href="https://www.escarapay.in/contact"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.escarapay.in/contact"/>
+  </url>
+
+  <!-- ═══════════════════════════════════════════
+       LEGAL PAGES — Low Priority
+  ════════════════════════════════════════════ -->
   <url>
     <loc>https://www.escarapay.in/terms</loc>
     <lastmod>2026-05-17</lastmod>
     <changefreq>yearly</changefreq>
-    <priority>0.4</priority>
+    <priority>0.3</priority>
   </url>
 
   <url>
     <loc>https://www.escarapay.in/privacy</loc>
     <lastmod>2026-05-17</lastmod>
     <changefreq>yearly</changefreq>
-    <priority>0.4</priority>
+    <priority>0.3</priority>
   </url>
 
   <url>
     <loc>https://www.escarapay.in/refund</loc>
     <lastmod>2026-05-17</lastmod>
     <changefreq>yearly</changefreq>
-    <priority>0.4</priority>
+    <priority>0.3</priority>
   </url>
 
   <url>
     <loc>https://www.escarapay.in/dispute</loc>
     <lastmod>2026-05-17</lastmod>
     <changefreq>yearly</changefreq>
-    <priority>0.4</priority>
+    <priority>0.3</priority>
   </url>
 
 </urlset>
