@@ -1,0 +1,150 @@
+{
+  "slug": "wix-store-rto-loss-prevention-escarapay",
+  "title": "Wix Store Ka RTO Loss Kaise Rokein — EscaraPay COD Protection Guide",
+  "date": "July 28, 2026",
+  "readTime": "7 min read",
+  "category": "RTO Prevention",
+  "categoryColor": "#facc15",
+  "excerpt": "Wix store pe COD orders se RTO loss zyada ho raha hai? EscaraPay ka Simple COD protection setup karo — ek Custom Code paste karo aur fake orders automatically filter honge.",
+  "metaDescription": "Wix store ke RTO loss ko kaise rokein — EscaraPay COD protection integration guide. Step-by-step Wix setup, token payment system aur genuine buyers filter karna sikho. 2026 guide.",
+  "coverImage": "https://images.unsplash.com/photo-1563013544-824ae1b704d3?w=1200&q=80",
+  "content": [
+    {
+      "type": "intro",
+      "text": "Wix ek popular website builder hai India mein — khaaskar fashion, beauty, handmade products aur boutique sellers ke liye. Lekin COD orders mein RTO loss ek badi problem hai. Is guide mein samjhenge ki EscaraPay se Wix store ko kaise protect karein."
+    },
+    {
+      "type": "heading",
+      "text": "Wix Sellers Ko RTO Loss Kyun Zyada Hota Hai?"
+    },
+    {
+      "type": "text",
+      "text": "Wix store pe mostly impulse buyers aate hain — Instagram ya Facebook ad dekhi, store pe aaye, COD mein order kar diya. Inhe upfront kuch pay nahi karna, isliye genuine intent nahi hota. Result? High RTO rates, wasted shipping costs, aur inventory blockage."
+    },
+    {
+      "type": "list",
+      "items": [
+        {
+          "title": "COD = Zero Commitment",
+          "desc": "Buyer ko kuch pay nahi karna upfront. Woh order karta hai, baad mein delivery ke time change of mind ho jaata hai ya phone hi nahi uthata."
+        },
+        {
+          "title": "Impulsive Buying",
+          "desc": "Social media ads se aaye buyers zyada impulsive hote hain. COD milne ki wajah se bina sochhe order kar dete hain."
+        },
+        {
+          "title": "Wrong Address/Phone",
+          "desc": "Kai buyers galat details dete hain — delivery fail hoti hai aur product wapas aata hai double shipping cost ke saath."
+        },
+        {
+          "title": "Competitor Spamming",
+          "desc": "Competitors kabhi kabhi fake orders daalte hain tumhara inventory block karne ke liye. COD mein ye possible hai."
+        }
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "EscaraPay Kaise Solve Karta Hai Ye Problem?"
+    },
+    {
+      "type": "text",
+      "text": "EscaraPay ek simple solution hai — jab buyer COD order kare, unhe order value ka 10% token amount pay karna padta hai BEFORE dispatch. Ye token ek confirmation hai ki buyer genuine hai. Token pay karne wala buyer serious hai — woh delivery nahi lenegi aisi baat rare hoti hai."
+    },
+    {
+      "type": "callout",
+      "text": "📊 Real Data: EscaraPay use karne wale sellers ka RTO rate average 35% se gir ke 8-12% tak aa jaata hai. Matlab 70% tak kam fake orders!"
+    },
+    {
+      "type": "heading",
+      "text": "Wix Store Pe EscaraPay Setup — Complete Guide"
+    },
+    {
+      "type": "text",
+      "text": "Wix pe EscaraPay setup karna bahut easy hai. Koi coding knowledge chahiye nahi. Niche step by step guide hai:"
+    },
+    {
+      "type": "list",
+      "items": [
+        {
+          "title": "Step 1 — EscaraPay Account Banao",
+          "desc": "escarapay.in → Register as Seller → Details bharo → Seller dashboard access karo. Free hai!"
+        },
+        {
+          "title": "Step 2 — Seller ID Note Karo",
+          "desc": "Seller dashboard → Profile ya Integration tab → Tumhara numeric Seller ID copy karo (e.g. 42)"
+        },
+        {
+          "title": "Step 3 — Trust Badge Add Karo (Wix Custom Code)",
+          "desc": "Wix Dashboard → Settings → Custom Code → + Add Code → Body End select karo → All Pages → Paste karo: <script src='https://escarapay.in/sdk/escara.js' data-seller-id='TUMHARA_ID'></script> → Apply → Save. Bas! Badge automatically dikhega."
+        },
+        {
+          "title": "Step 4 — Automation Setup (Wix Business Plan)",
+          "desc": "Wix Dashboard → Automations → New Automation → Trigger: New Order Placed (COD) → Action: Send HTTP Request → POST → URL: EscaraPay Integration tab se copy karo → JSON body mein buyer details map karo → Activate."
+        },
+        {
+          "title": "Step 5 — Test Karo",
+          "desc": "Apne store pe test COD order place karo → EscaraPay dashboard mein order dikhe → Badge checkout pe dikhe. Sab theek hai!"
+        }
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "Wix Free Plan vs Business Plan — Kya Fark Padta Hai?"
+    },
+    {
+      "type": "list",
+      "items": [
+        {
+          "title": "Wix Free/Core Plan",
+          "desc": "Sirf Trust Badge lag sakta hai (Step 3). Automatic order creation ke liye Wix Automations ki zarurat hai jo Business plan mein milti hai. Badge bhi important hai — buyers ko trust milta hai."
+        },
+        {
+          "title": "Wix Business Plan (₹1,200/month)",
+          "desc": "Poora integration possible hai — badge + automatic order creation + buyer notification. Sab kuch fully automatic. Recommended agar serious seller ho."
+        },
+        {
+          "title": "Alternative — Manual Method",
+          "desc": "Free plan pe bhi kaam kar sakte ho — EscaraPay seller dashboard se manually order create karo aur buyer ko WhatsApp pe link bhejo. Thoda extra kaam but works!"
+        }
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "Wix Checkout Pe Trust Badge Kaisa Dikhega?"
+    },
+    {
+      "type": "text",
+      "text": "Jab aap EscaraPay ka SDK code Wix mein add karte ho, checkout page pe automatically ek green badge appear hota hai:"
+    },
+    {
+      "type": "callout",
+      "text": "🛡️ COD Orders Secured by EscaraPay — A small refundable token confirms your order is genuine. Learn more →\n\nYe badge dikhne se buyers ko confidence aata hai ki seller trustworthy hai. Conversion rate bhi improve hoti hai!"
+    },
+    {
+      "type": "heading",
+      "text": "Practical Tips — Wix Sellers Ke Liye"
+    },
+    {
+      "type": "checklist",
+      "items": [
+        "Token amount 10% rakho — na zyada kam (genuine buyers ne pay kar denge), na zyada (buyers bounce na karein)",
+        "Product page pe EscaraPay badge ki mention karo — 'Secured by EscaraPay' text add karo product description mein",
+        "Order confirmation email mein mention karo ki buyer ko token payment request aayegi",
+        "WhatsApp Business pe auto-reply set karo — agar buyer token ke baare mein pooche",
+        "EscaraPay dashboard regularly check karo — pending token orders pe manually buyer ko WhatsApp karo"
+      ]
+    },
+    {
+      "type": "heading",
+      "text": "ROI Calculate Karo — Kya EscaraPay Worth It Hai?"
+    },
+    {
+      "type": "text",
+      "text": "Maan lo tumhara average order value ₹800 hai, month mein 100 COD orders aate hain, aur RTO rate 30% hai. Matlab 30 orders wapas aate hain. Har order pe ₹200 shipping cost = ₹6,000/month RTO loss. EscaraPay se RTO 30% se 10% aa jaaye toh sirf 10 orders return — ₹2,000/month loss. ₹4,000/month savings. EscaraPay commission? 5% of 10% token = practically ₹4-5 per ₹800 order. Ye toh clear winner hai!"
+    },
+    {
+      "type": "text",
+      "text": "Wix pe store hai aur COD orders protect karna chahte ho? Abhi EscaraPay pe free account banao aur apne store ko secure karo. Setup mein 15 minute lagte hain aur pahle mahine se hi fark dikhega!"
+    }
+  ]
+}

@@ -2047,96 +2047,144 @@ function Landing({ onEnter, onTrack, dark, onToggle, lang, onLangToggle }) {
               letterSpacing:"2px",textTransform:"uppercase",marginBottom:14
             }}>ECOMMERCE INTEGRATION</span>
             <h2 className="syne" style={{fontSize:"clamp(24px,3.5vw,42px)",fontWeight:800,marginBottom:14,letterSpacing:"-0.5px"}}>
-              🏪 Apne Online Store ko<br/>EscaraPay se Jodo
+              {lang==="hi"
+                ? <>🏪 अपने ऑनलाइन स्टोर को<br/>EscaraPay से जोड़ें</>
+                : lang==="en"
+                  ? <>🏪 Connect Your Online Store<br/>to EscaraPay</>
+                  : <>🏪 Apne Online Store ko<br/>EscaraPay se Jodo</>}
             </h2>
             <p style={{color:"var(--muted)",fontSize:15,maxWidth:520,margin:"0 auto",lineHeight:1.7}}>
-              Shopify, Wix, WooCommerce, ya koi bhi website — <strong>ek line ka code</strong> add karo aur sab COD orders automatically protect ho jayenge.
+              {lang==="hi"
+                ? <>Shopify, Wix, WooCommerce, या कोई भी वेबसाइट — <strong>एक लाइन का कोड</strong> add करें और सभी COD orders automatically protect होंगे।</>
+                : lang==="en"
+                  ? <>Shopify, Wix, WooCommerce, or any website — add <strong>one line of code</strong> and every COD order gets automatically protected.</>
+                  : <>Shopify, Wix, WooCommerce, ya koi bhi website — <strong>ek line ka code</strong> add karo aur sab COD orders automatically protect ho jayenge.</>}
             </p>
           </div>
 
           {/* How it works — 3 steps */}
-          <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(240px,1fr))",gap:20,marginBottom:48}}>
-            {[
-              { step:"01", icon:"🛒", title:"Buyer COD Order Karta Hai", desc:"Buyer aapke Shopify ya Wix store pe COD select karta hai aur order place karta hai." },
-              { step:"02", icon:"⚡", title:"EscaraPay Auto-Create", desc:"Milliseconds mein order aapke EscaraPay dashboard mein aata hai — koi manual kaam nahi." },
-              { step:"03", icon:"💳", title:"Buyer Token Pay Karta Hai", desc:"Buyer ko turant email aata hai token pay karne ka. Token pay hone ke baad aap dispatch karo." },
-            ].map(s=>(
-              <div key={s.step} className="card" style={{padding:"28px 22px",position:"relative",overflow:"hidden"}}>
-                <div style={{
-                  position:"absolute",top:12,right:16,
-                  fontSize:48,fontWeight:900,color:"rgba(14,165,233,.07)",
-                  fontFamily:"monospace",lineHeight:1,pointerEvents:"none"
-                }}>{s.step}</div>
-                <div style={{fontSize:32,marginBottom:14}}>{s.icon}</div>
-                <div className="syne" style={{fontWeight:700,fontSize:15,marginBottom:8}}>{s.title}</div>
-                <div style={{fontSize:13,color:"var(--muted)",lineHeight:1.7}}>{s.desc}</div>
+          {(()=>{
+            const steps = lang==="hi"
+              ? [
+                  { step:"01", icon:"🛒", title:"Buyer COD Order Karta Hai", desc:"Buyer aapke Shopify ya Wix store pe COD select karta hai aur order place karta hai." },
+                  { step:"02", icon:"⚡", title:"EscaraPay Auto-Create", desc:"Milliseconds mein order aapke EscaraPay dashboard mein aa jaata hai — koi manual kaam nahi." },
+                  { step:"03", icon:"💳", title:"Buyer Token Pay Karta Hai", desc:"Buyer ko turant email aata hai token pay karne ka. Token pay hone ke baad dispatch karo." },
+                ]
+              : lang==="en"
+              ? [
+                  { step:"01", icon:"🛒", title:"Buyer Places COD Order", desc:"Buyer selects COD on your Shopify or Wix store and places the order normally." },
+                  { step:"02", icon:"⚡", title:"EscaraPay Auto-Creates", desc:"In milliseconds, the order appears in your EscaraPay dashboard — zero manual work." },
+                  { step:"03", icon:"💳", title:"Buyer Pays Token", desc:"Buyer instantly receives a token payment email. Dispatch only after token is paid." },
+                ]
+              : [
+                  { step:"01", icon:"🛒", title:"Buyer COD Order Karta Hai", desc:"Buyer aapke Shopify ya Wix store pe COD select karta hai aur order place karta hai." },
+                  { step:"02", icon:"⚡", title:"EscaraPay Auto-Create", desc:"Milliseconds mein order aapke EscaraPay dashboard mein aata hai — koi manual kaam nahi." },
+                  { step:"03", icon:"💳", title:"Buyer Token Pay Karta Hai", desc:"Buyer ko turant email aata hai token pay karne ka. Token pay hone ke baad aap dispatch karo." },
+                ];
+            return (
+              <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(240px,1fr))",gap:20,marginBottom:48}}>
+                {steps.map(s=>(
+                  <div key={s.step} className="card" style={{padding:"28px 22px",position:"relative",overflow:"hidden"}}>
+                    <div style={{position:"absolute",top:12,right:16,fontSize:48,fontWeight:900,color:"rgba(14,165,233,.07)",fontFamily:"monospace",lineHeight:1,pointerEvents:"none"}}>{s.step}</div>
+                    <div style={{fontSize:32,marginBottom:14}}>{s.icon}</div>
+                    <div className="syne" style={{fontWeight:700,fontSize:15,marginBottom:8}}>{s.title}</div>
+                    <div style={{fontSize:13,color:"var(--muted)",lineHeight:1.7}}>{s.desc}</div>
+                  </div>
+                ))}
               </div>
-            ))}
-          </div>
+            );
+          })()}
 
-          {/* Platform badges */}
+          {/* Platform badges + Code */}
           <div style={{
             background:dark?"rgba(255,255,255,.03)":"rgba(14,165,233,.04)",
             border:"1px solid rgba(14,165,233,.15)",
-            borderRadius:16,padding:"28px 24px",marginBottom:40,
+            borderRadius:16,padding:"28px clamp(14px,4vw,24px)",marginBottom:40,
           }}>
             <div style={{textAlign:"center",marginBottom:20}}>
-              <div className="syne" style={{fontWeight:700,fontSize:15,marginBottom:4}}>Works with every platform</div>
-              <div style={{fontSize:13,color:"var(--muted)"}}>Seller ko bas ek line ka code apni site mein add karna hai</div>
+              <div className="syne" style={{fontWeight:700,fontSize:15,marginBottom:4}}>
+                {lang==="en" ? "Works with every platform" : lang==="hi" ? "हर प्लेटफॉर्म के साथ काम करता है" : "Works with every platform"}
+              </div>
+              <div style={{fontSize:13,color:"var(--muted)"}}>
+                {lang==="en"
+                  ? "Seller just adds one line of code to their site"
+                  : lang==="hi"
+                    ? "Seller को बस एक लाइन का code apni site mein add karna hai"
+                    : "Seller ko bas ek line ka code apni site mein add karna hai"}
+              </div>
             </div>
-            <div style={{display:"flex",flexWrap:"wrap",gap:12,justifyContent:"center",marginBottom:20}}>
+            <div style={{display:"flex",flexWrap:"wrap",gap:10,justifyContent:"center",marginBottom:20}}>
               {[
-                {icon:"🛒",name:"Shopify",color:"#5c6ac4"},
-                {icon:"🌐",name:"Wix",color:"#facc15"},
-                {icon:"🔌",name:"WooCommerce",color:"#7f54b3"},
-                {icon:"📄",name:"HTML Sites",color:"#0ea5e9"},
-                {icon:"📦",name:"Custom Stores",color:"#059669"},
-                {icon:"⚡",name:"Any Platform",color:"var(--gold)"},
+                {icon:"🛒",name:"Shopify"},
+                {icon:"🌐",name:"Wix"},
+                {icon:"🔌",name:"WooCommerce"},
+                {icon:"📄",name:"HTML Sites"},
+                {icon:"📦",name:"Custom Stores"},
+                {icon:"⚡",name:"Any Platform"},
               ].map(p=>(
                 <div key={p.name} style={{
                   display:"flex",alignItems:"center",gap:7,
                   background:dark?"rgba(255,255,255,.06)":"#fff",
                   border:"1px solid var(--border)",borderRadius:40,
-                  padding:"6px 14px",fontSize:13,fontWeight:600,
+                  padding:"6px 14px",fontSize:12,fontWeight:600,
                   boxShadow:"0 1px 3px rgba(0,0,0,.06)",
                 }}>
-                  <span style={{fontSize:16}}>{p.icon}</span>
+                  <span style={{fontSize:15}}>{p.icon}</span>
                   <span>{p.name}</span>
                 </div>
               ))}
             </div>
-            {/* Code snippet */}
+
+            {/* ✅ FIXED: Code snippet — responsive with horizontal scroll */}
             <div style={{
-              background:dark?"#0a0a14":"#0c2340",
-              borderRadius:12,padding:"16px 20px",
-              fontFamily:"monospace",fontSize:13,
-              color:"#e2e8f0",lineHeight:1.7,
+              background:"#0c1929",
+              borderRadius:12,
               border:"1px solid rgba(255,255,255,.08)",
+              overflow:"hidden",
             }}>
-              <span style={{color:"rgba(255,255,255,.3)"}}>{"<!-- Sirf ye ek line apni site mein add karo -->"}</span><br/>
-              <span style={{color:"#7dd3fc"}}>&lt;script </span>
-              <span style={{color:"#86efac"}}>src</span>
-              <span style={{color:"#7dd3fc"}}>=</span>
-              <span style={{color:"#fde68a"}}>"https://escarapay.in/sdk/escara.js"</span><br/>
-              <span style={{color:"rgba(255,255,255,.3)",paddingLeft:8}}>{"        "}</span>
-              <span style={{color:"#86efac"}}>data-seller-id</span>
-              <span style={{color:"#7dd3fc"}}>=</span>
-              <span style={{color:"#fde68a"}}>"YOUR_SELLER_ID"</span>
-              <span style={{color:"#7dd3fc"}}>&gt;&lt;/script&gt;</span>
+              {/* Top bar */}
+              <div style={{background:"rgba(255,255,255,.04)",padding:"8px 14px",display:"flex",alignItems:"center",gap:6,borderBottom:"1px solid rgba(255,255,255,.06)"}}>
+                <span style={{width:10,height:10,borderRadius:"50%",background:"#ef4444",display:"inline-block"}}/>
+                <span style={{width:10,height:10,borderRadius:"50%",background:"#f59e0b",display:"inline-block"}}/>
+                <span style={{width:10,height:10,borderRadius:"50%",background:"#22c55e",display:"inline-block"}}/>
+                <span style={{fontSize:11,color:"rgba(255,255,255,.3)",marginLeft:6}}>
+                  {lang==="en" ? "Add this one line to your website" : "Apni website mein ye ek line add karo"}
+                </span>
+              </div>
+              {/* Code — horizontal scroll on mobile */}
+              <div style={{overflowX:"auto",padding:"14px 16px",WebkitOverflowScrolling:"touch"}}>
+                <pre style={{
+                  margin:0,
+                  fontFamily:"'Courier New',Courier,monospace",
+                  fontSize:"clamp(11px,2.5vw,13px)",
+                  color:"#e2e8f0",
+                  lineHeight:1.8,
+                  whiteSpace:"pre",
+                  minWidth:"max-content",
+                }}><span style={{color:"rgba(255,255,255,.3)"}}>{lang==="en"
+                  ? "<!-- Add this ONE line before </body> -->"
+                  : "<!-- Sirf ye ek line </body> se pehle add karo -->"}</span>{"\n"}<span style={{color:"#7dd3fc"}}>&lt;script</span>{" "}<span style={{color:"#86efac"}}>src</span><span style={{color:"#7dd3fc"}}>="</span><span style={{color:"#fde68a"}}>https://escarapay.in/sdk/escara.js</span><span style={{color:"#7dd3fc"}}>"</span>{"\n       "}<span style={{color:"#86efac"}}>data-seller-id</span><span style={{color:"#7dd3fc"}}>="</span><span style={{color:"#fde68a"}}>YOUR_SELLER_ID</span><span style={{color:"#7dd3fc"}}>"&gt;&lt;/script&gt;</span></pre>
+              </div>
             </div>
-            <div style={{textAlign:"center",marginTop:12,fontSize:12,color:"var(--muted)"}}>
-              ✅ Badge automatic dikhega &nbsp;·&nbsp; ✅ COD orders auto-detect honge &nbsp;·&nbsp; ✅ Buyer ko turant email jayega
+
+            <div style={{textAlign:"center",marginTop:12,fontSize:12,color:"var(--muted)",lineHeight:1.8}}>
+              {lang==="en"
+                ? "✅ Badge shown automatically · ✅ COD orders auto-detected · ✅ Buyer email sent instantly"
+                : "✅ Badge automatic dikhega · ✅ COD orders auto-detect honge · ✅ Buyer ko turant email jayega"}
             </div>
           </div>
 
           {/* 2 cards — Social vs Website */}
-          <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(280px,1fr))",gap:16,marginBottom:40}}>
+          <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(260px,1fr))",gap:16,marginBottom:40}}>
             <div className="card" style={{padding:"24px",border:"1px solid rgba(245,158,11,.3)",background:"rgba(245,158,11,.04)"}}>
               <div style={{fontSize:28,marginBottom:10}}>📱</div>
-              <div className="syne" style={{fontWeight:800,fontSize:16,marginBottom:8}}>Social Media Seller</div>
+              <div className="syne" style={{fontWeight:800,fontSize:16,marginBottom:8}}>
+                {lang==="en" ? "Social Media Seller" : "Social Media Seller"}
+              </div>
               <div style={{fontSize:13,color:"var(--muted)",lineHeight:1.8}}>
-                Instagram, WhatsApp, Facebook pe sell karte ho?<br/>
-                <strong>Manual order create karo</strong> seller dashboard se — buyer ko payment link share karo.
+                {lang==="en"
+                  ? <>Selling on Instagram, WhatsApp or Facebook?<br/><strong>Create orders manually</strong> from the seller dashboard and share payment links.</>
+                  : <>Instagram, WhatsApp, Facebook pe sell karte ho?<br/><strong>Manual order create karo</strong> seller dashboard se — buyer ko payment link share karo.</>}
               </div>
               <div style={{marginTop:14,display:"flex",gap:8,flexWrap:"wrap"}}>
                 {["📎 WhatsApp Link","📊 Dashboard","🔔 Auto Reminder"].map(t=>(
@@ -2146,10 +2194,13 @@ function Landing({ onEnter, onTrack, dark, onToggle, lang, onLangToggle }) {
             </div>
             <div className="card" style={{padding:"24px",border:"1px solid rgba(14,165,233,.3)",background:"rgba(14,165,233,.04)"}}>
               <div style={{fontSize:28,marginBottom:10}}>🏪</div>
-              <div className="syne" style={{fontWeight:800,fontSize:16,marginBottom:8}}>Website Store Seller</div>
+              <div className="syne" style={{fontWeight:800,fontSize:16,marginBottom:8}}>
+                {lang==="en" ? "Website Store Seller" : "Website Store Seller"}
+              </div>
               <div style={{fontSize:13,color:"var(--muted)",lineHeight:1.8}}>
-                Shopify, Wix, WooCommerce pe store hai?<br/>
-                <strong>Ek baar setup karo</strong> — har COD order automatically EscaraPay se protect hoga.
+                {lang==="en"
+                  ? <>Have a store on Shopify, Wix or WooCommerce?<br/><strong>Set up once</strong> — every COD order will be automatically protected by EscaraPay.</>
+                  : <>Shopify, Wix, WooCommerce pe store hai?<br/><strong>Ek baar setup karo</strong> — har COD order automatically EscaraPay se protect hoga.</>}
               </div>
               <div style={{marginTop:14,display:"flex",gap:8,flexWrap:"wrap"}}>
                 {["⚡ Auto-Orders","🛡️ Trust Badge","📧 Auto Email"].map(t=>(
@@ -2161,10 +2212,16 @@ function Landing({ onEnter, onTrack, dark, onToggle, lang, onLangToggle }) {
 
           {/* CTA */}
           <div style={{textAlign:"center"}}>
-            <div className="syne" style={{fontWeight:700,fontSize:18,marginBottom:8}}>Apna Store Connect Karo — Free Mein</div>
-            <div style={{color:"var(--muted)",fontSize:13,marginBottom:20}}>Registration ke baad Dashboard → Integration tab mein sab setup guide available hai.</div>
+            <div className="syne" style={{fontWeight:700,fontSize:18,marginBottom:8}}>
+              {lang==="en" ? "Connect Your Store — For Free" : "Apna Store Connect Karo — Free Mein"}
+            </div>
+            <div style={{color:"var(--muted)",fontSize:13,marginBottom:20}}>
+              {lang==="en"
+                ? "After registration, find the complete setup guide in Dashboard → Integration tab."
+                : "Registration ke baad Dashboard → Integration tab mein sab setup guide available hai."}
+            </div>
             <button className="cta-btn" onClick={onEnter} style={{fontSize:15,padding:"14px 36px"}}>
-              🚀 Start for Free
+              🚀 {lang==="en" ? "Start for Free" : "Start for Free"}
             </button>
           </div>
         </div>
