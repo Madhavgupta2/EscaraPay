@@ -1,135 +1,128 @@
 {
   "slug": "how-to-protect-cod-orders-shopify-india-2026",
-  "title": "Shopify Store Ke COD Orders Kaise Protect Karein — EscaraPay Integration Guide 2026",
+  "title": "How to Protect COD Orders on Shopify India — EscaraPay Integration Guide 2026",
   "date": "July 28, 2026",
   "readTime": "8 min read",
   "category": "Ecommerce Integration",
   "categoryColor": "#5c6ac4",
-  "excerpt": "Shopify store pe COD orders se RTO loss ho raha hai? EscaraPay ka one-line integration lagao — har COD order automatically protect hoga, fake buyers automatically filter honge.",
-  "metaDescription": "Shopify store ke COD orders protect karne ka step-by-step guide. EscaraPay se integrate karo, RTO loss khatam karo, aur har genuine buyer ko auto-verify karo. Free setup 2026.",
+  "excerpt": "Getting too many fake COD orders on your Shopify store? Set up EscaraPay in 15 minutes — every COD order gets automatically protected and fake buyers are filtered out before you dispatch.",
+  "metaDescription": "Step-by-step guide to protect Shopify COD orders with EscaraPay. Stop RTO losses, filter fake buyers, and auto-verify every customer. Free setup for Indian sellers 2026.",
   "coverImage": "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=1200&q=80",
   "content": [
     {
       "type": "intro",
-      "text": "Agar aap Shopify pe sell karte hain aur COD orders mein 30-40% RTO se pareshan hain — to ye blog specifically aapke liye likha gaya hai. EscaraPay ko Shopify se connect karo aur fake COD orders hamesha ke liye band karo."
+      "text": "If you are selling on Shopify India and losing 30-40% of your revenue to COD returns and fake orders — this guide is written specifically for you. Connect EscaraPay to your Shopify store in 15 minutes and stop fake COD orders permanently."
     },
     {
       "type": "heading",
-      "text": "Shopify COD ka Sabse Bada Problem — Fake Orders"
+      "text": "The Biggest Problem with Shopify COD — Fake Orders"
     },
     {
       "type": "text",
-      "text": "Shopify India mein ek powerful platform hai — lakhs of sellers apna business chalate hain ispe. Lekin ek badi problem hai jo har Shopify seller face karta hai: COD (Cash on Delivery) orders mein fake aur fraudulent orders. Buyer order karta hai, aap dispatch karte ho, parcel deliver nahi hota — aur tumhara product, shipping cost, aur time sab waste."
+      "text": "Shopify is a powerful platform for Indian sellers. But one problem affects every Shopify seller using COD: fake and fraudulent orders. A buyer places an order, you dispatch the product, and then it comes back — wasting your product cost, shipping charges, and valuable time."
     },
     {
       "type": "list",
       "items": [
         {
           "title": "RTO (Return to Origin) Loss",
-          "desc": "Buyer order karta hai COD se, delivery ke time mein receive nahi karta ya phone nahi uthata. Product wapas aata hai — aap ne double shipping aur product cost dono gayi."
+          "desc": "Buyer places a COD order but refuses delivery or does not answer the phone. The product comes back and you lose double the shipping cost plus your margin."
         },
         {
           "title": "Fake Address Orders",
-          "desc": "Kai buyers galat address dalte hain — order kabhi deliver hi nahi ho sakta. Aap ko pata hi nahi chalta jab tak courier wapas na aaye."
+          "desc": "Many buyers enter incomplete or wrong addresses. Delivery fails before it even reaches them, and the courier returns the package — charging you both ways."
         },
         {
           "title": "Impulse Orders",
-          "desc": "COD mein buyer ko kuch pay nahi karna padta upfront — isliye woh impulsively order kar leta hai aur baad mein cancel. Ye aapke conversion rate aur inventory dono harm karta hai."
+          "desc": "COD requires no upfront payment, so buyers order impulsively and cancel later. This blocks your inventory and kills your conversion metrics."
         }
       ]
     },
     {
       "type": "heading",
-      "text": "EscaraPay Solution — Token-Based COD Protection"
+      "text": "How EscaraPay Solves This — Token Before Dispatch"
     },
     {
       "type": "text",
-      "text": "EscaraPay ek token-based payment protection system hai. Jab buyer COD order place karta hai, EscaraPay automatically buyer se ek chhota sa token amount collect karta hai (order value ka 10%). Ye token ek confirmation hai ki buyer genuine hai aur order receive karne ke liye serious hai. Token pay karne ke baad hi aap dispatch karo — isse fake orders automatically filter ho jaate hain."
+      "text": "EscaraPay uses a token-based payment system. When a buyer places a COD order, EscaraPay automatically collects a small token amount (10% of the order value) from the buyer before you dispatch. This token acts as proof that the buyer is genuine and serious about receiving their order. Only buyers who pay the token get their order dispatched."
     },
     {
       "type": "callout",
-      "text": "🛡️ Token kitna hoga? Default 10% hai — ₹1000 ke order pe sirf ₹100. Ye itna kam hai ki genuine buyer ke liye koi dikkat nahi, lekin fake/fraud buyer ke liye enough deterrent hai."
+      "text": "How much is the token? The default is 10% — just Rs 100 on a Rs 1,000 order. This amount is low enough that genuine buyers pay it instantly, but high enough to filter out fake and impulsive buyers completely."
     },
     {
       "type": "heading",
-      "text": "Shopify se EscaraPay Integrate Karna — Step by Step"
-    },
-    {
-      "type": "text",
-      "text": "EscaraPay ka Shopify integration bahut simple hai. Sirf ek baar setup karna hai — phir sab automatic hoga. Niche poora process detail mein explain kiya gaya hai:"
+      "text": "Step-by-Step: Connect Shopify to EscaraPay"
     },
     {
       "type": "list",
       "items": [
         {
-          "title": "Step 1 — EscaraPay pe Seller Account Banao",
-          "desc": "escarapay.in pe jao → Register as Seller → PAN/GST details bharo → Shop name add karo → Account ready!"
+          "title": "Step 1 — Create Your EscaraPay Seller Account",
+          "desc": "Visit escarapay.in, click Register as Seller, fill in your PAN or GST details, add your shop name, and your account is ready. It is completely free."
         },
         {
-          "title": "Step 2 — API Key Generate Karo",
-          "desc": "Seller Dashboard → Integration tab (🔗) → 'Generate API Key' button dabao → Ek unique key milegi jaise: ep_live_abc123xyz... → Isko copy karke safe jagah save karo."
+          "title": "Step 2 — Generate Your API Key",
+          "desc": "Go to Seller Dashboard, click the Integration tab, then click Generate API Key. You will receive a unique key like ep_live_abc123. Copy and save it in a secure place."
         },
         {
-          "title": "Step 3 — Shopify Webhook Setup Karo",
-          "desc": "Shopify Admin → Settings → Notifications → Webhooks section → 'Create webhook' → Event: Order creation → Format: JSON → URL: apni EscaraPay Integration tab se copy karo (key already embedded hogi) → Save."
+          "title": "Step 3 — Set Up the Shopify Webhook",
+          "desc": "In Shopify Admin, go to Settings, then Notifications, scroll down to Webhooks, and click Create Webhook. Set Event to Order Creation, Format to JSON, and paste the Webhook URL from your EscaraPay Integration tab. Save."
         },
         {
-          "title": "Step 4 — Trust Badge Add Karo (Optional but Recommended)",
-          "desc": "Shopify Admin → Online Store → Themes → Edit Code → theme.liquid → </body> tag se pehle paste karo: <script src='https://escarapay.in/sdk/escara.js' data-seller-id='TUMHARA_ID'></script> → Save."
+          "title": "Step 4 — Add the Trust Badge (Recommended)",
+          "desc": "In Shopify Admin, go to Online Store, then Themes, click Edit Code, open theme.liquid, and paste this line before the closing body tag: script src='https://escarapay.in/sdk/escara.js' data-seller-id='YOUR_ID'. Save."
         },
         {
-          "title": "Step 5 — Test Order Place Karo",
-          "desc": "Apne Shopify store pe ek test COD order place karo → EscaraPay dashboard mein order dikhai dega → Buyer ke email pe token payment link jayega. Setup complete!"
+          "title": "Step 5 — Place a Test Order",
+          "desc": "Place a test COD order on your Shopify store. Check your EscaraPay dashboard — the order should appear. The buyer's email should receive a token payment link. Setup is complete."
         }
       ]
     },
     {
       "type": "heading",
-      "text": "Setup Ke Baad Kya Hoga — Full Flow"
-    },
-    {
-      "type": "text",
-      "text": "Ek baar Shopify-EscaraPay integration setup ho jaaye, phir ye sab automatic hoga bina kisi extra kaam ke:"
+      "text": "What Happens After Integration — The Complete Flow"
     },
     {
       "type": "checklist",
       "items": [
-        "Buyer Shopify pe COD order place karta hai",
-        "Shopify automatically EscaraPay ko order details bhejta hai",
-        "EscaraPay turant buyer ke email pe token payment link bhejta hai",
-        "Order tumhare EscaraPay seller dashboard mein 'Pending Token' status mein dikhai deta hai",
-        "Buyer token pay karta hai → status 'Token Paid' ho jaata hai",
-        "Tum dispatch karo → buyer ko delivery confirmation link milta hai",
-        "Buyer delivery confirm kare → payment tumhare UPI pe aa jaata hai",
-        "Agar buyer 14 din mein kuch na kare → payment automatically tumhe release ho jaata hai"
+        "Buyer places a COD order on your Shopify store",
+        "Shopify automatically sends the order details to EscaraPay",
+        "EscaraPay instantly emails the buyer a token payment link",
+        "Order appears in your EscaraPay dashboard with status Pending Token",
+        "Buyer pays the token — status changes to Token Paid",
+        "You dispatch the order from Shopify",
+        "EscaraPay sends the buyer a delivery confirmation link",
+        "Buyer confirms delivery — payment is released to your UPI",
+        "If buyer takes no action within 14 days — payment auto-releases to you"
       ]
     },
     {
       "type": "heading",
-      "text": "Prepaid Orders Ka Kya Hoga?"
+      "text": "What About Prepaid Shopify Orders?"
     },
     {
       "type": "callout",
-      "text": "✅ Prepaid orders completely skip hote hain — EscaraPay sirf COD orders pe kaam karta hai. Razorpay, PayTM, UPI se aaye orders pe koi token nahi lagega. System automatically detect karta hai."
+      "text": "Prepaid orders are completely skipped — EscaraPay only processes COD orders. Orders paid via Razorpay, PayTM, or UPI are automatically ignored. No extra setup needed."
     },
     {
       "type": "heading",
-      "text": "Real Results — Shopify Sellers Ko Kitna Faida?"
+      "text": "Real Results — What Shopify Sellers Experience"
     },
     {
       "type": "list",
       "items": [
         {
-          "title": "RTO Rate mein 60-70% Reduction",
-          "desc": "Token pay karne wala buyer genuine hota hai — woh order cancel nahi karta. Fake buyers naturally filter ho jaate hain kyunki woh token pay nahi karte."
+          "title": "60-70% Reduction in RTO Rate",
+          "desc": "Buyers who pay a token are genuine. They have already committed to receiving the order. Fake and impulsive buyers naturally filter themselves out."
         },
         {
-          "title": "Cash Flow Better Hota Hai",
-          "desc": "Token collect ho jaata hai before dispatch — agar delivery fail bhi ho toh partial recovery hoti hai."
+          "title": "Better Cash Flow",
+          "desc": "Token is collected before dispatch. Even if delivery fails for any reason, you have partial recovery and proof of buyer commitment."
         },
         {
-          "title": "Zero Extra Work",
-          "desc": "Ek baar setup ke baad kuch karna nahi — sab automatic. Dashboard pe sirf 'Token Paid' orders dispatch karo."
+          "title": "Zero Extra Work After Setup",
+          "desc": "Once configured, everything runs automatically. Just check your dashboard for Token Paid orders and dispatch with confidence."
         }
       ]
     },
@@ -141,26 +134,26 @@
       "type": "list",
       "items": [
         {
-          "title": "Kya EscaraPay Shopify ke saath officially compatible hai?",
-          "desc": "Haan! EscaraPay Shopify webhooks use karta hai jo Shopify ka official feature hai. Kisi bhi third-party app ki zarurat nahi hai."
+          "title": "Is EscaraPay officially compatible with Shopify?",
+          "desc": "Yes. EscaraPay uses Shopify Webhooks, which is an official Shopify feature. No third-party app installation is required."
         },
         {
-          "title": "Integration mein kitna time lagega?",
-          "desc": "15-20 minute mein poora setup complete ho jaata hai. Koi coding knowledge ki zarurat nahi."
+          "title": "How long does the setup take?",
+          "desc": "The complete setup takes 15 to 20 minutes. No coding knowledge is required."
         },
         {
-          "title": "Buyer ko EscaraPay ke baare mein pata hoga?",
-          "desc": "Haan — payment page pe 'Powered by EscaraPay' aur 'Secured by EscaraPay' badge dikhega. Isse buyer ko trust aata hai."
+          "title": "Will buyers know about EscaraPay?",
+          "desc": "Yes. The payment page shows Powered by EscaraPay and the checkout page shows a trust badge. This actually increases buyer confidence."
         },
         {
-          "title": "Commission kitna lagta hai?",
-          "desc": "EscaraPay 5% commission leti hai successful delivery pe. Gateway fee ~2% alag hoti hai jo buyer pay karta hai."
+          "title": "What commission does EscaraPay charge?",
+          "desc": "EscaraPay charges 5% commission on successful delivery. The payment gateway fee of approximately 2% is charged to the buyer."
         }
       ]
     },
     {
       "type": "text",
-      "text": "Shopify India mein ek powerful platform hai, aur EscaraPay ke saath integrate karne ke baad tumhara COD business much more profitable ban jaata hai. Fake orders ka darr khatam, RTO loss reduced, aur genuine buyers ke saath genuine business. Aaj hi setup karo — free hai!"
+      "text": "Shopify combined with EscaraPay makes your COD business significantly more profitable. No more fear of fake orders, reduced RTO loss, and only genuine buyers in your pipeline. Set it up today — it is free to start!"
     }
   ]
 }
