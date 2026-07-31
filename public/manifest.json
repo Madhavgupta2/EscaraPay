@@ -1,7 +1,7 @@
 {
   "short_name": "EscaraPay",
-  "name": "Escara Pay | India's Trusted Payment Protection Platform",
-  "description": "Secure token-based payment protection for WhatsApp & Instagram sellers. Stop RTO losses and prevent fraud.",
+  "name": "EscaraPay | COD Protection for Shopify, Wix & WhatsApp Sellers India",
+  "description": "Token-based COD payment protection for Shopify, Wix, WooCommerce, WhatsApp and Instagram sellers in India. Stop RTO losses and prevent COD fraud automatically.",
   "icons": [
     {
       "src": "favicon.ico",
@@ -11,16 +11,22 @@
     {
       "src": "android-chrome-192x192.png",
       "type": "image/png",
-      "sizes": "192x192"
+      "sizes": "192x192",
+      "purpose": "any maskable"
     },
     {
       "src": "android-chrome-512x512.png",
       "type": "image/png",
-      "sizes": "512x512"
+      "sizes": "512x512",
+      "purpose": "any maskable"
     }
   ],
   "start_url": ".",
   "display": "standalone",
   "theme_color": "#24A1E2",
-  "background_color": "#0B0E14"
+  "background_color": "#0B0E14",
+  "categories": ["finance", "shopping", "business"],
+  "lang": "en-IN",
+  "dir": "ltr",
+  "orientation": "portrait"
 }
