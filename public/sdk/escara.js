@@ -1,22 +1,24 @@
 /**
- * EscaraPay Checkout SDK v1.0
+ * EscaraPay Checkout SDK v1.1
  * https://escarapay.in
  *
  * Usage:
  * <script src="https://escarapay.in/sdk/escara.js"
  *         data-seller-id="YOUR_SELLER_ID">
  * </script>
- *
- * What this does:
- * 1. Injects "Secured by EscaraPay" trust badge near checkout
- * 2. Detects COD order placement
- * 3. Sends order data to EscaraPay automatically
  */
+
+// ✅ BUG FIX 1: Capture currentScript BEFORE IIFE
+// document.currentScript becomes null after script executes
+// so we capture it here at module level (works sync + some async loaders)
+var _escaraScript = document.currentScript ||
+  document.querySelector('script[data-seller-id]');
+
 (function () {
   "use strict";
 
   /* ── Config ── */
-  const SELLER_ID   = (document.currentScript || {}).getAttribute("data-seller-id") || "";
+  const SELLER_ID   = (_escaraScript || {}).getAttribute("data-seller-id") || "";
   const ESCARA_API  = "https://escarapay-backend.onrender.com";
   const ESCARA_SITE = "https://escarapay.in";
 
@@ -161,13 +163,23 @@
       const v = parseFloat(el.getAttribute("data-total") || el.getAttribute("data-order-total") || el.getAttribute("data-cart-total"));
       if (v > 0) return v;
     }
-    /* Try common text selectors */
+    /* ✅ BUG FIX 4: Added Wix-specific + Shopify + more selectors */
     const amtSelectors = [
+      // Wix specific
+      "[data-hook='product-price']", "[data-hook='price-range-from']",
+      ".total-price", ".cart-total-price",
+      "[class*='totalPrice']", "[class*='total-price']",
+      // WooCommerce
       ".order-total .amount", ".cart_totals .order-total td",
-      ".woocommerce-Price-amount", ".total-amount",
-      "[data-testid='total-price']", ".order-summary__total-recap",
-      ".payment-due__price", "#order-total",
-      ".checkout-summary-total", ".cart-total",
+      ".woocommerce-Price-amount",
+      // Generic
+      ".total-amount", "[data-testid='total-price']",
+      ".order-summary__total-recap", ".payment-due__price",
+      "#order-total", ".checkout-summary-total",
+      ".cart-total", ".grand-total",
+      // Shopify
+      "[data-checkout-subtotal-price-target]",
+      ".order-summary__total .total-line__price",
     ];
     for (const sel of amtSelectors) {
       const el = document.querySelector(sel);
@@ -224,6 +236,23 @@
       if ((txt.includes("cash on delivery") || txt.includes("cod")) &&
           label.classList.toString().toLowerCase().includes("selected")) {
         return true;
+      }
+    }
+
+    // ✅ BUG FIX 3: Single-payment-method stores (Wix/custom with only COD)
+    // Many small stores only have COD — no radio buttons at all
+    // If NO payment inputs exist AND page/title has COD text → assume COD
+    if (paymentInputs.length === 0) {
+      const bodyText = (document.body.innerText || "").toLowerCase();
+      const hasCODText = bodyText.includes("cash on delivery") || bodyText.includes("cod");
+      if (hasCODText) {
+        const url = window.location.href.toLowerCase();
+        const title = document.title.toLowerCase();
+        const isCheckoutPage =
+          url.includes("checkout") || url.includes("order") || url.includes("cart") ||
+          title.includes("checkout") || title.includes("order") ||
+          !!document.querySelector("form[action*='order'], form[action*='checkout'], button[type='submit']");
+        if (isCheckoutPage) return true;
       }
     }
 
